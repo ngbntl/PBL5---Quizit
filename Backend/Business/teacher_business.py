@@ -1,7 +1,7 @@
-from Model.db_model import Teacher
-from DataAccess.teacher_DA import teacher_DA
+from ..Model.db_model import Teacher
+from ..DataAccess.teacher_DA import teacher_DA
 from . import bcrypt_context
-from Model.request_model import Req_Teacher
+from ..Model.request_model import Req_Teacher
 
 
 

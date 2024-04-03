@@ -1,11 +1,11 @@
 from fastapi import APIRouter, HTTPException, Depends, Body
 from starlette import status
-from Model.db_model import Teacher
-from Business.authenticate_bussiness import get_current_user
+from ..Model.db_model import Teacher
+from ..Business.authenticate_bussiness import get_current_user
 from typing import Annotated
-from Business.student_business import student_bussiness
-from Model.request_model import Req_Student
-from Model.response_model import Res_Student
+from ..Business.student_business import student_bussiness
+from ..Model.request_model import Req_Student
+from ..Model.response_model import Res_Student
 
 student_router = APIRouter(prefix='/student', tags=['student'])
 

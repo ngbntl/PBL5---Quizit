@@ -1,5 +1,5 @@
 from . import get_database
-from Model.db_model import Teacher
+from ..Model.db_model import Teacher
 
 
 class teacher_DA:
@@ -19,8 +19,7 @@ class teacher_DA:
                 return Teacher(row)
             return None
 
-    def insert_teacher(self, email: str, hash_pswd: str, name: str) -> str:
+    def insert_teacher(self, email: str, hash_pswd: str, name: str):
         with get_database(True) as cursor:
             cursor.execute("INSERT INTO [teacher]([email], [hash_pswd], [name])  VALUES (%s, %s, %s)",
                            (email, hash_pswd, name))
-            return cursor.lastrowid

@@ -2,11 +2,11 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from starlette import status
-from Business.authenticate_bussiness import create_access_token
-from Business.teacher_business import teacher_bussiness
-from Business.student_business import student_bussiness
-from Model.response_model import Res_Token
-from Model.db_model import Teacher, Student
+from ..Business.authenticate_bussiness import create_access_token
+from ..Business.teacher_business import teacher_bussiness
+from ..Business.student_business import student_bussiness
+from ..Model.response_model import Res_Token
+from ..Model.db_model import Teacher, Student
 
 auth_router = APIRouter(prefix='/auth', tags=['auth'])
 

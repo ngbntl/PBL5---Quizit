@@ -1,6 +1,6 @@
-from Model.response_model import Res_Collection
-from DataAccess.collection_DA import collection_DA
-from Model.request_model import Req_Collection
+from ..Model.response_model import Res_Collection
+from ..DataAccess.collection_DA import collection_DA
+from ..Model.request_model import Req_Collection
 
 
 class collection_business:

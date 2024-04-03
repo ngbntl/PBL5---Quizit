@@ -67,7 +67,7 @@ create table [group] (
 create table [group_student] (
 	[group_id]          char(8) not null,
 	[student_id]        char(8) not null,
-	[is_join]           bit     default 1,
+	[is_join]           bit     default 0,
 	[request_timestamp] datetime       default getdate(),
 	-- constraint
 	constraint [pk_grstu] primary key ([group_id], [student_id]),

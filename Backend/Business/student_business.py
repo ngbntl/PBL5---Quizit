@@ -1,6 +1,6 @@
-from Model.db_model import Student
-from Model.request_model import Req_Student
-from DataAccess.student_DA import student_DA
+from ..Model.db_model import Student
+from ..Model.request_model import Req_Student
+from ..DataAccess.student_DA import student_DA
 from . import bcrypt_context
 
 

@@ -1,11 +1,11 @@
 from fastapi import APIRouter, HTTPException, Depends, Body
 from starlette import status
-from Model.db_model import Teacher
-from Business.authenticate_bussiness import get_current_user
+from ..Model.db_model import Teacher
+from ..Business.authenticate_bussiness import get_current_user
 from typing import Annotated
-from Business.teacher_business import teacher_bussiness
-from Model.request_model import Req_Teacher
-from Model.response_model import Res_Teacher
+from ..Business.teacher_business import teacher_bussiness
+from ..Model.request_model import Req_Teacher
+from ..Model.response_model import Res_Teacher
 from .collection_router import collection_router
 from .teacher_group_router import teacher_group_router
 
