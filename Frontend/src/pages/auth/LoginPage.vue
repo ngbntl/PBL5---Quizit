@@ -1,5 +1,6 @@
 <template>
     trang login
+    <router-view />
 </template>
 
 <script>

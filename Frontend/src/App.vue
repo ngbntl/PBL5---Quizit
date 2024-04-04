@@ -3,7 +3,7 @@ import HelloWorld from './components/HelloWorld.vue'
 </script>
 
 <template>
-  oh
+  ccc
   <router-view />
 </template>
 
