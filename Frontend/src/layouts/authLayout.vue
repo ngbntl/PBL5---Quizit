@@ -1,14 +1,22 @@
 <template>
-    <Header />
-    <router-view />
+    <div class="">
+        <Header class="fixed z-50 bg-white" />
+
+        <HomePage class="" />
+    </div>
+
+
+
 </template>
 
 <script>
 import Header from '../components/Header.vue';
+import HomePage from '../pages/HomePage.vue';
 export default {
-    components: { Header }
+    components: { Header, HomePage }
 }
 </script>
+
 
 <style>
 
