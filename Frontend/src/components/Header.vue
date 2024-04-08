@@ -13,12 +13,14 @@
             <button
                 class="bg-transparent border border-gray-400 p-2 rounded text-gray-500 hover:bg-blue-600 hover:text-white">
                 <router-link to="/login">Đăng nhập</router-link>
+
             </button>
             <button class="bg-blue-500 text-white  px-4 py-2 rounded hover:bg-blue-700">
                 <router-link to="/register">Đăng ký</router-link>
             </button>
         </div>
     </div>
+
 </template>
 
 <script>

@@ -1,11 +1,9 @@
 <template>
     <div class="">
         <Header class="fixed z-50 bg-white" />
-
         <HomePage class="" />
     </div>
-
-
+    <router-view />
 
 </template>
 
