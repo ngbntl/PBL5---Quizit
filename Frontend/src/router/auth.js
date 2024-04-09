@@ -12,6 +12,15 @@ const auth = [
       requiresAuth: false,
     },
   },
+  {
+    path: "/register",
+    name: "register",
+    component: () => import("../pages/auth/RegisterPage.vue"),
+    meta: {
+      title: "Login",
+      requiresAuth: false,
+    },
+  },
 ];
 
 export default auth;

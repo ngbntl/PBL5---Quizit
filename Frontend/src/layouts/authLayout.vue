@@ -3,8 +3,8 @@
         <Header class="fixed z-50 bg-white" />
         <HomePage class="" />
     </div>
-    <router-view />
 
+    <router-view />
 </template>
 
 <script>

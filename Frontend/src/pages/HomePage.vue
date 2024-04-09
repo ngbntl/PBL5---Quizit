@@ -13,6 +13,7 @@
             <img src="https://www.ifse.ca/wp-content/uploads/2023/07/man-3653346-scaled-2.jpg" alt="">
         </div>
     </div>
+
 </template>
 
 <script>
