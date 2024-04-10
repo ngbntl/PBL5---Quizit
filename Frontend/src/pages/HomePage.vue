@@ -13,12 +13,13 @@
             <img src="https://www.ifse.ca/wp-content/uploads/2023/07/man-3653346-scaled-2.jpg" alt="">
         </div>
     </div>
-
+    <Footer />
 </template>
 
 <script>
+import Footer from '../components/Footer.vue';
 export default {
-
+    components: { Footer }
 }
 </script>
 

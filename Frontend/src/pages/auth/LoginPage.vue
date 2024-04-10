@@ -1,7 +1,7 @@
 <template>
     <div class="w-screen">
         <Header class="fixed z-50 bg-white" />
-        <h1 class="mt-24 mx-24 text-4xl font-bold">Chào mừng bạn đến với Quizit</h1>
+        <h1 class="mt-24 mx-24 text-4xl font-bold">Đăng nhập để bắt đầu</h1>
         <div class="grid grid-cols-2 gap-4 m-10 mt-20 ml-24 h-full w-full">
             <div class="img w-2/3 ml-24 rounded-md shadow-lg">
                 <img src="/src/assets/img/Exams-bro.png" alt="" />
@@ -21,9 +21,11 @@
                     </p>
                 </div>
                 <div class="mb-4">
-                    <input type="password" v-model="password" @blur="validatePassword"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
-                        placeholder="Mật khẩu" />
+                    <input type="password" v-model="password" @blur="validatePassword" :class="`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500focus:outline-none ${
+              passwordError
+                ? 'border-red-500'
+                : 'border-gray-300 focus:border-blue-500'
+            }`" placeholder="Mật khẩu" />
                     <p v-if="passwordError" class="text-red-500 text-sm p-1">
                         {{ passwordError }}
                     </p>

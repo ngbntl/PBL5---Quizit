@@ -1,47 +1,56 @@
 <template>
-
     <div class="regis grid grid-cols-2 m-10 h-full">
         <Header />
         <div class="img w-2/3 bg-white m-28 shadow-md">
             <img src="/src/assets/img/register.png" alt="" />
         </div>
         <div class="form my-28 mx-12 bg-white shadow-md p-12 w-2/3">
-            <h2 class="text-3xl font-bold text-center my-14">Đăng ký tài khoản</h2>
+            <h2 class="text-3xl font-bold text-center mb-12">Đăng ký tài khoản</h2>
+
             <div class="mb-4">
-                <input type="email" v-model="email" :class="`w-full px-3 py-2 border rounded-md focus:outline-none ${
-            emailError
+                <input type="email" v-model="name" @blur="validateName" :class="`w-full px-3 py-2 border rounded-md focus:outline-none ${
+            nameError
               ? 'border-red-500'
               : 'border-gray-300 focus:border-blue-500'
-          }`" placeholder="Họ" />
+          }`" placeholder="Họ và tên" />
+                <p v-if="nameError" class="text-red-500 text-sm p-1">
+                    {{ nameError }}
+                </p>
             </div>
             <div class="mb-4">
-                <input type="email" v-model="email" :class="`w-full px-3 py-2 border rounded-md focus:outline-none ${
-            emailError
+                <input type="text" v-model="phone" @blur="validatePhone" :class="`w-full px-3 py-2 border rounded-md focus:outline-none ${
+            phoneError
               ? 'border-red-500'
               : 'border-gray-300 focus:border-blue-500'
-          }`" placeholder="Tên" />
+          }`" placeholder="Điện thoại" />
+                <p v-if="phoneError" class="text-red-500 text-sm p-1">
+                    {{ phoneError }}
+                </p>
             </div>
             <div class="mb-4">
-                <input type="email" v-model="email" :class="`w-full px-3 py-2 border rounded-md focus:outline-none ${
+                <input type="email" v-model="email" @blur="validateEmail" :class="`w-full px-3 py-2 border rounded-md focus:outline-none ${
             emailError
               ? 'border-red-500'
               : 'border-gray-300 focus:border-blue-500'
           }`" placeholder="Email" />
+                <p v-if="emailError" class="text-red-500 text-sm p-1">
+                    {{ emailError }}
+                </p>
             </div>
+
             <div class="mb-4">
                 <select name="role" id=""
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 text-gray-500">
-                    <option value="student">Học sinh</option>
-                    <option value="teacher">Giáo viên</option>
+                    <option value="student" class="p-4">Học sinh</option>
+                    <option value="teacher" class="p-4">Giáo viên</option>
                 </select>
             </div>
 
             <div class="mb-4">
-                <input type="password" v-model="password"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
-                    placeholder="Mật khẩu" />
-
-
+                <input :type="showPassword ? 'text' : 'password'" v-model="password" @blur="validatePassword" :class="`w-full px-3 py-2 border rounded-md focus:outline-none ${
+        passwordError ? 'border-red-500' : 'border-gray-300 focus:border-blue-500'
+      }`" placeholder="Mật khẩu" />
+                <p v-if="passwordError" class="text-red-500 text-sm p-1">{{ passwordError }}</p>
                 <button class="absolute right-4 top-4 focus:outline-none" @click="togglePasswordVisibility">
                     <svg v-if="showPassword" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400"
                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -51,7 +60,6 @@
 
                 </button>
             </div>
-
             <button @click="validateForm"
                 class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 Đăng ký
@@ -67,10 +75,77 @@
 
 <script>
 import Header from "../../components/Header.vue";
-
 export default {
     components: { Header },
+    data() {
+        return {
+            name: "",
+            phone: "",
+            email: "",
+            password: "",
+            nameError: "",
+            phoneError: "",
+            emailError: "",
+            passwordError: "",
+        };
+    },
+    methods: {
+        validateForm() {
+            this.validateEmail();
+            this.validatePassword();
+            this.validateName();
+            this.validatePhone();
+            if (
+                this.emailError ||
+                this.passwordError ||
+                this.nameError ||
+                this.phoneError
+            ) {
+                return;
+            }
+            this.submitForm();
+        },
+        validateName() {
+            if (this.name === "") {
+                this.nameError = "Vui lòng nhập họ và tên.";
+            } else {
+                this.nameError = "";
+            }
+        },
+        validatePhone() {
+            if (this.phone === "") {
+                this.phoneError = "Vui lòng nhập số điện thoại.";
+            } else if (!/((09|03|07|08|05)+([0-9]{8})\b)/g.test(this.phone)) {
+                this.phoneError = "Số điện thoại không hợp lệ.";
+            } else {
+                this.phoneError = "";
+            }
+        },
+        validateEmail() {
+            if (this.email === "") {
+                this.emailError = "Vui lòng nhập email.";
+            } else if (!/\S+@\S+\.\S+/.test(this.email)) {
+                this.emailError = "Định dạng email không hợp lệ.";
+            } else {
+                this.emailError = "";
+            }
+        },
+        validatePassword() {
+            if (this.password === "") {
+                this.passwordError = "Vui lòng nhập mật khẩu.";
+            } else if (this.password.length < 6) {
+                this.passwordError = "Mật khẩu phải có ít nhất 6 ký tự.";
+            } else {
+                this.passwordError = "";
+            }
+        },
+        submitForm() { },
+    },
 };
 </script>
 
-<style></style>
+<style>
+.w-screen {
+  overflow-x: hidden;
+}
+</style>
