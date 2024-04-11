@@ -72,6 +72,8 @@ export default {
         };
     },
     methods: {
+
+
         validateForm() {
             this.validateEmail();
             this.validatePassword();
@@ -79,6 +81,8 @@ export default {
                 return;
             }
             this.submitForm();
+            this.$router.push('/student/schedule');
+
         },
         validateEmail() {
             if (this.email === "") {

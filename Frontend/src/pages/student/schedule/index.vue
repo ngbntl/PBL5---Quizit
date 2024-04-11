@@ -1,5 +1,6 @@
 <template>
-
+    <h1>adsf</h1>
+    <router-view />
 </template>
 
 <script>
