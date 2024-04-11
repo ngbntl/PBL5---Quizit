@@ -1,31 +1,79 @@
-from fastapi import APIRouter, HTTPException, Depends, Body
+from fastapi import APIRouter, HTTPException, Depends, Body, File, UploadFile
 from starlette import status
-from ..Model.db_model import Teacher
-from ..Business.authenticate_bussiness import get_current_user
 from typing import Annotated
-from ..Business.teacher_business import teacher_bussiness
-from ..Model.request_model import Req_Teacher
-from ..Model.response_model import Res_Teacher
-from .collection_router import collection_router
-from .teacher_group_router import teacher_group_router
+
+from Backend.Model.db_model import Teacher
+from Backend.Model.request_model import Req_Teacher
+from Backend.Model.response_model import Res_Teacher
+from Backend.Business.authenticate_bussiness import get_current_user
+from Backend.Business.teacher_business import teacher_bussiness
+from Backend.Router.collection_router import collection_router
+from Backend.Router.group_router import teacher_group_router
 
 teacher_router = APIRouter(prefix='/teacher', tags=['teacher'])
 teacher_router.include_router(collection_router)
 teacher_router.include_router(teacher_group_router)
 
 
-@teacher_router.get('/', status_code=status.HTTP_200_OK)
-async def get_teacher(teacher: Annotated[Teacher, Depends(get_current_user)]):
-    if teacher is None or not isinstance(teacher, Teacher):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Authentication Failed')
-
-    return Res_Teacher.model_dump(teacher_bussiness().get_teacher_by_id(teacher.id))
-    # return Res_Teacher(**vars(teacher_bussiness().get_teacher_by_id(teacher.id)))
-
-
 @teacher_router.post('/sign_up', status_code=status.HTTP_201_CREATED)
-async def sign_up(data: Annotated[Req_Teacher, Body(...)], teacher_service: Annotated[teacher_bussiness, Depends()]):
+async def sign_up(data: Annotated[Req_Teacher, Body(...)],
+                  teacher_service: Annotated[teacher_bussiness, Depends()]):
+    """
+    Sign up teacher
+    :param data:
+    :param teacher_service:
+    :return:
+    """
     try:
-        teacher_service.sign_up(data)
-    except:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Email is already existed!")
+        return teacher_service.sign_up(data)
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+
+
+@teacher_router.get('/', status_code=status.HTTP_200_OK, response_model=Res_Teacher, response_model_exclude_unset=True)
+async def get_teacher(teacher: Annotated[Teacher, Depends(get_current_user)],
+                      teacher_service: Annotated[teacher_bussiness, Depends()]):
+    """
+    Get teacher information
+    :param teacher:
+    :param teacher_service:
+    :return:
+    """
+    try:
+        return Res_Teacher(**teacher_service.get_teacher_by_id(teacher.id))
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+
+
+@teacher_router.patch('/update', status_code=status.HTTP_200_OK)
+async def update(data: Annotated[Req_Teacher, Body(...)],
+                 teacher: Annotated[Teacher, Depends(get_current_user)],
+                 teacher_service: Annotated[teacher_bussiness, Depends()]):
+    """
+    Update teacher information
+    :param data:
+    :param teacher:
+    :param teacher_service:
+    :return:
+    """
+    try:
+        teacher_service.update_teacher(teacher_id=teacher.id, data=data)
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+
+
+@teacher_router.put('/avatar', status_code=status.HTTP_201_CREATED)
+async def update_avatar(image: Annotated[UploadFile, File(description="Upload avatar")],
+                        teacher: Annotated[Teacher, Depends(get_current_user)],
+                        teacher_service: Annotated[teacher_bussiness, Depends()]):
+    """
+    Update teacher avatar
+    :param image:
+    :param teacher:
+    :param teacher_service:
+    :return:
+    """
+    try:
+        return await teacher_service.update_avatar(teacher_id=teacher.id, image=image)
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))

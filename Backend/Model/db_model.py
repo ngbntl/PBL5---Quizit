@@ -8,7 +8,6 @@ class Admin:
         self.name: str | None = data.get("name")
         self.is_banned: bool | None = data.get("is_banned")
 
-
 class Student:
     def __init__(self, data: dict) -> None:
         self.id: str | None = data.get("id")

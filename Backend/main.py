@@ -2,12 +2,12 @@ import fastapi.middleware.cors
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from Router.auth_router import auth_router
-from Router.teacher_router import teacher_router
-from Router.student_router import student_router
+from Backend.Router.auth_router import auth_router
+from Backend.Router.teacher_router import teacher_router
+from Backend.Router.student_router import student_router
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="Static"), name="static")
+app.mount("/static", StaticFiles(directory="Backend/Static"), name="static")
 
 app.add_middleware(
     fastapi.middleware.cors.CORSMiddleware,

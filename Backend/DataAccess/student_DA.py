@@ -1,25 +1,57 @@
-from . import get_database
-from ..Model.db_model import Student
+from Backend.DataAccess import get_database, generate_id
+from Backend.Model.request_model import Req_Student
 
 
 class student_DA:
-    def get_student_by_email(self, email: str) -> Student | None:
+    # SELECT
+    def get_student_by_email(self, email: str) -> dict | None:
         with get_database(True) as cursor:
             cursor.execute("SELECT * FROM [student] WHERE [email]=%s", (email,))
             row = cursor.fetchone()
             if row is not None:
-                return Student(row)
+                return row
             return None
 
-    def get_student_by_id(self, id: str) -> Student | None:
+    def get_student_by_id(self, student_id: str) -> dict | None:
         with get_database(True) as cursor:
-            cursor.execute("SELECT * FROM [student] WHERE [id]=%s", (id,))
+            cursor.execute("SELECT * FROM [student] WHERE [id]=%s", (student_id,))
             row = cursor.fetchone()
             if row is not None:
-                return Student(row)
+                return row
             return None
 
-    def insert_student(self, email: str, hash_pswd: str, name: str) -> None:
+    # INSERT
+    def insert_student(self, data: Req_Student, hash_pswd: str) -> str:
+        failed_count = 0
         with get_database(True) as cursor:
-            cursor.execute("INSERT INTO [student]([email], [hash_pswd], [name])  VALUES (%s, %s, %s)",
-                           (email, hash_pswd, name))
+            while True:
+                id = generate_id(8)
+                try:
+                    cursor.execute("INSERT INTO [student]([id], [email], [hash_pswd], [name])  VALUES (%s, %s, %s, %s)",
+                                   (id, data.email, hash_pswd, data.name))
+                    return id
+                except Exception as e:
+                    failed_count += 1
+                    if failed_count > 5:
+                        raise e
+
+    # UPDATE
+    def update_password(self, student_id: str, hash_pswd: str):
+        with get_database(True) as cursor:
+            cursor.execute("UPDATE [student] SET [hash_pswd]=%s WHERE [id]=%s", (hash_pswd, student_id))
+
+    def update_name(self, student_id: str, name: str):
+        with get_database(True) as cursor:
+            cursor.execute("UPDATE [student] SET [name]=%s WHERE [id]=%s", (name, student_id))
+
+    def update_is_banned(self, student_id: str, is_banned: bool):
+        with get_database(True) as cursor:
+            cursor.execute("UPDATE [student] SET [is_banned]=%s WHERE [id]=%s", (is_banned, student_id))
+
+    def update_is_verified(self, student_id: str, is_verified: bool):
+        with get_database(True) as cursor:
+            cursor.execute("UPDATE [student] SET [is_verified]=%s WHERE [id]=%s", (is_verified, student_id))
+
+    def update_avatar_path(self, student_id: str, avatar_path: str):
+        with get_database(True) as cursor:
+            cursor.execute("UPDATE [student] SET [avatar_path]=%s WHERE [id]=%s", (avatar_path, student_id))

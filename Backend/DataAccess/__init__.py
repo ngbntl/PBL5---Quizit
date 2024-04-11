@@ -6,6 +6,12 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 from dotenv import load_dotenv
 from os import getenv
 
+import secrets
+from string import ascii_letters, digits
+
+def generate_id(n: int) -> str:
+    return ''.join(secrets.choice(ascii_letters + digits) for _ in range(n))
+
 load_dotenv()
 MSSQL_SERVER = getenv("MSSQL_SERVER")
 MSSQL_DATABASE = getenv("MSSQL_DATABASE")
@@ -27,3 +33,4 @@ def get_database(as_dict=True):
         raise e
     finally:
         mssql_connection.close()
+

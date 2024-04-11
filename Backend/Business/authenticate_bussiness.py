@@ -1,10 +1,10 @@
 import starlette.status
-import fastapi
+from fastapi import Depends, HTTPException
 from typing import Annotated
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
-from ..Model.db_model import Teacher, Student
-from . import ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY, HASH_ALGORITHM, oauth2_scheme
+from Backend.Model.db_model import Teacher, Student, Admin
+from Backend.Business import ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY, HASH_ALGORITHM, oauth2_scheme
 
 
 def create_access_token(data: dict, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)):
@@ -13,9 +13,8 @@ def create_access_token(data: dict, expires_delta=timedelta(minutes=ACCESS_TOKEN
     encode.update({'exp': expires})
     return jwt.encode(encode, SECRET_KEY, algorithm=HASH_ALGORITHM)
 
-
-async def get_current_user(token: Annotated[str, fastapi.Depends(oauth2_scheme)]):
-    credentials_exception = fastapi.HTTPException(
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+    credentials_exception = HTTPException(
         status_code=starlette.status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
@@ -28,7 +27,7 @@ async def get_current_user(token: Annotated[str, fastapi.Depends(oauth2_scheme)]
         elif role == "student":
             return Student({'id': payload.get('id'), 'email': payload.get('email')})
         elif role == "admin":
-            pass
+            return Admin({'id': payload.get('id'), 'username': payload.get('username')})
         else:
             raise credentials_exception
 
