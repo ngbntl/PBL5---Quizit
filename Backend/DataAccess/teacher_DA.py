@@ -1,3 +1,5 @@
+import pymssql
+
 from Backend.DataAccess import get_database, generate_id
 
 
@@ -23,15 +25,20 @@ class teacher_DA:
     def insert_teacher(self, email: str, hash_pswd: str, name: str):
         failed_count = 0
         with get_database(True) as cursor:
+            duplicate_id = False
             while True:
                 id = generate_id(8)
                 try:
                     cursor.execute("INSERT INTO [teacher]([id], [email], [hash_pswd], [name])  VALUES (%s, %s, %s, %s)",
                                    (id, email, hash_pswd, name))
                     return id
-                except Exception as e:
+                except pymssql.Error as e:
+                    if duplicate_id is False and id not in str(e.args[1]):
+                        raise e
+                    duplicate_id = True
+
                     failed_count += 1
-                    if failed_count > 5:
+                    if failed_count == 5:
                         raise e
 
     # UPDATE

@@ -15,7 +15,7 @@ class group_student_business:
     def get_groups_by_student(self, student_id: str, is_join: bool = True) -> list[dict]:
         return self.group_student_DA.get_groups_by_student(student_id, is_join)
 
-    def get_students_by_group(self, group_id: str, is_join: bool = True) -> list[str]:
+    def get_students_by_group(self, group_id: str, is_join: bool = True) -> list[dict]:
         return self.group_student_DA.get_students_by_group(group_id, is_join)
 
     # INSERT
@@ -25,17 +25,16 @@ class group_student_business:
         self.group_student_DA.insert_student(group_id=group_id, student_id=student_id)
 
     # UPDATE
-    def accept_join_request(self, teacher_id: str, group_id: str, student_id: str):
+    def update_join_request(self, teacher_id: str, group_id: str, student_id: str, accept: bool):
         if group_DA().check_owner(group_id, teacher_id) is False:
             raise ValueError(f"group {group_id} does not belong to {teacher_id}")
-        self.group_student_DA.accept_join_request(group_id, student_id)
+        self.group_student_DA.update_join_request(group_id, student_id, accept)
 
     def update_visibility(self, group_id: str, student_id: str, visibility: str):
         self.group_student_DA.update_visibility(group_id, student_id, visibility)
 
     # DELETE
-    def delete_join_request(self, teacher_id: str, group_id: str, student_id: str):
-        group = group_business().get_group_by_id(group_id)
-        if group.get("teacher_id") != teacher_id:
+    def delete_student(self, teacher_id: str, group_id: str, student_id: str):
+        if group_DA().check_owner(group_id, teacher_id) is False:
             raise ValueError(f"group {group_id} does not belong to {teacher_id}")
-        self.group_student_DA.delete_join_request(group_id, student_id)
+        self.group_student_DA.delete_student(group_id, student_id)

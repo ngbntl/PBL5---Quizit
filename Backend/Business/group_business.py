@@ -23,8 +23,10 @@ class group_business:
         return self.group_DA.insert_group(teacher_id, data.name)
 
     # UPDATE
-    def update_is_show(self, group_id: str, is_show: bool):
-        self.group_DA.update_is_show(group_id, is_show)
+    def update_visibility(self, teacher_id: str, group_id: str, visibility: bool):
+        if self.group_DA.check_owner(group_id, teacher_id) is False:
+            raise Exception(f"Group {group_id} is not belong to teacher {teacher_id}!")
+        self.group_DA.update_visibility(group_id, visibility)
 
     def update_group_name(self, group_id: str, name: str):
         self.group_DA.update_group_name(group_id, name)

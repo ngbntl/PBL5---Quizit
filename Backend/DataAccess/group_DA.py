@@ -35,7 +35,7 @@ class group_DA:
                         raise e
 
     # UPDATE
-    def update_is_show(self, group_id: str, is_show: bool):
+    def update_visibility(self, group_id: str, is_show: bool):
         with get_database(True) as cursor:
             cursor.execute("UPDATE [group] SET [is_show] = %s WHERE [id] = %s", (is_show, group_id))
 

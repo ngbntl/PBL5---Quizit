@@ -31,7 +31,7 @@ class Res_Teacher(BaseModel):
 class Res_Group(BaseModel):
     id: str
     name: str | None = None
-    teacher_id: str
+    teacher_id: str | None = None
     created_timestamp: datetime | None = None
     is_show: bool | None = None
 
