@@ -9,7 +9,7 @@ from Backend.DataAccess.student_DA import student_DA
 from Backend.Business import bcrypt_context, IMAGE_EXTENSIONS, save_file, STATIC_PATH
 
 
-class student_bussiness:
+class student_BO:
     def __init__(self):
         self.student_DA = student_DA()
 

@@ -14,12 +14,18 @@ class collection_DA:
             cursor.execute("SELECT * FROM [collection] WHERE [id]=%s", collection_id)
             return cursor.fetchone()
 
+    def check_owner(self, collection_id: str, teacher_id: str) -> bool:
+        with get_database(False) as cursor:
+            cursor.execute("SELECT [id] FROM [collection] WHERE [id]=%s AND [teacher_id]=%s", (collection_id, teacher_id))
+            return cursor.fetchone() is not None
+
     # INSERT
     def insert_collection(self, data: Req_Collection) -> str:
-        id = generate_id(8)
-        failed_count = 0
+
         with get_database(True) as cursor:
+            failed_count = 0
             while True:
+                id = generate_id(8)
                 try:
                     cursor.execute("INSERT INTO [collection] ([id], [name], [teacher_id]) VALUES (%s, %s, %s)",
                                    (id, data.name, data.teacher_id))
@@ -28,7 +34,6 @@ class collection_DA:
                     failed_count += 1
                     if failed_count > 5:
                         raise e
-                    id = generate_id(8)
 
     # UPDATE
     def update_collection_name(self, collection_id: str, name: str) -> None:

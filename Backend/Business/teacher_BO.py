@@ -9,7 +9,7 @@ from Backend.DataAccess.teacher_DA import teacher_DA
 from Backend.Business import bcrypt_context, STATIC_PATH, save_file, IMAGE_EXTENSIONS
 
 
-class teacher_bussiness:
+class teacher_BO:
     def __init__(self):
         self.teacher_DA = teacher_DA()
 
@@ -32,7 +32,8 @@ class teacher_bussiness:
             raise ValueError("Password is required!")
         if data.name is None:
             raise ValueError("Name is required!")
-        return self.teacher_DA.insert_teacher(email=data.email, hash_pswd=bcrypt_context.hash(data.password), name=data.name)
+        return self.teacher_DA.insert_teacher(email=data.email, hash_pswd=bcrypt_context.hash(data.password),
+                                              name=data.name)
 
     # UPDATE
     def update_teacher(self, teacher_id: str, data: Req_Teacher) -> None:
@@ -64,4 +65,3 @@ class teacher_bussiness:
 
     async def upload_avatar_path(self, teacher_id: str, avatar_path: str):
         self.teacher_DA.update_avatar_path(teacher_id, avatar_path)
-

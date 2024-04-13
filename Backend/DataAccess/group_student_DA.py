@@ -28,8 +28,22 @@ class group_student_DA:
     # INSERT
     def insert_student(self, group_id: str, student_id: str) -> None:
         with get_database(True) as cursor:
-            cursor.execute("INSERT INTO [group_student]([group_id], [student_id])  VALUES (%s, %s)",
-                           (group_id, student_id))
+            try:
+                cursor.execute("INSERT INTO [group_student]([group_id], [student_id], [is_join]) VALUES (%s, %s, 1)",
+                               (group_id, student_id))
+            except:
+                cursor.execute("UPDATE [group_student] SET [is_join] = 1 WHERE [group_id] = %s AND [student_id] = %s",
+                               (group_id, student_id))
+
+    def insert_students(self, group_id: str, list_id: list[str]) -> None:
+        with get_database(True) as cursor:
+            query = f"INSERT INTO [group_student]([group_id], [student_id], [is_join]) VALUES ('{group_id}', %s, 1)"
+            for student_id in list_id:
+                try:
+                    cursor.execute(query, student_id)
+                except:
+                    cursor.execute("UPDATE [group_student] SET [is_join] = 1 WHERE [group_id] = %s AND [student_id] = %s",
+                                   (group_id, student_id))
 
     # UPDATE
     def update_join_request(self, group_id: str, student_id: str, accept: bool) -> None:
@@ -48,3 +62,11 @@ class group_student_DA:
         with get_database(True) as cursor:
             cursor.execute("DELETE FROM [group_student] WHERE [group_id] = %s AND [student_id] = %s",
                            (group_id, student_id))
+
+    def delete_students(self, group_id: str, list_id: list[str]):
+        list_id = tuple(list_id)  # Convert list_id to tuple
+        with get_database(True) as cursor:
+            placeholders = ','.join(['%s'] * len(list_id))
+            query = f"DELETE FROM [group_student] WHERE [group_id] = %s AND [student_id] IN ({placeholders})"
+            params = (group_id,) + list_id
+            cursor.execute(query, params)

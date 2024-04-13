@@ -41,6 +41,7 @@ class Res_GroupStudent(BaseModel):
     student_id: str
     is_join: bool | None = None
     request_timestamp: datetime | None = None
+    is_show: bool | None = None
 
 
 class Res_GroupTest(BaseModel):
@@ -61,7 +62,7 @@ class Res_Collection(BaseModel):
 
 class Res_QuestionBank(BaseModel):
     id: str
-    collection_id: str
+    collection_id: str | None = None
     name: str | None = None
     created_timestamp: datetime | None = None
 

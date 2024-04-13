@@ -5,8 +5,8 @@ from typing import Annotated
 from Backend.Model.db_model import Teacher
 from Backend.Model.request_model import Req_Teacher
 from Backend.Model.response_model import Res_Teacher
-from Backend.Business.authenticate_bussiness import get_current_user
-from Backend.Business.teacher_business import teacher_bussiness
+from Backend.Business.authenticate_BO import get_current_user
+from Backend.Business.teacher_BO import teacher_BO
 from Backend.Router.collection_router import collection_router
 from Backend.Router.group_router import teacher_group_router
 
@@ -17,7 +17,7 @@ teacher_router.include_router(teacher_group_router)
 
 @teacher_router.post('/sign_up', status_code=status.HTTP_201_CREATED)
 async def sign_up(data: Annotated[Req_Teacher, Body(...)],
-                  teacher_service: Annotated[teacher_bussiness, Depends()]):
+                  teacher_service: Annotated[teacher_BO, Depends()]):
     """
     Sign up teacher
     :param data:
@@ -32,7 +32,7 @@ async def sign_up(data: Annotated[Req_Teacher, Body(...)],
 
 @teacher_router.get('/', status_code=status.HTTP_200_OK, response_model=Res_Teacher, response_model_exclude_unset=True)
 async def get_teacher(teacher: Annotated[Teacher, Depends(get_current_user)],
-                      teacher_service: Annotated[teacher_bussiness, Depends()]):
+                      teacher_service: Annotated[teacher_BO, Depends()]):
     """
     Get teacher information
     :param teacher:
@@ -45,10 +45,10 @@ async def get_teacher(teacher: Annotated[Teacher, Depends(get_current_user)],
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
 
 
-@teacher_router.patch('/update', status_code=status.HTTP_200_OK)
+@teacher_router.patch('/information', status_code=status.HTTP_200_OK)
 async def update(data: Annotated[Req_Teacher, Body(...)],
                  teacher: Annotated[Teacher, Depends(get_current_user)],
-                 teacher_service: Annotated[teacher_bussiness, Depends()]):
+                 teacher_service: Annotated[teacher_BO, Depends()]):
     """
     Update teacher information
     :param data:
@@ -65,7 +65,7 @@ async def update(data: Annotated[Req_Teacher, Body(...)],
 @teacher_router.put('/avatar', status_code=status.HTTP_201_CREATED)
 async def update_avatar(image: Annotated[UploadFile, File(description="Upload avatar")],
                         teacher: Annotated[Teacher, Depends(get_current_user)],
-                        teacher_service: Annotated[teacher_bussiness, Depends()]):
+                        teacher_service: Annotated[teacher_BO, Depends()]):
     """
     Update teacher avatar
     :param image:

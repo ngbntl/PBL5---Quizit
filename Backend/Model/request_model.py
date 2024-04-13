@@ -39,7 +39,8 @@ class Req_Group(BaseModel):
 class Req_GroupStudent(BaseModel):
     group_id: str = Field(None, min_length=8, max_length=8)
     student_id: str = Field(None, min_length=8, max_length=8)
-    is_join: bool = False
+    is_join: bool = True
+    is_show: bool = True
 
 
 class Req_GroupTest(BaseModel):

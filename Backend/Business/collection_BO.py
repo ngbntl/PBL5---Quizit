@@ -3,7 +3,7 @@ from Backend.DataAccess.collection_DA import collection_DA
 from Backend.Model.request_model import Req_Collection
 
 
-class collection_business:
+class collection_BO:
     def __init__(self):
         self.collection_DA = collection_DA()
 

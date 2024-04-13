@@ -2,7 +2,7 @@ from Backend.DataAccess.group_DA import group_DA
 from Backend.Model.request_model import Req_Group
 
 
-class group_business:
+class group_BO:
     def __init__(self):
         self.group_DA = group_DA()
 
@@ -23,10 +23,10 @@ class group_business:
         return self.group_DA.insert_group(teacher_id, data.name)
 
     # UPDATE
-    def update_visibility(self, teacher_id: str, group_id: str, visibility: bool):
-        if self.group_DA.check_owner(group_id, teacher_id) is False:
-            raise Exception(f"Group {group_id} is not belong to teacher {teacher_id}!")
-        self.group_DA.update_visibility(group_id, visibility)
-
-    def update_group_name(self, group_id: str, name: str):
-        self.group_DA.update_group_name(group_id, name)
+    def update_group(self, teacher_id: str, data: Req_Group):
+        if self.group_DA.check_owner(data.id, teacher_id) is False:
+            raise Exception(f"Group {data.id} is not belong to teacher {teacher_id}!")
+        if data.is_show is not None:
+            self.group_DA.update_visibility(group_id=data.id, is_show=data.is_show)
+        if data.name is not None:
+            self.group_DA.update_group_name(group_id=data.id, name=data.name)
