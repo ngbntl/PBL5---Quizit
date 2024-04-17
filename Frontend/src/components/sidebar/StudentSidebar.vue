@@ -1,30 +1,50 @@
 <template>
-    <div class="flex h-screen bg-gray-200">
-        <div class="w-64 bg-white p-4 shadow-lg">
-            <h2 class="text-3xl m-4 justify-center text-center font-semibold text-blue-500">Quizit</h2>
-            <nav>
-                <router-link to="/student/schedule"
-                    class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-500 hover:text-white">Lịch
-                    thi</router-link>
-                <router-link to="/student/grades"
-                    class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-500 hover:text-white">Lớp</router-link>
-                <router-link to="/student/notifications"
-                    class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-500 hover:text-white">Thông
-                    báo</router-link>
-            </nav>
-        </div>
-        <div class="flex-1 p-10 text-2xl font-bold">
-            <router-view />
-        </div>
+    <div class="w-1/6 h-screen flex flex-col overflow-hidden custom-sidebar shadow-lg">
+        <h1 class="text-4xl m-8 justify-center text-center font-semibold text-blue-500">Quizit</h1>
+        <a-menu class="h-full overflow-auto flex flex-col text-lg pb-10 " v-model:openKeys="state.openKeys"
+            v-model:selectedKeys="state.selectedKeys" mode="inline">
+            <a-menu-item key="schedule" class="ml-4">
+                <router-link :to="{name: 'student - schedule'}" class="pl-8">
+                    <fa :icon="['far', 'calendar-days']" class="pr-2" />
+                    Lịch thi
+                </router-link>
+            </a-menu-item>
+
+            <a-menu-item key="grade a">
+                <router-link :to="{name: 'student - grade'}" class="pl-8">
+                    <fa :icon="['fas', 'graduation-cap']" />
+                    Lớp
+                </router-link>
+            </a-menu-item>
+            <a-menu-item key="notif">
+                <router-link :to="{name: 'student - notif'}" class="pl-8">
+                    <fa icon="fa-solid fa-bell" />
+                    Thông báo
+                </router-link>
+            </a-menu-item>
+
+            <a-menu-item key="logout" class="">
+                <router-link :to="{name: 'student - notif'}" class="pl-8">
+                    <fa icon="fa-solid fa-right-from-bracket" /> Đăng xuất
+                </router-link>
+            </a-menu-item>
+        </a-menu>
     </div>
 </template>
-
-<script>
-export default {
-    // Your component logic here
-}
+<script lang="ts" setup>
+    import { reactive, watch, h } from 'vue';
+   
+    const state = reactive({
+       
+        selectedKeys: ['1'],
+        openKeys: ['sub1'],
+        
+    });
+    
+   
+   
 </script>
 
-<style scoped>
-/* Your custom styles here */
+<style>
+
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div class="regis grid grid-cols-2 m-10 h-full">
+    <div class="regis grid grid-cols-2 p-20 pl-24 h-full">
         <Header />
         <div class="img w-2/3 bg-white m-28 shadow-md">
             <img src="/src/assets/img/register.png" alt="" />
@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import Header from "../../components/Header.vue";
+import Header from "../../components/header/Header.vue";
 export default {
     components: { Header },
     data() {
