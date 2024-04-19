@@ -1,6 +1,6 @@
 <template>
-    <a-calendar v-model:value="value" class="">
-        <template #dateCellRender=" { current }">
+    <a-calendar v-model:value="value">
+        <template #dateCellRender="{ current }">
             <ul class="events">
                 <li v-for="item in getListData(current)" :key="item.content">
                     <a-badge :status="item.type" :text="item.content" />
@@ -25,55 +25,33 @@ const getListData = value => {
             listData = [
                 {
                     type: 'warning',
-                    content: 'This is warning event.',
+                    content: 'Quản lý dự án',
                 },
                 {
                     type: 'success',
-                    content: 'This is usual event.',
+                    content: 'Công nghệ web',
                 },
             ];
             break;
         case 10:
             listData = [
-                {
-                    type: 'warning',
-                    content: 'This is warning event.',
-                },
-                {
-                    type: 'success',
-                    content: 'This is usual event.',
-                },
+
                 {
                     type: 'error',
-                    content: 'This is error event.',
+                    content: 'Phân tích thiết kế HDt',
                 },
             ];
             break;
         case 15:
             listData = [
+
                 {
-                    type: 'warning',
-                    content: 'This is warning event',
+                    type: 'error',
+                    content: 'Lập trình mạng',
                 },
                 {
                     type: 'success',
-                    content: 'This is very long usual event。。....',
-                },
-                {
-                    type: 'error',
-                    content: 'This is error event 1.',
-                },
-                {
-                    type: 'error',
-                    content: 'This is error event 2.',
-                },
-                {
-                    type: 'error',
-                    content: 'This is error event 3.',
-                },
-                {
-                    type: 'error',
-                    content: 'This is error event 4.',
+                    content: 'Công nghệ phần mồm',
                 },
             ];
             break;

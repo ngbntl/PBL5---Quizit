@@ -15,6 +15,11 @@ const student = [
         component: () => import("../pages/student/grade/index.vue"),
       },
       {
+        path: "detail",
+        name: "student - grade - detail",
+        component: () => import("../pages/student/grade/detail.vue"),
+      },
+      {
         path: "notif",
         name: "student - notif",
         component: () => import("../pages/student/notif/index.vue"),

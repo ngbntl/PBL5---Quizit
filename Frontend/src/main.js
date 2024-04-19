@@ -16,12 +16,13 @@ import { far } from "@fortawesome/free-regular-svg-icons";
 library.add(fas, fab, far);
 
 import "ant-design-vue/dist/reset.css";
-import { Calendar, Menu, Layout, Avatar } from "ant-design-vue";
+import { Calendar, Menu, Layout, Avatar, Badge } from "ant-design-vue";
 
 const app = createApp(App);
 app.use(router);
 app.use(Layout);
 app.use(Avatar);
+app.use(Badge);
 app.use(Calendar);
 app.use(Menu);
 
