@@ -2,11 +2,11 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from starlette import status
-from Backend.Business.authenticate_BO import create_access_token
-from Backend.Business.teacher_BO import teacher_BO
-from Backend.Business.student_BO import student_BO
+from Backend.Business.BO_authenticate import create_access_token
+from Backend.Business.BO_teacher import BO_teacher
+from Backend.Business.BO_student import BO_student
 from Backend.Model.response_model import Res_Token
-from Backend.Model.db_model import Teacher, Student
+from Backend.Model.DB_model import Teacher, Student
 
 auth_router = APIRouter(prefix='/auth', tags=['auth'])
 
@@ -14,7 +14,7 @@ auth_router = APIRouter(prefix='/auth', tags=['auth'])
 @auth_router.post("/token")
 async def get_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], role: str) -> Res_Token:
     if role == "teacher":
-        teacher_service = teacher_BO()
+        teacher_service = BO_teacher()
         teacher: Teacher = teacher_service.authenticate(form_data.username, form_data.password)
         if not teacher:
             raise HTTPException(
@@ -28,7 +28,7 @@ async def get_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depen
         return Res_Token(**{"access_token": token, "token_type": 'bearer'})
 
     if role == "student":
-        student_service = student_BO()
+        student_service = BO_student()
         student: Student = student_service.authenticate(form_data.username, form_data.password)
         if not student:
             raise HTTPException(

@@ -5,9 +5,9 @@ from concurrent.futures import ThreadPoolExecutor
 
 from Backend.Model.request_model import Req_Collection
 from Backend.Model.response_model import Res_Collection
-from Backend.Model.db_model import Teacher
-from Backend.Business.collection_BO import collection_BO
-from Backend.Business.authenticate_BO import get_current_user
+from Backend.Model.DB_model import Teacher
+from Backend.Business.BO_collection import BO_collection
+from Backend.Business.BO_authenticate import get_current_user
 from Backend.Router.question_bank_router import question_bank_router
 
 collection_router = APIRouter(prefix='/collection', tags=['collection', 'teacher'])
@@ -16,11 +16,10 @@ collection_router.include_router(question_bank_router)
 
 @collection_router.get('/', status_code=status.HTTP_200_OK, response_model=list[Res_Collection])
 async def get_collections(teacher: Annotated[Teacher, Depends(get_current_user)],
-                          collection_service: Annotated[collection_BO, Depends()]):
+                          collection_service: Annotated[BO_collection, Depends()]):
     try:
-        with ThreadPoolExecutor() as executor:
-            return list(executor.map(lambda collection: Res_Collection(**collection),
-                                     collection_service.get_collections_by_teacher(teacher.id)))
+        return [Res_Collection(**collection.__dict__) for collection in
+                collection_service.get_collections_by_teacher(teacher.id)]
     except:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Can not get collections!")
 
@@ -37,7 +36,7 @@ async def get_collections(teacher: Annotated[Teacher, Depends(get_current_user)]
 @collection_router.post('/', status_code=status.HTTP_201_CREATED)
 async def insert_collection(teacher: Annotated[Teacher, Depends(get_current_user)],
                             data: Annotated[Req_Collection, Body()],
-                            collection_service: Annotated[collection_BO, Depends()]):
+                            collection_service: Annotated[BO_collection, Depends()]):
     try:
         return collection_service.insert_collection(teacher.id, data)
     except Exception as e:
@@ -47,7 +46,7 @@ async def insert_collection(teacher: Annotated[Teacher, Depends(get_current_user
 @collection_router.patch('/update', status_code=status.HTTP_200_OK)
 async def update_collection(teacher: Annotated[Teacher, Depends(get_current_user)],
                             data: Annotated[Req_Collection, Body()],
-                            collection_service: Annotated[collection_BO, Depends()]):
+                            collection_service: Annotated[BO_collection, Depends()]):
     try:
         if data.id is None:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="id is required!")

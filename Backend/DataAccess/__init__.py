@@ -9,9 +9,10 @@ from os import getenv
 import secrets
 from string import ascii_letters, digits
 
-def generate_id(n: int) -> str:
+def DAO_test(n: int) -> str:
     return ''.join(secrets.choice(ascii_letters + digits) for _ in range(n))
 
+# MSSQL_SERVER
 load_dotenv()
 MSSQL_SERVER = getenv("MSSQL_SERVER")
 MSSQL_DATABASE = getenv("MSSQL_DATABASE")
@@ -19,7 +20,7 @@ MSSQL_PORT = getenv("MSSQL_PORT")
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=6))
 @contextmanager
-def get_database(as_dict=True):
+def get_MS_database(as_dict=True):
     mssql_connection = pymssql.connect(server=MSSQL_SERVER, database=MSSQL_DATABASE, port=MSSQL_PORT, as_dict=as_dict)
     cursor = mssql_connection.cursor()
 
@@ -34,3 +35,18 @@ def get_database(as_dict=True):
     finally:
         mssql_connection.close()
 
+
+# MONGODB
+from pymongo import MongoClient
+MONGODB_SERVER = getenv("MONGODB_SERVER")
+MONGODB_DATABASE = getenv("MONGODB_DATABASE")
+
+@contextmanager
+def get_mongodb_database():
+    client = MongoClient(MONGODB_SERVER)
+    db = client[MONGODB_DATABASE]
+
+    try:
+        yield db
+    finally:
+        client.close()

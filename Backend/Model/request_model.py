@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from pydantic import BaseModel, EmailStr, Field
 
 
@@ -46,7 +45,7 @@ class Req_GroupStudent(BaseModel):
 class Req_GroupTest(BaseModel):
     id: str = Field(None, min_length=8, max_length=8)
     group_id: str = Field(None, min_length=8, max_length=8)
-    test_path: str = Field(None, max_length=255)
+    test_id: str = Field(None, min_length=8, max_length=8)
     start: datetime = None
     end: datetime = None
 
@@ -63,7 +62,21 @@ class Req_QuestionBank(BaseModel):
     name: str = Field(None, max_length=100)
 
 
-class Req_GenerateTest(BaseModel):
+class Req_Test(BaseModel):
     id: str = Field(None, min_length=8, max_length=8)
     collection_id: str = Field(None, min_length=8, max_length=8)
     name: str = Field(None, max_length=100)
+
+
+class Req_Answer(BaseModel):
+    id: str = Field(None, min_length=8, max_length=8)
+    question_id: str = Field(None, min_length=8, max_length=8)
+    answer: list[str]
+    is_correct: bool = False
+
+class Req_Question(BaseModel):
+    id: str = Field(None, min_length=8, max_length=8)
+    question_bank_id: str = Field(None, min_length=8, max_length=8)
+    question: str = Field(None, max_length=255)
+    answers: list[Req_Answer] = None
+

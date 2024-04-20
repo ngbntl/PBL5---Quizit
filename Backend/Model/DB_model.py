@@ -1,5 +1,6 @@
 from datetime import datetime
 
+
 class Admin:
     def __init__(self, data: dict) -> None:
         self.id: str | None = data.get("id")
@@ -7,6 +8,7 @@ class Admin:
         self.hash_pswd: str | None = data.get("hash_pswd")
         self.name: str | None = data.get("name")
         self.is_banned: bool | None = data.get("is_banned")
+
 
 class Student:
     def __init__(self, data: dict) -> None:
@@ -18,6 +20,7 @@ class Student:
         self.is_banned: bool | None = data.get("is_banned")
         self.created_timestamp: datetime | None = data.get("created_timestamp")
         self.is_verified: bool | None = data.get("is_verified")
+
 
 class Teacher:
     def __init__(self, data: dict) -> None:
@@ -46,13 +49,14 @@ class GroupStudent:
         self.student_id: str | None = data.get("student_id")
         self.is_join: bool | None = data.get("is_join")
         self.request_timestamp: datetime | None = data.get("request_timestamp")
+        self.is_show: bool | None = data.get("is_show")
 
 
 class GroupTest:
     def __init__(self, data: dict) -> None:
         self.id: str | None = data.get("id")
         self.group_id: str | None = data.get("group_id")
-        self.test_path: str | None = data.get("test_path")
+        self.test_id: str | None = data.get("test_id")
         self.start: datetime | None = data.get("start")
         self.end: datetime | None = data.get("end")
         self.created_timestamp: datetime | None = data.get("created_timestamp")
@@ -74,15 +78,7 @@ class QuestionBank:
         self.created_timestamp: datetime | None = data.get("created_timestamp")
 
 
-class GenerateTest:
-    def __init__(self, data: dict) -> None:
-        self.id: str | None = data.get("id")
-        self.collection_id: str | None = data.get("collection_id")
-        self.name: str | None = data.get("name")
-        self.created_timestamp: datetime | None = data.get("created_timestamp")
-
-
-class ManualTest:
+class Test:
     def __init__(self, data: dict) -> None:
         self.id: str | None = data.get("id")
         self.collection_id: str | None = data.get("collection_id")

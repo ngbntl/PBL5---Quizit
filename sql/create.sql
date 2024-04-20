@@ -80,13 +80,14 @@ create table [group_student] (
 create table [group_test] (
                               [id]                char(8)        collate SQL_Latin1_General_CP1_CS_AS,
                               [group_id]          char(8)        collate SQL_Latin1_General_CP1_CS_AS not null,
-                              [test_path]         varchar(MAX),
+                              [test_id]           char(8)        collate SQL_Latin1_General_CP1_CS_AS not null,
                               [start]             datetime,
                               [end]               datetime,
                               [created_timestamp] datetime       default getdate(),
     -- constraint
                               constraint [pk_grtes] primary key ([id]),
                               constraint [fk_grtes_grp] foreign key ([group_id]) references [group](id),
+                              constraint [fk_grtes_test] foreign key ([test_id]) references [test](id),
 )
 
 -- collection
@@ -111,24 +112,12 @@ create table [question_bank] (
                                  constraint [fk_quesbank_clt] foreign key ([collection_id]) references [collection](id),
 )
 
--- generate_test
-create table [generate_test] (
+create table [test] (
                                  [id]                char(8)        collate SQL_Latin1_General_CP1_CS_AS,
                                  [collection_id]     char(8)        collate SQL_Latin1_General_CP1_CS_AS not null,
                                  [name]              nvarchar(100),
                                  [created_timestamp] datetime       default getdate(),
     -- constraint
-                                 constraint [pk_gentes] primary key ([id]),
-                                 constraint [fk_gentes_clt] foreign key ([collection_id]) references [collection](id),
-)
-
--- manual_test
-create table [manual_test] (
-                               [id]                char(8)        collate SQL_Latin1_General_CP1_CS_AS,
-                               [collection_id]     char(8)        collate SQL_Latin1_General_CP1_CS_AS not null,
-                               [name]              nvarchar(100),
-                               [created_timestamp] datetime       default getdate(),
-    -- constraint
-                               constraint [pk_manutes] primary key ([id]),
-                               constraint [fk_manutes_clt] foreign key ([collection_id]) references [collection](id),
+                                 constraint [pk_test] primary key ([id]),
+                                 constraint [fk_test_clt] foreign key ([collection_id]) references [collection](id),
 )
