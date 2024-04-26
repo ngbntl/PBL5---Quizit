@@ -1,4 +1,4 @@
-from Backend.DataAccess import get_MS_database, DAO_test
+from Backend.DataAccess import get_MS_database, generate_id
 from datetime import datetime
 
 
@@ -11,7 +11,7 @@ class DAO_group_test:
 
     # INSERT
     def insert_group_test(self, group_id: str, test_path: str, start: datetime, end: datetime) -> str:
-        id = DAO_test(8)
+        id = generate_id(8)
         failed_count = 0
         with get_MS_database(True) as cursor:
             while True:
@@ -23,7 +23,7 @@ class DAO_group_test:
                     failed_count += 1
                     if failed_count > 5:
                         raise e
-                    id = DAO_test(8)
+                    id = generate_id(8)
 
     # UPDATE
     def update_time(self, group_test_id: str, star: datetime, end: datetime) -> None:

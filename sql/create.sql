@@ -15,6 +15,7 @@ create table [admin] (
     -- constraint
                          constraint [pk_adm] primary key ([id]),
                          constraint [unq_adm_username] unique ([username]),
+                         constraint [ck_adm_id] check (LEN([id]) = 8),
 )
 
 -- student
@@ -29,7 +30,8 @@ create table [student] (
                            [is_verified]       bit          default 0,
     -- constraint
                            constraint [pk_stu]      primary key ([id]),
-                           constraint [unq_stu_ema] unique ([email])
+                           constraint [unq_stu_ema] unique ([email]),
+                           constraint [ck_stu_id] check (LEN([id]) = 8),
 )
 
 CREATE INDEX [idx_stu_ema] ON [student] ([email]);
@@ -46,7 +48,8 @@ create table [teacher] (
                            [is_verified]       bit          default 0,
     -- constraint
                            constraint [pk_tch]      primary key ([id]),
-                           constraint [unq_tch_ema] unique ([email])
+                           constraint [unq_tch_ema] unique ([email]),
+                           constraint [ck_tch_id] check (LEN([id]) = 8),
 )
 
 CREATE INDEX [idx_tch_ema] ON [teacher] ([email]);
@@ -61,6 +64,7 @@ create table [group] (
     -- constraint
                          constraint [pk_grp]     primary key ([id]),
                          constraint [fk_grp_tch] foreign key ([teacher_id]) references [teacher](id),
+                         constraint [ck_grp_id] check (LEN([id]) = 8),
 )
 
 -- group student
@@ -76,6 +80,42 @@ create table [group_student] (
                                  constraint [fk_grstu_stu] foreign key ([student_id]) references [student](id),
 )
 
+-- collection
+create table [collection] (
+                              [id]                char(8)        collate SQL_Latin1_General_CP1_CS_AS,
+                              [teacher_id]        char(8)        collate SQL_Latin1_General_CP1_CS_AS not null,
+                              [name]              nvarchar(100),
+                              [created_timestamp] datetime       default getdate(),
+    -- constraint
+                              constraint [pk_clt] primary key ([id]),
+                              constraint [fk_clt_tch] foreign key ([teacher_id]) references [teacher](id),
+                              constraint [ck_clt_id] check (LEN([id]) = 8),
+)
+
+-- question_bank
+create table [question_bank] (
+                                 [id]                char(8)        collate SQL_Latin1_General_CP1_CS_AS,
+                                 [collection_id]     char(8)        collate SQL_Latin1_General_CP1_CS_AS not null,
+                                 [name]              nvarchar(100),
+                                 [created_timestamp] datetime       default getdate(),
+    -- constraint
+                                 constraint [pk_quesbank] primary key ([id]),
+                                 constraint [fk_quesbank_clt] foreign key ([collection_id]) references [collection](id),
+                                 constraint [ck_quesbank_id] check (LEN([id]) = 8),
+)
+
+create table [test] (
+                        [id]                      char(8)        collate SQL_Latin1_General_CP1_CS_AS,
+                        [collection_id]           char(8)        collate SQL_Latin1_General_CP1_CS_AS not null,
+                        [name]                    nvarchar(100),
+                        [reference_question_bank] nvarchar(max),
+                        [created_timestamp]       datetime       default getdate(),
+    -- constraint
+                        constraint [pk_test] primary key ([id]),
+                        constraint [fk_test_clt] foreign key ([collection_id]) references [collection](id),
+                        constraint [ck_test_id] check (LEN([id]) = 8),
+)
+
 -- group_test
 create table [group_test] (
                               [id]                char(8)        collate SQL_Latin1_General_CP1_CS_AS,
@@ -88,36 +128,21 @@ create table [group_test] (
                               constraint [pk_grtes] primary key ([id]),
                               constraint [fk_grtes_grp] foreign key ([group_id]) references [group](id),
                               constraint [fk_grtes_test] foreign key ([test_id]) references [test](id),
+                              constraint [ck_grtes_id] check (LEN([id]) = 8),
 )
 
--- collection
-create table [collection] (
-                              [id]                char(8)        collate SQL_Latin1_General_CP1_CS_AS,
-                              [teacher_id]        char(8)        collate SQL_Latin1_General_CP1_CS_AS not null,
-                              [name]              nvarchar(100),
-                              [created_timestamp] datetime       default getdate(),
+-- question
+create table [question] (
+                           [id]                char(10)        collate SQL_Latin1_General_CP1_CS_AS,
+                           [question_bank_id]  char(8)         collate SQL_Latin1_General_CP1_CS_AS not null,
+                           [order_number]      smallint,
+                           [content]           nvarchar(max),
+                           [answer]            varbinary(max),
+                           [attachment]        varchar(max),
+                           [difficulty]        tinyint,
     -- constraint
-                              constraint [pk_clt] primary key ([id]),
-                              constraint [fk_clt_tch] foreign key ([teacher_id]) references [teacher](id),
-)
-
--- question_bank
-create table [question_bank] (
-                                 [id]                char(8)        collate SQL_Latin1_General_CP1_CS_AS,
-                                 [collection_id]     char(8)        collate SQL_Latin1_General_CP1_CS_AS not null,
-                                 [name]              nvarchar(100),
-                                 [created_timestamp] datetime       default getdate(),
-    -- constraint
-                                 constraint [pk_quesbank] primary key ([id]),
-                                 constraint [fk_quesbank_clt] foreign key ([collection_id]) references [collection](id),
-)
-
-create table [test] (
-                                 [id]                char(8)        collate SQL_Latin1_General_CP1_CS_AS,
-                                 [collection_id]     char(8)        collate SQL_Latin1_General_CP1_CS_AS not null,
-                                 [name]              nvarchar(100),
-                                 [created_timestamp] datetime       default getdate(),
-    -- constraint
-                                 constraint [pk_test] primary key ([id]),
-                                 constraint [fk_test_clt] foreign key ([collection_id]) references [collection](id),
+                           constraint [pk_ques] primary key ([id]),
+                           constraint [fk_ques_quesbank] foreign key ([question_bank_id]) references [question_bank](id),
+                           constraint [ck_ques_id] check (LEN([id]) = 10),
+                           constraint [ck_ques_dif] check ([difficulty] between 1 and 5),
 )

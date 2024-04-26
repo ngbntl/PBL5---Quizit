@@ -1,4 +1,4 @@
-from Backend.DataAccess import get_MS_database, DAO_test
+from Backend.DataAccess import get_MS_database, generate_id
 from Backend.Model.request_model import Req_GenerateTest
 
 
@@ -14,7 +14,7 @@ class DAO_test:
         failed_count = 0
         with get_MS_database(True) as cursor:
             while True:
-                id = DAO_test(8)
+                id = generate_id(8)
                 try:
                     cursor.execute("INSERT INTO [test] ([id], [collection_id], [name]) VALUES (%s, %s, %s)",
                                    (id, data.collection_id, data.name))

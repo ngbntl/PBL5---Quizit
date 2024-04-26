@@ -1,4 +1,4 @@
-from Backend.DataAccess import get_MS_database, DAO_test
+from Backend.DataAccess import get_MS_database, generate_id
 from Backend.Model.DB_model import Group
 
 
@@ -24,7 +24,7 @@ class DAO_group:
         failed_count = 0
         with get_MS_database(True) as cursor:
             while True:
-                id = DAO_test(8)
+                id = generate_id(8)
                 try:
                     cursor.execute("INSERT INTO [group]([id], [teacher_id], [name])  VALUES (%s, %s, %s)",
                                    (id, teacher_id, name))

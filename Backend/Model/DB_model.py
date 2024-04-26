@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 
@@ -52,16 +53,6 @@ class GroupStudent:
         self.is_show: bool | None = data.get("is_show")
 
 
-class GroupTest:
-    def __init__(self, data: dict) -> None:
-        self.id: str | None = data.get("id")
-        self.group_id: str | None = data.get("group_id")
-        self.test_id: str | None = data.get("test_id")
-        self.start: datetime | None = data.get("start")
-        self.end: datetime | None = data.get("end")
-        self.created_timestamp: datetime | None = data.get("created_timestamp")
-
-
 class Collection:
     def __init__(self, data: dict) -> None:
         self.id: str | None = data.get("id")
@@ -78,9 +69,36 @@ class QuestionBank:
         self.created_timestamp: datetime | None = data.get("created_timestamp")
 
 
+class Question:
+    def __init__(self, data: dict) -> None:
+        self.id: str | None = data.get("id")
+        self.question_bank_id: str | None = data.get("question_bank_id")
+        self.order_number: int | None = data.get("order_number")
+        self.content: str | None = data.get("content")
+        self.answer: bytes | None = data.get("answer")
+        self.attachment: str | None = data.get("attachment")
+        self.difficulty: int | None = data.get("difficulty")
+
+
 class Test:
     def __init__(self, data: dict) -> None:
         self.id: str | None = data.get("id")
         self.collection_id: str | None = data.get("collection_id")
         self.name: str | None = data.get("name")
+        self.reference_question_bank: str | None = data.get("reference_question_bank")
         self.created_timestamp: datetime | None = data.get("created_timestamp")
+
+
+class GroupTest:
+    def __init__(self, data: dict) -> None:
+        self.id: str | None = data.get("id")
+        self.group_id: str | None = data.get("group_id")
+        self.test_id: str | None = data.get("test_id")
+        self.start: datetime | None = data.get("start")
+        self.end: datetime | None = data.get("end")
+        self.created_timestamp: datetime | None = data.get("created_timestamp")
+
+
+class IEncoder(json.JSONEncoder):
+    def default(self, obj):
+        return dict(obj)

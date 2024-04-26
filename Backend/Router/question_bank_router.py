@@ -2,13 +2,15 @@ from fastapi import APIRouter, HTTPException, Depends, Body, Query
 from starlette import status
 from typing import Annotated
 
-from Backend.Business.BO_question_bank import BO_question_bank
-from Backend.Model.request_model import Req_QuestionBank
 from Backend.Model.DB_model import Teacher
-from Backend.Business.BO_authenticate import get_current_user
+from Backend.Model.request_model import Req_QuestionBank
 from Backend.Model.response_model import Res_QuestionBank
+from Backend.Business.BO_question_bank import BO_question_bank
+from Backend.Business.BO_authenticate import get_current_user
+from Backend.Router.question_router import question_router
 
-question_bank_router = APIRouter(prefix='/question_bank', tags=['collection', 'teacher', 'question_bank'])
+question_bank_router = APIRouter(prefix='/question_bank', tags=['question_bank'])
+question_bank_router.include_router(question_router)
 
 # INSERT
 @question_bank_router.post('/', status_code=status.HTTP_200_OK)

@@ -69,14 +69,13 @@ class Req_Test(BaseModel):
 
 
 class Req_Answer(BaseModel):
-    id: str = Field(None, min_length=8, max_length=8)
-    question_id: str = Field(None, min_length=8, max_length=8)
-    answer: list[str]
+    content: str = Field(None, max_length=256)
     is_correct: bool = False
 
-class Req_Question(BaseModel):
-    id: str = Field(None, min_length=8, max_length=8)
-    question_bank_id: str = Field(None, min_length=8, max_length=8)
-    question: str = Field(None, max_length=255)
-    answers: list[Req_Answer] = None
 
+class Req_Question(BaseModel):
+    id: str = Field(None, min_length=10, max_length=10)
+    question_bank_id: str = Field(None, min_length=8, max_length=8)
+    content: str = Field(None, max_length=512)
+    answer: list[Req_Answer] = None
+    difficulty: int = Field(None, ge=1, le=5)

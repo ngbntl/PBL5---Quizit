@@ -1,4 +1,4 @@
-from Backend.DataAccess import get_MS_database, DAO_test
+from Backend.DataAccess import get_MS_database, generate_id
 from Backend.Model.DB_model import QuestionBank
 
 
@@ -14,12 +14,19 @@ class DAO_question_bank:
             cursor.execute("SELECT [collection_id] FROM [question_bank] WHERE [id] = %s", question_bank_id)
             return cursor.fetchone()[0]
 
+    def check_owner(self, teacher_id: str, question_bank_id: str) -> bool:
+        collection_id = self.get_collection_id(question_bank_id)
+        with get_MS_database(False) as cursor:
+            cursor.execute("SELECT [id] FROM [collection] WHERE [teacher_id] = %s AND [id] = %s",
+                           (teacher_id, collection_id))
+            return cursor.fetchone() is not None
+
     # INSERT
     def insert_question_bank(self, collection_id: str, name: str) -> str:
         with get_MS_database(True) as cursor:
             failed_count = 0
             while True:
-                id = DAO_test(8)
+                id = generate_id(8)
                 try:
                     cursor.execute("INSERT INTO [question_bank] ([id], [collection_id], [name]) VALUES (%s, %s, %s)",
                                    (id, collection_id, name))

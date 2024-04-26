@@ -1,4 +1,4 @@
-from Backend.DataAccess import get_MS_database, DAO_test
+from Backend.DataAccess import get_MS_database, generate_id
 
 
 class DAO_admin:
@@ -14,7 +14,7 @@ class DAO_admin:
         failed_count = 0
         with get_MS_database(True) as cursor:
             while True:
-                id = DAO_test(8)
+                id = generate_id(8)
                 try:
                     cursor.execute("INSERT INTO [admin]([id], [username], [hash_pswd], [name])  VALUES (%s, %s, %s, %s)",
                                    (id, username, hash_pswd, name))

@@ -1,7 +1,6 @@
-from fastapi import APIRouter, HTTPException, Depends, Body, Path
+from fastapi import APIRouter, HTTPException, Depends, Body
 from starlette import status
 from typing import Annotated
-from concurrent.futures import ThreadPoolExecutor
 
 from Backend.Model.request_model import Req_Collection
 from Backend.Model.response_model import Res_Collection
@@ -10,7 +9,7 @@ from Backend.Business.BO_collection import BO_collection
 from Backend.Business.BO_authenticate import get_current_user
 from Backend.Router.question_bank_router import question_bank_router
 
-collection_router = APIRouter(prefix='/collection', tags=['collection', 'teacher'])
+collection_router = APIRouter(prefix='/collection', tags=['collection'])
 collection_router.include_router(question_bank_router)
 
 

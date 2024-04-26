@@ -13,7 +13,7 @@ student_router.include_router(student_group_router)
 
 
 @student_router.post('/sign_up', status_code=status.HTTP_201_CREATED)
-async def sign_up(data: Annotated[Req_Student, Body(...)],
+async def sign_up(data: Annotated[Req_Student, Body()],
                   student_service: Annotated[BO_student, Depends()]) -> str:
     """
     Sign up student

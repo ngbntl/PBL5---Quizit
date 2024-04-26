@@ -1,6 +1,6 @@
 import pymssql
 
-from Backend.DataAccess import get_MS_database, DAO_test
+from Backend.DataAccess import get_MS_database, generate_id
 from Backend.Model.DB_model import Teacher
 
 
@@ -28,7 +28,7 @@ class DAO_teacher:
         with get_MS_database(True) as cursor:
             duplicate_id = False
             while True:
-                id = DAO_test(8)
+                id = generate_id(8)
                 try:
                     cursor.execute("INSERT INTO [teacher]([id], [email], [hash_pswd], [name])  VALUES (%s, %s, %s, %s)",
                                    (id, email, hash_pswd, name))
