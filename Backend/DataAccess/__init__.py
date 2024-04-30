@@ -40,21 +40,3 @@ def get_MS_database(as_dict=True):
         raise e
     finally:
         mssql_connection.close()
-
-
-# MONGODB
-from pymongo import MongoClient
-
-MONGODB_SERVER = getenv("MONGODB_SERVER")
-MONGODB_DATABASE = getenv("MONGODB_DATABASE")
-
-
-@contextmanager
-def get_mongodb_database():
-    client = MongoClient(MONGODB_SERVER)
-    db = client[MONGODB_DATABASE]
-
-    try:
-        yield db
-    finally:
-        client.close()

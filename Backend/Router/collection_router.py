@@ -36,6 +36,7 @@ async def get_collections(teacher: Annotated[Teacher, Depends(get_current_user)]
 async def insert_collection(teacher: Annotated[Teacher, Depends(get_current_user)],
                             data: Annotated[Req_Collection, Body()],
                             collection_service: Annotated[BO_collection, Depends()]):
+
     try:
         return collection_service.insert_collection(teacher.id, data)
     except Exception as e:

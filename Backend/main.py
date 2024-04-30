@@ -10,7 +10,7 @@ app.mount("/static", StaticFiles(directory="Backend/Static"), name="static")
 
 app.add_middleware(
     fastapi.middleware.cors.CORSMiddleware,
-    allow_origins=["http://localhost:4444"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

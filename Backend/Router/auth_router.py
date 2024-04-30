@@ -12,39 +12,21 @@ auth_router = APIRouter(prefix='/auth', tags=['auth'])
 
 
 @auth_router.post("/token")
-async def get_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], role: str) -> Res_Token:
-    if role == "teacher":
-        teacher_service = BO_teacher()
-        teacher: Teacher = teacher_service.authenticate(form_data.username, form_data.password)
-        if not teacher:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect username or password",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-
-        token = create_access_token({"id": teacher.id, "email": teacher.email, "role": role})
-
+async def get_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Res_Token:
+    teacher_service = BO_teacher()
+    teacher: Teacher = teacher_service.authenticate(form_data.username, form_data.password)
+    token = None
+    if teacher:
+        token = create_access_token({"id": teacher.id, "email": teacher.email, "role": 'teacher'})
         return Res_Token(**{"access_token": token, "token_type": 'bearer'})
 
-    if role == "student":
-        student_service = BO_student()
-        student: Student = student_service.authenticate(form_data.username, form_data.password)
-        if not student:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect username or password",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-
-        token = create_access_token({"id": student.id, "email": student.email, "role": role})
-
+    student_service = BO_student()
+    student: Student = student_service.authenticate(form_data.username, form_data.password)
+    if student:
+        token = create_access_token({"id": student.id, "email": student.email, "role": 'student'})
         return Res_Token(**{"access_token": token, "token_type": 'bearer'})
 
-    if role == "admin":
-        pass
+    if not token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
 
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail="Need role: ['teacher', 'student', 'admin']",
-    )
+
