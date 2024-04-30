@@ -11,6 +11,29 @@
                 <h2 class="text-3xl font-bold text-center my-16">Đăng nhập</h2>
 
                 <div class="mb-4">
+
+                    <div class="mt-2 flex flex-wrap space-x-6">
+                        <div>
+                            <label class="inline-flex items-center">
+                                <input type="radio" class="form-radio text-blue-600 h-4 w-4" name="role" value="teacher"
+                                    v-model="role">
+                                <span class="ml-2 text-gray-700">Giáo viên</span>
+                            </label>
+                        </div>
+                        <div>
+                            <label class="inline-flex items-center">
+                                <input type="radio" class="form-radio text-blue-600 h-4 w-4" name="role" value="student"
+                                    v-model="role">
+                                <span class="ml-2 text-gray-700">Học Sinh</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="mb-4">
+
+
                     <input type="email" v-model="email" @blur="validateEmail" :class="`w-full px-3 py-2 border rounded-md focus:outline-none ${
               emailError
                 ? 'border-red-500'
@@ -60,49 +83,71 @@
 </template>
 
 <script>
+import { ref } from 'vue';
 import Header from "../../components/header/Header.vue";
+import { useAuthStore } from "../../stores/modules/auth.js";
 export default {
     components: { Header },
-    data() {
-        return {
-            email: "",
-            password: "",
-            emailError: "",
-            passwordError: "",
+    setup() {
+        const email = ref("");
+        const password = ref("");
+        const emailError = ref("");
+        const passwordError = ref("");
+        const role = ref("Teacher");
+
+        const validateEmail = () => {
+            if (email.value === "") {
+                emailError.value = "Vui lòng nhập email.";
+            } else if (!/\S+@\S+\.\S+/.test(email.value)) {
+                emailError.value = "Định dạng email không hợp lệ.";
+            } else {
+                emailError.value = "";
+            }
         };
-    },
-    methods: {
 
+        const validatePassword = () => {
+            if (password.value === "") {
+                passwordError.value = "Vui lòng nhập mật khẩu.";
+            } else if (password.value.length < 6) {
+                passwordError.value = "Mật khẩu phải có ít nhất 6 ký tự.";
+            } else {
+                passwordError.value = "";
+            }
+        };
 
-        validateForm() {
-            this.validateEmail();
-            this.validatePassword();
-            if (this.emailError || this.passwordError) {
+        const validateForm = () => {
+            validateEmail();
+            validatePassword();
+            if (emailError.value || passwordError.value) {
                 return;
             }
-            this.submitForm();
-            this.$router.push('/student/schedule');
+            submitForm();
 
-        },
-        validateEmail() {
-            if (this.email === "") {
-                this.emailError = "Vui lòng nhập email.";
-            } else if (!/\S+@\S+\.\S+/.test(this.email)) {
-                this.emailError = "Định dạng email không hợp lệ.";
-            } else {
-                this.emailError = "";
-            }
-        },
-        validatePassword() {
-            if (this.password === "") {
-                this.passwordError = "Vui lòng nhập mật khẩu.";
-            } else if (this.password.length < 6) {
-                this.passwordError = "Mật khẩu phải có ít nhất 6 ký tự.";
-            } else {
-                this.passwordError = "";
-            }
-        },
-        submitForm() { },
+        };
+
+        const submitForm = () => {
+            const data = {
+                username: email.value,
+                password: password.value,
+                role: role.value
+            };
+            const authStore = useAuthStore();
+            console.log(data);
+            authStore.login(data);
+
+        };
+
+        return {
+            role,
+            email,
+            password,
+            emailError,
+            passwordError,
+            validateEmail,
+            validatePassword,
+            validateForm,
+            submitForm
+        };
     },
 };
 </script>
