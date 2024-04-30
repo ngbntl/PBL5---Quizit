@@ -33,3 +33,5 @@ IMAGE_EXTENSIONS = [".jpeg", ".jpg", ".jpe", ".png", ".gif", ".bmp", ".tif", ".t
 
 AUDIO_EXTENSIONS = [".mp3", ".wav", ".wma", ".flac", ".aac", ".m4a", ".ogg", ".oga", ".opus", ".weba", ".3gp", ".amr",
                     ".awb", ".flac", ".m4a", ".mpc", ".ogg", ".opus", ".ra", ".rm", ".wav", ".wma"]
+
+ACCEPTED_FILE_EXTENSIONS = IMAGE_EXTENSIONS + AUDIO_EXTENSIONS

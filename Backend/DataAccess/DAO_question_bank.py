@@ -23,7 +23,7 @@ class DAO_question_bank:
 
     # INSERT
     def insert_question_bank(self, collection_id: str, name: str) -> str:
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             failed_count = 0
             while True:
                 id = generate_id(8)
@@ -38,5 +38,5 @@ class DAO_question_bank:
 
     # UPDATE
     def update_name(self, question_bank_id: str, name: str):
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             cursor.execute("UPDATE [question_bank] SET [name] = %s WHERE [id] = %s", (name, question_bank_id))

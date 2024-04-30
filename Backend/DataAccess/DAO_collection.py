@@ -22,7 +22,7 @@ class DAO_collection:
 
     # INSERT
     def insert_collection(self, teacher_id: str, name: str) -> str:
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             failed_count = 0
             while True:
                 id = generate_id(8)
@@ -32,10 +32,10 @@ class DAO_collection:
                     return id
                 except Exception as e:
                     failed_count += 1
-                    if failed_count > 5:
+                    if failed_count == 5:
                         raise e
 
     # UPDATE
     def update_name(self, id: str, name: str) -> None:
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             cursor.execute("UPDATE [collection] SET [name]=%s WHERE [id]=%s", (name, id))

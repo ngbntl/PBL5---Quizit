@@ -49,7 +49,6 @@
 # c3 = c2.to_dict()['a']
 # print(c2.to_dict())
 # print(c2.__dict__)
-import json
 
 # class Answer:
 #     def __init__(self, data: dict) -> None:
@@ -72,16 +71,10 @@ import json
 # print(a.__dict__)
 # print(dict(a))
 
-import pickle
+import os
 
-# Assuming data is your list of dictionaries
-binary_data = pickle.dumps([
-    {'id': 1, 'a': True, 'b': None},
-    {'id': 2, 'a': False, 'b': 5.5}
-])
-print(type(binary_data))
-print(binary_data)
+path = "Teacher\\k4BYaYk7\\Collection\\6d789LoC\\QuestionBank\\RqOBnbVT\\Question\\RN3YUyCVv8\\jt9DU.mp3"
+components = path.split(os.sep)
+question_id = components[-2]  # Index 6 corresponds to the question_id in the given structure
 
-data = pickle.loads(binary_data)
-print(type(data))
-print(data)
+print(question_id)  # Outputs: RN3YUyCVv8

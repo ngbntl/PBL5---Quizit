@@ -138,7 +138,7 @@ create table [question] (
                            [order_number]      smallint,
                            [content]           nvarchar(max),
                            [answer]            varbinary(max),
-                           [attachment]        varchar(max),
+                           [attachment]        varbinary(max),
                            [difficulty]        tinyint,
     -- constraint
                            constraint [pk_ques] primary key ([id]),

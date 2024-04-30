@@ -22,15 +22,17 @@ async def insert_questions(teacher: Annotated[Teacher, Depends(get_current_user)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
+
 @question_router.post('/attachment', status_code=status.HTTP_200_OK)
 async def insert_attachment(teacher: Annotated[Teacher, Depends(get_current_user)],
                             question_id: Annotated[str, Query(min_length=10, max_length=10)],
                             attachment: Annotated[list[UploadFile], File()],
-                            question_service: Annotated[BO_question, Depends()]) -> None:
+                            question_service: Annotated[BO_question, Depends()]) -> list[str]:
     try:
-        question_service.insert_attachment(teacher_id=teacher.id, question_id=question_id, attachment=attachment)
+        return await question_service.insert_attachment(teacher_id=teacher.id, question_id=question_id, attachment=attachment)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
 
 # SELECT
 @question_router.get('/', status_code=status.HTTP_200_OK, response_model_exclude_unset=True)
@@ -40,15 +42,16 @@ async def get_questions_in_bank(teacher: Annotated[Teacher, Depends(get_current_
                                 offset: int = Query(default=1, ge=1),
                                 length: int = Query(default=50, ge=0, le=100)) -> list[Res_Question]:
     try:
-        questions = []
-        for ques in question_service.get_questions_in_bank(teacher_id=teacher.id, question_bank_id=question_bank_id, offset=offset, length=length):
-            questions.append(
-                Res_Question(id=ques.id, order_number=ques.order_number, content=ques.content,
+        return [Res_Question(id=ques.id, order_number=ques.order_number, content=ques.content,
                              answer=pickle.loads(ques.answer),
-                             attachment=ques.attachment, difficulty=ques.difficulty))
-        return questions
+                             attachment=pickle.loads(ques.attachment) if ques.attachment else None,
+                             difficulty=ques.difficulty) for ques in
+                question_service.get_questions_in_bank(teacher_id=teacher.id, question_bank_id=question_bank_id,
+                                                       offset=offset, length=length)]
+
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
 
 @question_router.get('/count', status_code=status.HTTP_200_OK)
 async def count_questions_in_bank(teacher: Annotated[Teacher, Depends(get_current_user)],
@@ -58,6 +61,7 @@ async def count_questions_in_bank(teacher: Annotated[Teacher, Depends(get_curren
         return question_service.count_questions_in_bank(teacher_id=teacher.id, question_bank_id=question_bank_id)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
 
 # UPDATE
 @question_router.put('/', status_code=status.HTTP_200_OK)
@@ -82,3 +86,12 @@ async def delete_questions(teacher: Annotated[Teacher, Depends(get_current_user)
                                           question_ids=list_id)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+@question_router.delete('/attachment', status_code=status.HTTP_200_OK)
+async def delete_attachment(teacher: Annotated[Teacher, Depends(get_current_user)],
+                            attachment_path: Annotated[str, Body()],
+                            question_service: Annotated[BO_question, Depends()]) -> None:
+    try:
+        question_service.delete_attachment(teacher_id=teacher.id, attachment_path=attachment_path)
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'File \'{attachment_path}\' not found')

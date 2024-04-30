@@ -1,5 +1,6 @@
+import pickle
 from Backend.DataAccess import get_MS_database, generate_id
-from Backend.Model.DB_model import Question
+from Backend.Model.DB_model import Question, QuestionBank
 
 
 class DAO_question:
@@ -44,19 +45,27 @@ class DAO_question:
                     if failed_count == 5:
                         raise e
 
-    def check_owner(self, teacher_id: str, question_id: str) -> bool:
+    async def insert_attachment_path(self, question_id: str, attachment_path: list[str]):
         with get_MS_database(False) as cursor:
-            sql = """
-            SELECT c.[id] 
-            FROM [collection] c
-            JOIN [question_bank] qb ON c.[id] = qb.[collection_id]
-            JOIN [question] q ON qb.[id] = q.[question_bank_id]
-            WHERE c.[teacher_id] = %s AND q.[id] = %s
-            """
-            cursor.execute(sql, (teacher_id, question_id))
-            return cursor.fetchone() is not None
+            cursor.execute("SELECT [attachment] FROM [question] WHERE [id] = %s", question_id)
+            attachment = cursor.fetchone()[0]
+            if attachment is None:
+                attachment = []
+            else:
+                attachment = pickle.loads(attachment)
+            attachment.extend(attachment_path)
+            cursor.execute("UPDATE [question] SET [attachment] = %s WHERE [id] = %s",
+                           (pickle.dumps(attachment), question_id))
 
     # SELECT
+    def get_question_by_id(self, question_id: str) -> Question:
+        with get_MS_database(True) as cursor:
+            cursor.execute("SELECT * FROM [question] WHERE [id] = %s", question_id)
+            q = cursor.fetchone()
+            if q is None:
+                return None
+            return Question(q)
+
     def get_questions_in_bank(self, question_bank_id: str, offset: int, length: int) -> list[Question]:
         with get_MS_database(True) as cursor:
             sql = """
@@ -76,12 +85,34 @@ class DAO_question:
             cursor.execute("SELECT COUNT(*) FROM [question] WHERE [question_bank_id] = %s", question_bank_id)
             return cursor.fetchone()[0]
 
+    def get_question_bank(self, question_id: str):
+        with get_MS_database(True) as cursor:
+            cursor.execute(
+                "SELECT * FROM [question_bank] WHERE [id] IN (SELECT [question_bank_id] FROM [question] WHERE [id] = %s)",
+                question_id)
+            q = cursor.fetchone()
+            if q is None:
+                return None
+            return QuestionBank(q)
+
+    def check_owner(self, teacher_id: str, question_id: str) -> bool:
+        with get_MS_database(False) as cursor:
+            sql = """
+            SELECT c.[id] 
+            FROM [collection] c
+            JOIN [question_bank] qb ON c.[id] = qb.[collection_id]
+            JOIN [question] q ON qb.[id] = q.[question_bank_id]
+            WHERE c.[teacher_id] = %s AND q.[id] = %s
+            """
+            cursor.execute(sql, (teacher_id, question_id))
+            return cursor.fetchone() is not None
+
     # UPDATE
     def update_questions(self, question_bank_id: str, data: list[Question]):
         update_content_sql = "UPDATE [question] SET [content] = %s WHERE [question_bank_id] = %s AND [id] = %s"
         update_difficulty_sql = "UPDATE [question] SET [difficulty] = %s WHERE [question_bank_id] = %s AND [id] = %s"
         update_answer_sql = "UPDATE [question] SET [answer] = %s WHERE [question_bank_id] = %s AND [id] = %s"
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             for q in data:
                 try:
                     if q.id is None:
@@ -95,9 +126,14 @@ class DAO_question:
                 except Exception as e:
                     raise e
 
+    def update_question_attachment(self, question: Question):
+        with get_MS_database(False) as cursor:
+            cursor.execute("UPDATE [question] SET [attachment] = %s WHERE [id] = %s",
+                           (question.attachment, question.id))
+
     # DELETE
     def delete_questions(self, question_bank_id: str, question_ids: list[str]):
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             try:
                 cursor.execute("DELETE FROM [question] WHERE [question_bank_id] = %s AND [id] IN %s",
                                (question_bank_id, tuple(question_ids)))
@@ -106,7 +142,7 @@ class DAO_question:
                 raise e
 
     def delete_question(self, question_bank_id: str, question_id: str):
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             try:
                 cursor.execute("DELETE FROM [question] WHERE [question_bank_id] = %s AND [id] = %s",
                                (question_bank_id, question_id))

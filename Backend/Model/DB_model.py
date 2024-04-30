@@ -76,7 +76,7 @@ class Question:
         self.order_number: int | None = data.get("order_number")
         self.content: str | None = data.get("content")
         self.answer: bytes | None = data.get("answer")
-        self.attachment: str | None = data.get("attachment")
+        self.attachment: bytes | None = data.get("attachment")
         self.difficulty: int | None = data.get("difficulty")
 
 

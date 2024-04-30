@@ -28,7 +28,7 @@ class DAO_group_student:
 
     # INSERT
     def request_join(self, group_id: str, student_id: str) -> None:
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             try:
                 cursor.execute("INSERT INTO [group_student]([group_id], [student_id], [is_join]) VALUES (%s, %s, 0)",
                                (group_id, student_id))
@@ -38,7 +38,7 @@ class DAO_group_student:
 
     def insert_students(self, group_id: str, list_id: list[str]) -> None:
         self.delete_students(group_id, list_id)
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             query = f"INSERT INTO [group_student]([group_id], [student_id], [is_join]) VALUES ('{group_id}', %s, 1)"
             for student_id in list_id:
                 try:
@@ -53,20 +53,20 @@ class DAO_group_student:
     #                        (accept, group_id, student_id))
 
     def update_visibility(self, group_id: str, student_id: str, visibility: bool) -> None:
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             cursor.execute("UPDATE [group_student] SET [is_show] = %s WHERE [group_id] = %s AND [student_id] = %s",
                            (visibility, group_id, student_id))
 
     # DELETE
 
     def delete_student(self, group_id, student_id):
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             cursor.execute("DELETE FROM [group_student] WHERE [group_id] = %s AND [student_id] = %s",
                            (group_id, student_id))
 
     def delete_students(self, group_id: str, list_id: list[str]):
         list_id = tuple(list_id)  # Convert list_id to tuple
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             placeholders = ','.join(['%s'] * len(list_id))
             query = f"DELETE FROM [group_student] WHERE [group_id] = %s AND [student_id] IN ({placeholders})"
             params = (group_id,) + list_id

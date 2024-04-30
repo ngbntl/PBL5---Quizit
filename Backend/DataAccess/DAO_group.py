@@ -22,7 +22,7 @@ class DAO_group:
     # INSERT
     def insert_group(self, teacher_id: str, name: str) -> str:
         failed_count = 0
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             while True:
                 id = generate_id(8)
                 try:
@@ -36,9 +36,9 @@ class DAO_group:
 
     # UPDATE
     def update_visibility(self, group_id: str, is_show: bool):
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             cursor.execute("UPDATE [group] SET [is_show] = %s WHERE [id] = %s", (is_show, group_id))
 
     def update_group_name(self, group_id: str, name: str):
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             cursor.execute("UPDATE [group] SET [name] = %s WHERE [id] = %s", (name, group_id))

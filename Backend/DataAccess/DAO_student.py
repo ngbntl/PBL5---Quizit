@@ -26,7 +26,7 @@ class DAO_student:
     # INSERT
     def insert_student(self, email: str, name: str, hash_pswd: str) -> str:
         failed_count = 0
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             duplicate_id = False
             while True:
                 id = generate_id(8)
@@ -40,26 +40,26 @@ class DAO_student:
                     duplicate_id = True
 
                     failed_count += 1
-                    if failed_count > 5:
+                    if failed_count == 5:
                         raise e
 
     # UPDATE
     def update_password(self, student_id: str, hash_pswd: str):
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             cursor.execute("UPDATE [student] SET [hash_pswd]=%s WHERE [id]=%s", (hash_pswd, student_id))
 
     def update_name(self, student_id: str, name: str):
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             cursor.execute("UPDATE [student] SET [name]=%s WHERE [id]=%s", (name, student_id))
 
     def update_is_banned(self, student_id: str, is_banned: bool):
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             cursor.execute("UPDATE [student] SET [is_banned]=%s WHERE [id]=%s", (is_banned, student_id))
 
     def update_is_verified(self, student_id: str, is_verified: bool):
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             cursor.execute("UPDATE [student] SET [is_verified]=%s WHERE [id]=%s", (is_verified, student_id))
 
     def update_avatar_path(self, student_id: str, avatar_path: str):
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             cursor.execute("UPDATE [student] SET [avatar_path]=%s WHERE [id]=%s", (avatar_path, student_id))

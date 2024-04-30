@@ -1,5 +1,4 @@
 from Backend.DataAccess import get_MS_database, generate_id
-from Backend.Model.request_model import Req_GenerateTest
 
 
 class DAO_test:

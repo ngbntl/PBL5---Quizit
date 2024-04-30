@@ -12,7 +12,7 @@ class DAO_admin:
     # INSERT
     def insert_admin(self, username, hash_pswd, name) -> str:
         failed_count = 0
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             while True:
                 id = generate_id(8)
                 try:
@@ -21,14 +21,14 @@ class DAO_admin:
                     return id
                 except Exception as e:
                     failed_count += 1
-                    if failed_count > 5:
+                    if failed_count == 5:
                         raise e
 
     # UPDATE
     def ban_admin(self, admin_id) -> None:
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             cursor.execute("UPDATE [admin] SET [is_banned]=1 WHERE [id]=%s", admin_id)
 
     def unban_admin(self, admin_id) -> None:
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             cursor.execute("UPDATE [admin] SET [is_banned]=0 WHERE [id]=%s", admin_id)
