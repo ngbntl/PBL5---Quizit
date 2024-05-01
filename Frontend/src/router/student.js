@@ -14,11 +14,11 @@ const student = [
         name: "student - group",
         component: () => import("../pages/student/group/index.vue"),
       },
-      {
-        path: "detail",
-        name: "student-group-detail",
-        component: () => import("../pages/student/group/detail.vue"),
-      },
+      // {
+      //   path: "detail",
+      //   name: "student-group-detail",
+      //   component: () => import("../pages/student/group/detail.vue"),
+      // },
       {
         path: "notif",
         name: "student - notif",

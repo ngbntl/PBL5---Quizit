@@ -1,35 +1,67 @@
 <template>
-    <div class="flex flex-wrap group hover:cursor-pointer hover:text-blue-500" @click="toggleGroups">
-        <DownOutlined v-if="showGroups" class="ml-4 mt-6" />
+    <div class="flex flex-wrap group hover:cursor-pointer hover:text-blue-500" @click="toggleGroup1">
+        <DownOutlined v-if="showGroup1" class="ml-4 mt-6" />
         <RightOutlined v-else class="ml-4 mt-6" />
-        <h1 class="text-2xl p-4">Nhóm</h1>
+        <h1 class="text-xl p-4">Nhóm</h1>
     </div>
 
-    <div v-show="showGroups">
-        <Group :cards="cards" />
+    <div v-show="showGroup1" class="scroll-container">
+        <Group :cards="cardshow" />
     </div>
 
+    <div class="flex flex-wrap group hover:cursor-pointer hover:text-blue-500" @click="toggleGroup2">
+        <DownOutlined v-if="showGroup2" class="ml-4 mt-6" />
+        <RightOutlined v-else class="ml-4 mt-6" />
+        <h1 class="text-xl p-4">Nhóm đã ẩn</h1>
+    </div>
+    <div v-show="showGroup2" class="scroll-container">
+        <Group :cards="cardshidden" />
+    </div>
+
+    <router-view />
 </template>
 
 <script>
+import { defineComponent, onMounted, ref } from 'vue';
 import Group from '../../../components/group/Group.vue'
 import { DownOutlined, RightOutlined } from "@ant-design/icons-vue";
-
-export default {
+import { useStudentStore } from '../../../stores/modules/student.js';
+export default defineComponent({
     components: { Group, DownOutlined, RightOutlined },
-    data() {
+    setup() {
+        const showGroup1 = ref(true);
+        const showGroup2 = ref(false);
+        const cardshow = ref([]);
+        const cardshidden = ref([]);
+
+        const toggleGroup1 = () => {
+            showGroup1.value = !showGroup1.value;
+        };
+
+        const toggleGroup2 = () => {
+            showGroup2.value = !showGroup2.value;
+        };
+
+        onMounted(async () => {
+            const studentStore = useStudentStore();
+            const groups = await studentStore.getGroups();
+            groups.forEach(group => {
+                if (group.is_show) {
+                    cardshow.value.push(group);
+                } else {
+                    cardshidden.value.push(group);
+                }
+            });
+        })
+
         return {
-            showGroups: true,
-            cards: [
-                { id: 1, title: 'Lập trình mạng', description: '21Nh16' },
-                { id: 2, title: 'Nhúng', description: '21Nh99' },
-            ]
-        }
-    },
-    methods: {
-        toggleGroups() {
-            this.showGroups = !this.showGroups;
-        }
+            showGroup1,
+            showGroup2,
+            cardshow,
+            cardshidden,
+            toggleGroup1,
+            toggleGroup2
+        };
     }
-}
+});
 </script>

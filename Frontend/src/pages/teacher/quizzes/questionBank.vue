@@ -1,11 +1,7 @@
 <template>
-    <!-- <button
-        class="bg-blue-500 cursor-pointer text-white px-2 py-1 mt-2 text-end right-0 rounded-md transition duration-150 hover:bg-blue-700 self-start"
-        type="button" @click="createCollection">
-        Thêm bộ sưu tập
-    </button> -->
+
     <div class="flex flex-wrap">
-        <Collection v-for="(item, index) in collections" :key="index" :collection="item" @click="getTmpId(item.id)" />
+        <Collection v-for="(item, index) in banks" :key="index" />
     </div>
 
     <router-view />
@@ -20,17 +16,16 @@ export default defineComponent({
     components: {
         Collection,
     },
+
     setup() {
         const collections = ref([]);
         const teacherStore = useTeacherStore();
 
         onMounted(async () => {
-            collections.value = await teacherStore.getCollections();
+            console.log("ccc");
+            collections.value = await teacherStore.getQuestionBank(teacherStore.tmpCollectionId);
         });
 
-        const getTmpId = (id) => {
-            teacherStore.tmpCollectionId = id;
-        }
         return {
             collections
         };

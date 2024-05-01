@@ -6,7 +6,7 @@ export const useAuthStore = defineStore("auth", {
   state: () => ({
     role: null,
     isLoggedIn: false,
-    token: null, // corrected here
+    token: null,
   }),
 
   actions: {
@@ -17,12 +17,13 @@ export const useAuthStore = defineStore("auth", {
             username: data.username,
             password: data.password,
           };
-          console.log(teacher);
+
           const response = await AuthService.loginTeacher(teacher);
           if (response && response.data.access_token) {
             this.token = response.data.access_token;
+            localStorage.setItem("token", this.token);
             this.isLoggedIn = true;
-            console.log(response);
+            //console.log(localStorage.getItem("token"));
             router.push({ name: "teacher-schedule" });
           }
         }
@@ -34,6 +35,7 @@ export const useAuthStore = defineStore("auth", {
           const response = await AuthService.loginStudent(student);
           if (response && response.data.access_token) {
             this.token = response.data.access_token;
+            localStorage.setItem("token", this.token);
             this.isLoggedIn = true;
             console.log(response);
             router.push({ name: "student - schedule" });

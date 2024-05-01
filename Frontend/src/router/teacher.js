@@ -21,6 +21,11 @@ const teacher = [
         component: () => import("../pages/teacher/quizzes/index.vue"),
       },
       {
+        path: "question-bank/:id",
+        name: "teacher-question-bank",
+        component: () => import("../pages/teacher/quizzes/questionBank.vue"),
+      },
+      {
         path: "profile",
         name: "teacher-profile",
         component: () => import("../pages/teacher/profile/index.vue"),
