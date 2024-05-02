@@ -1,41 +1,51 @@
 <template>
-    <!-- <button
-        class="bg-blue-500 cursor-pointer text-white px-2 py-1 mt-2 text-end right-0 rounded-md transition duration-150 hover:bg-blue-700 self-start"
-        type="button" @click="createCollection">
-        Thêm bộ sưu tập
-    </button> -->
+
+    <h1 class="text-2xl ml-10 mt-5">Bộ sưu tập</h1>
+    <div class="flex justify-end m-4 -mt-4 mr-8">
+        <addform />
+    </div>
     <div class="flex flex-wrap">
-        <Collection v-for="(item, index) in collections" :key="index" :collection="item" @click="getTmpId(item.id)" />
+
+        <Collection v-for="(item, index) in collections" :key="index" :collection="item" @click="getName(item.name)" />
+
     </div>
 
     <router-view />
 </template>
 
 <script>
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, watch } from 'vue';
 import Collection from '../../../components/collection/Collection.vue';
 import { useTeacherStore } from '../../../stores/modules/teacher.js';
+import Addform from '../../../components/modal/Addform.vue';
 
 export default defineComponent({
     components: {
         Collection,
+        Addform
     },
     setup() {
         const collections = ref([]);
         const teacherStore = useTeacherStore();
 
+        const getName = (name) => {
+            teacherStore.collectionName = name;
+        };
         onMounted(async () => {
             collections.value = await teacherStore.getCollections();
         });
 
-        const getTmpId = (id) => {
-            teacherStore.tmpCollectionId = id;
-        }
+
+        watch(() => teacherStore.collections, (newCollections) => {
+            collections.value = newCollections;
+        });
+
         return {
-            collections
+            collections,
+            getName
         };
     }
-})
+});
 </script>
 
 <style>

@@ -20,7 +20,7 @@
             <a-menu-item key="quizzes">
                 <router-link :to="{name: 'teacher-quizes'}" class="pl-8">
                     <fa :icon="['far', 'question-circle']" />
-                    Ngân hàng câu hỏi
+                    Bộ sưu t
                 </router-link>
             </a-menu-item>
 
