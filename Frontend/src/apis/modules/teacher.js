@@ -15,6 +15,25 @@ export default {
       },
     });
   },
+  addQuestionBank(bank) {
+    return Api().post("teacher/collection/question_bank/", bank, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+  },
+
+  addQuestion(questionBankId, question) {
+    return Api().post(
+      `teacher/collection/question_bank/question/?question_bank_id=${questionBankId}`,
+      question,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+  },
   getQuestionBank(collectionId) {
     return Api().get(
       `teacher/collection/question_bank/?collection_id=${collectionId}`,
