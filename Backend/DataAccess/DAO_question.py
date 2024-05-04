@@ -1,6 +1,7 @@
 import pickle
 from Backend.DataAccess import get_MS_database, generate_id
 from Backend.Model.DB_model import Question, QuestionBank
+from Backend.Model.response_model import Res_NumberOfQuestion
 
 
 class DAO_question:
@@ -80,10 +81,11 @@ class DAO_question:
             cursor.execute(sql, (question_bank_id, offset, offset + length - 1))
             return [Question(q) for q in cursor.fetchall()]
 
-    def count_questions_in_bank(self, question_bank_id: str):
-        with get_MS_database(False) as cursor:
-            cursor.execute("SELECT COUNT(*) FROM [question] WHERE [question_bank_id] = %s", question_bank_id)
-            return cursor.fetchone()[0]
+    def summary(self, question_bank_id: str) -> list[Res_NumberOfQuestion]:
+        with get_MS_database(True) as cursor:
+            sql = "SELECT [difficulty], COUNT(*) as [number_of_question] FROM [question] WHERE [question_bank_id] = %s GROUP BY [difficulty]"
+            cursor.execute(sql, question_bank_id)
+            return [Res_NumberOfQuestion(**q) for q in cursor.fetchall()]
 
     def get_question_bank(self, question_id: str):
         with get_MS_database(True) as cursor:

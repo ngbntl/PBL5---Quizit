@@ -27,7 +27,7 @@ class DAO_student:
     def insert_student(self, email: str, name: str, hash_pswd: str) -> str:
         failed_count = 0
         with get_MS_database(False) as cursor:
-            duplicate_id = False
+            duplicate_PK = False
             while True:
                 id = generate_id(8)
                 try:
@@ -35,9 +35,9 @@ class DAO_student:
                                    (id, email, hash_pswd, name))
                     return id
                 except pymssql.Error as e:
-                    if duplicate_id is False and id not in str(e.args[1]):
-                        raise e
-                    duplicate_id = True
+                    if duplicate_PK is False and id not in str(e.args[1]):
+                        raise e  # Another error. Not duplicate_PK
+                    duplicate_PK = True  # Not athor error. duplicate_PK
 
                     failed_count += 1
                     if failed_count == 5:

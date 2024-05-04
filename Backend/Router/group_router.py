@@ -12,7 +12,6 @@ from Backend.Business.BO_authenticate import get_current_user
 student_group_router = APIRouter(prefix='/group', tags=['group', 'student'])
 teacher_group_router = APIRouter(prefix='/group', tags=['group', 'teacher'])
 
-
 ### TEACHER ###
 @teacher_group_router.post('/', status_code=status.HTTP_201_CREATED)
 async def insert_group(teacher: Annotated[Teacher, Depends(get_current_user)],

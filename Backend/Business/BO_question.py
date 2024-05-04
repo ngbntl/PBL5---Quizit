@@ -92,10 +92,10 @@ class BO_question:
             raise ValueError(f"Teacher {teacher_id} is not owner of question bank {question_bank_id}!")
         return self.dao_question.get_questions_in_bank(question_bank_id, offset=offset, length=length)
 
-    def count_questions_in_bank(self, teacher_id, question_bank_id):
+    def summary(self, teacher_id, question_bank_id):
         if self.dao_question_bank.check_owner(teacher_id=teacher_id, question_bank_id=question_bank_id) is False:
             raise ValueError(f"Teacher {teacher_id} is not owner of question bank {question_bank_id}!")
-        return self.dao_question.count_questions_in_bank(question_bank_id)
+        return self.dao_question.summary(question_bank_id)
 
     # UPDATE
     def update_questions(self, teacher_id: str, question_bank_id: str, data: list[Req_Question]):

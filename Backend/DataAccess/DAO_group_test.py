@@ -1,27 +1,34 @@
 from Backend.DataAccess import get_MS_database, generate_id
 from datetime import datetime
 
+from Backend.Model.DB_model import GroupTest
+
 
 class DAO_group_test:
     # SELECT
-    def get_all_group_tests(self, group_id: str) -> list[dict]:
+    def get_group_test(self, group_id: str) -> list[GroupTest]:
         with get_MS_database(True) as cursor:
             cursor.execute("SELECT * FROM [group_test] WHERE [group_id] = %s", (group_id,))
-            return cursor.fetchall()
+            return [GroupTest(row) for row in cursor.fetchall()]
 
     # INSERT
-    def insert_group_test(self, group_id: str, test_path: str, start: datetime, end: datetime) -> str:
+    def insert_group_test(self, data: GroupTest) -> str:
         id = generate_id(8)
         failed_count = 0
+        duplicate_PK = False
         with get_MS_database(False) as cursor:
             while True:
                 try:
-                    cursor.execute("INSERT INTO [group_test]([id], [group_id], [test_path], [start], [end])  VALUES (%s, %s, %s, %s, %s)",
-                                   (id, group_id, test_path, start, end))
+                    cursor.execute(
+                        "INSERT INTO [group_test]([id], [group_id], [test_id], [start], [end], [duration], [shuffle])  VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                        (id, data.group_id, data.test_id, data.start, data.end, data.duration, data.shuffle))
                     return id
                 except Exception as e:
+                    if duplicate_PK is False and id not in str(e.args[1]):
+                        raise e  # Another error. Not duplicate id
+                    duplicate_PK = True  # Not athor error. Duplicate id
                     failed_count += 1
-                    if failed_count > 5:
+                    if failed_count == 5:
                         raise e
                     id = generate_id(8)
 

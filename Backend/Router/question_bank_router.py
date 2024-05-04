@@ -12,6 +12,7 @@ from Backend.Router.question_router import question_router
 question_bank_router = APIRouter(prefix='/question_bank', tags=['question_bank'])
 question_bank_router.include_router(question_router)
 
+
 # INSERT
 @question_bank_router.post('/', status_code=status.HTTP_200_OK)
 async def insert_question_bank(teacher: Annotated[Teacher, Depends(get_current_user)],
@@ -22,16 +23,21 @@ async def insert_question_bank(teacher: Annotated[Teacher, Depends(get_current_u
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
+
 # SELECT
-@question_bank_router.get('/', response_model=list[Res_QuestionBank], status_code=status.HTTP_200_OK, response_model_exclude_unset=True)
+@question_bank_router.get('/', response_model=list[Res_QuestionBank], status_code=status.HTTP_200_OK,
+                          response_model_exclude_unset=True)
 async def get_question_banks_by_collection(teacher: Annotated[Teacher, Depends(get_current_user)],
                                            collection_id: Annotated[str, Query(min_length=8, max_length=8)],
                                            question_bank_service: Annotated[BO_question_bank, Depends()]):
     try:
-        return [Res_QuestionBank(id=question_bank.id, name=question_bank.name, created_timestamp=question_bank.created_timestamp) for question_bank in
-                question_bank_service.get_question_banks_by_collection(teacher_id=teacher.id, collection_id=collection_id)]
+        return [Res_QuestionBank(id=question_bank.id, name=question_bank.name,
+                                 created_timestamp=question_bank.created_timestamp) for question_bank in
+                question_bank_service.get_question_banks_by_collection(teacher_id=teacher.id,
+                                                                       collection_id=collection_id)]
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
 
 # UPDATE
 @question_bank_router.patch('/', status_code=status.HTTP_204_NO_CONTENT)

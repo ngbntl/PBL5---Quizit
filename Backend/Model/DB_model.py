@@ -85,8 +85,14 @@ class Test:
         self.id: str | None = data.get("id")
         self.collection_id: str | None = data.get("collection_id")
         self.name: str | None = data.get("name")
-        self.reference_question_bank: str | None = data.get("reference_question_bank")
         self.created_timestamp: datetime | None = data.get("created_timestamp")
+
+
+class TestStructure:
+    def __init__(self, data: dict) -> None:
+        self.test_id: str | None = data.get("test_id")
+        self.question_bank_id: str | None = data.get("question_bank_id")
+        self.number_of_question: bytes | None = data.get("number_of_question")
 
 
 class GroupTest:
@@ -96,9 +102,16 @@ class GroupTest:
         self.test_id: str | None = data.get("test_id")
         self.start: datetime | None = data.get("start")
         self.end: datetime | None = data.get("end")
+        self.duration: int | None = data.get("duration")
+        self.shuffle: bool | None = data.get("shuffle")
         self.created_timestamp: datetime | None = data.get("created_timestamp")
 
 
-class IEncoder(json.JSONEncoder):
-    def default(self, obj):
-        return dict(obj)
+class StudentTest:
+    def __init__(self, data: dict) -> None:
+        self.student_id: str | None = data.get("student_id")
+        self.group_test_id: str | None = data.get("group_test_id")
+        self.start: datetime | None = data.get("start")
+        self.end: datetime | None = data.get("end")
+        self.student_work: bytes | None = data.get("student_work")
+        self.score: int | None = data.get("score")

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class Res_Token(BaseModel):
@@ -71,6 +71,8 @@ class Res_GroupTest(BaseModel):
     test_id: str | None = None
     start: datetime | None = None
     end: datetime | None = None
+    duration: int | None = None
+    shuffle: bool | None = None
     created_timestamp: datetime | None = None
 
 
@@ -88,3 +90,14 @@ class Res_Question(BaseModel):
     answer: list[Res_Answer] | None = None
     attachment: list[str] | None = None
     difficulty: int | None = None
+
+
+class Res_NumberOfQuestion(BaseModel):
+    difficulty: int
+    number_of_question: int
+
+
+class Res_TestStructure(BaseModel):
+    test_id: str
+    question_bank_id: str
+    number_of_question: list[Res_NumberOfQuestion] | None = None

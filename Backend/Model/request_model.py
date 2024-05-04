@@ -79,3 +79,24 @@ class Req_Question(BaseModel):
     content: str = Field(None, max_length=512)
     answer: list[Req_Answer] = None
     difficulty: int = Field(None, ge=1, le=5)
+
+
+class Req_NumberOfQuestion(BaseModel):
+    difficulty: int = Field(ge=1, le=5)
+    number_of_question: int = Field(ge=1)
+
+
+class Req_TestStructure(BaseModel):
+    test_id: str = Field(min_length=8, max_length=8)
+    question_bank_id: str = Field(min_length=8, max_length=8)
+    number_of_question: list[Req_NumberOfQuestion]
+
+
+class Req_GroupTest(BaseModel):
+    id: str = Field(None, min_length=8, max_length=8)
+    group_id: str = Field(None, min_length=8, max_length=8)
+    test_id: str = Field(None, min_length=8, max_length=8)
+    start: datetime = None
+    end: datetime = None
+    duration: int = Field(None, ge=1, le=180)
+    shuffle: bool = False
