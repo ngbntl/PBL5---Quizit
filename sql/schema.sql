@@ -1,9 +1,13 @@
---USE master;
---GO
---ALTER DATABASE trac_nghiem SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
---GO
---DROP DATABASE trac_nghiem;
---GO
+USE [master];
+GO
+ALTER DATABASE [trac_nghiem] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+GO
+DROP DATABASE [trac_nghiem];
+GO
+CREATE DATABASE [trac_nghiem];
+GO
+USE [trac_nghiem];
+GO
 
 -- admin
 create table [admin]

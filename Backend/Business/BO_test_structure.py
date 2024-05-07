@@ -34,14 +34,9 @@ class BO_test_structure:
 
     # SELECT
     def get_structure(self, test_id: str) -> list[Res_TestStructure]:
-        # return [Res_TestStructure(test_id=test_id, question_bank_id=ts.question_bank_id, number_of_question=pickle.loads(ts.number_of_question)) for ts in self.dao_test_structure.get_structure(test_id)]
-        arr = []
-        for ts in self.dao_test_structure.get_structure(test_id):
-            number_of_question = pickle.loads(ts.number_of_question)
-            print(number_of_question)
-            arr.append(Res_TestStructure(test_id=test_id, question_bank_id=ts.question_bank_id,
-                                         number_of_question=number_of_question))
-        return arr
+        return [Res_TestStructure(test_id=test_id, question_bank_id=ts.question_bank_id,
+                                  number_of_question=pickle.loads(ts.number_of_question)) for ts in
+                self.dao_test_structure.get_structure(test_id)]
 
     # UPDATE
     def update_structure(self, teacher_id: str, data: Req_TestStructure):
