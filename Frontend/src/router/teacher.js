@@ -14,7 +14,11 @@ const teacher = [
         name: "teacher-group",
         component: () => import("../pages/teacher/group/index.vue"),
       },
-
+      {
+        path: "group/:id",
+        name: "teacher-group-detail",
+        component: () => import("../pages/teacher/group/GroupDetail.vue"),
+      },
       {
         path: "quizes",
         name: "teacher-quizes",

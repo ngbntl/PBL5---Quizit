@@ -10,6 +10,7 @@ export const useTeacherStore = defineStore("teacher", {
     questionBank: [],
     questions: [],
     bankId: "",
+    groupId: "",
   }),
 
   actions: {
@@ -70,6 +71,33 @@ export const useTeacherStore = defineStore("teacher", {
           question
         );
         this.questions = this.getQuestions(this.bankId);
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async getStudents(groupId) {
+      try {
+        const response = await teacherService.getStudents(groupId);
+        console.log(response.data);
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async getGroups() {
+      try {
+        const response = await teacherService.getGroups();
+        console.log(response.data);
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async getHiddenGroups() {
+      try {
+        const response = await teacherService.getHiddenGroups();
+        console.log(response.data);
         return response.data;
       } catch (error) {
         console.error(error);
