@@ -54,4 +54,25 @@ export default {
       }
     );
   },
+  getStudents(groupId) {
+    return Api().get(`teacher/group/student`, groupId, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+  },
+  getGroups() {
+    return Api().get(`teacher/group/`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+  },
+  getHiddenGroups() {
+    return Api().get(`teacher/group/?is_show=0`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+  },
 };
