@@ -1,37 +1,24 @@
 <template>
-    <div class="container mx-auto">
-        <h1 class="text-2xl font-bold mb-4">Edit Profile</h1>
-        <form>
-            <div class="mb-4">
-                <label for="name" class="block text-gray-700 font-bold mb-2">Name</label>
-                <input type="text" id="name" class="border border-gray-300 rounded-md p-2 w-full" v-model="name">
+    <div class="container mx-auto p-4">
+        <div class="flex flex-cols-2 space-x-20">
+            <div class="avt bg-white shadow-md rounded-md p-6 w-full text-center">
+                <img :src="user.avatar_path" class="rounded-full w-64 h-64 text-center">
+                <h1 class="text-2xl font-bold text-center">{{ user.name }}</h1>
+                <p class="text-gray-500 text-center">{{ user.email }}</p>
             </div>
-            <div class="mb-4">
-                <label for="email" class="block text-gray-700 font-bold mb-2">Email</label>
-                <input type="email" id="email" class="border border-gray-300 rounded-md p-2 w-full" v-model="email">
-            </div>
-            <div class="mb-4">
-                <label for="bio" class="block text-gray-700 font-bold mb-2">Bio</label>
-                <textarea id="bio" class="border border-gray-300 rounded-md p-2 w-full" v-model="bio"></textarea>
-            </div>
-            <button type="submit"
-                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Save</button>
-        </form>
+
+        </div>
     </div>
 </template>
 
 <script>
 export default {
-    data() {
-        return {
-            name: '',
-            email: '',
-            bio: ''
-        }
-    }
+    props: {
+        user: Object
+    },
+
 }
 </script>
 
-<style>
-/* Add your custom styles here */
+<style scoped>
 </style>
