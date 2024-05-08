@@ -15,10 +15,18 @@ export default {
         const teacherStore = useTeacherStore();
 
         onMounted(async () => {
-            teacher.value = await teacherStore.getInfor();
+            const teacherInfo = await teacherStore.getInfor();
+            console.log(teacherInfo); // In ra giá trị trả về từ getInfor()
 
+            if (teacherInfo && teacherInfo.avatar_path) {
+                teacher.value = teacherInfo;
+                teacher.value.avatar_path = teacher.value.avatar_path.replace(/\\\\/g, '/');
+
+                console.log(teacher.value)
+            }
         });
         return {
+
             teacher
         }
 

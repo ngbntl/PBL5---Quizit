@@ -106,7 +106,7 @@ export const useTeacherStore = defineStore("teacher", {
     async getInfor() {
       try {
         const response = await teacherService.getInfor();
-        console.log(response.data);
+
         return response.data;
       } catch (error) {
         console.error(error);

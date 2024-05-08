@@ -22,4 +22,10 @@ export default {
       },
     });
   },
+  signUpTeacher(data) {
+    return Api().post("teacher/sign_up", data);
+  },
+  signUpStudent(data) {
+    return Api().post("student/sign_up", data);
+  },
 };

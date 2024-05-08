@@ -55,7 +55,7 @@ export default {
     );
   },
   getStudents(groupId) {
-    return Api().get(`teacher/group/student`, groupId, {
+    return Api().get(`teacher/group/student/`, groupId, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },

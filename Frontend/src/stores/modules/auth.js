@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import AuthService from "../../apis/modules/auth.js";
 import router from "../../router";
-
+import { useToast } from "vue-toastification";
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     role: null,
@@ -17,13 +17,12 @@ export const useAuthStore = defineStore("auth", {
             username: data.username,
             password: data.password,
           };
-
           const response = await AuthService.loginTeacher(teacher);
           if (response && response.data.access_token) {
             this.token = response.data.access_token;
             localStorage.setItem("token", this.token);
             this.isLoggedIn = true;
-            //console.log(localStorage.getItem("token"));
+            useToast().success("Đăng nhập thành công");
             router.push({ name: "teacher-schedule" });
           }
         }
@@ -42,7 +41,39 @@ export const useAuthStore = defineStore("auth", {
           }
         }
       } catch (error) {
-        console.error(error);
+        if (error.response.data.detail == "Incorrect username or password") {
+          useToast().error("Email hoặc mật khẩu không đúng!");
+        }
+      }
+    },
+    async signUp(data) {
+      try {
+        if (data.role === "teacher") {
+          const teacher = {
+            username: data.username,
+            password: data.password,
+            role: data.role,
+          };
+          const response = await AuthService.signUpTeacher(teacher);
+          console.log(response);
+          useToast().success("Đăng ký thành công");
+          router.push({ name: "login" });
+        }
+        if (data.role === "student") {
+          const student = {
+            username: data.username,
+            password: data.password,
+            role: data.role,
+          };
+          const response = await AuthService.signUpStudent(student);
+          console.log(response);
+          useToast().success("Đăng ký thành công");
+          router.push({ name: "login" });
+        }
+      } catch (error) {
+        if (error.response.data.detail == "Username already exists") {
+          useToast().error("Email đã tồn tại!");
+        }
       }
     },
   },

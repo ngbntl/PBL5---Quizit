@@ -17,7 +17,7 @@
                     {{ nameError }}
                 </p>
             </div>
-            <div class="mb-4">
+            <!-- <div class="mb-4">
                 <input type="text" v-model="phone" @blur="validatePhone" :class="`w-full px-3 py-2 border rounded-md focus:outline-none ${
             phoneError
               ? 'border-red-500'
@@ -26,7 +26,7 @@
                 <p v-if="phoneError" class="text-red-500 text-sm p-1">
                     {{ phoneError }}
                 </p>
-            </div>
+            </div> -->
             <div class="mb-4">
                 <input type="email" v-model="email" @blur="validateEmail" :class="`w-full px-3 py-2 border rounded-md focus:outline-none ${
             emailError

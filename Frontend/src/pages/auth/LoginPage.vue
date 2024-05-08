@@ -132,7 +132,7 @@ export default {
                 role: role.value
             };
             const authStore = useAuthStore();
-            console.log(data);
+
             authStore.login(data);
 
         };

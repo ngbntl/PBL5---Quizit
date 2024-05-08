@@ -7,14 +7,14 @@ import App from "./App.vue";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-// Import toàn bộ gói icon
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { fab } from "@fortawesome/free-brands-svg-icons";
 import { far } from "@fortawesome/free-regular-svg-icons";
 
-// Add toàn bộ gói icon vào thư viện
 library.add(fas, fab, far);
-
+import Toast from "vue-toastification";
+// Import the CSS or use your own!
+import "vue-toastification/dist/index.css";
 import "ant-design-vue/dist/reset.css";
 import {
   Calendar,
@@ -37,6 +37,7 @@ app.use(Button);
 app.use(Input);
 app.use(Calendar);
 app.use(Menu);
+app.use(Toast);
 
 app.use(createPinia());
 app.component("fa", FontAwesomeIcon);
