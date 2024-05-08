@@ -75,10 +75,11 @@ async def insert_students(teacher: Annotated[Teacher, Depends(get_current_user)]
 @teacher_group_router.get('/student', response_model=list[Res_Student], status_code=status.HTTP_200_OK)
 async def get_students_in_group(_: Annotated[Teacher, Depends(get_current_user)],
                                 group_student_service: Annotated[BO_group_student, Depends()],
-                                data: Annotated[Req_GroupStudent, Body()]):
+                                group_id: Annotated[str, Query(min_length=8, max_length=8)],
+                                is_join: Annotated[bool, Query()] = True):
     try:
         return [Res_Student(**student.__dict__) for student in
-                group_student_service.get_students_by_group(data.group_id, data.is_join)]
+                group_student_service.get_students_by_group(group_id, is_join)]
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
