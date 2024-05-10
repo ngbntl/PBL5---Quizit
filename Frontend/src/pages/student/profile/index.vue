@@ -1,49 +1,39 @@
 <template>
-    <div class="flex flex-col p-4">
-        <h1 class="text-2xl font-bold mb-4">Thông tin cá nhân</h1>
-
-        <div class="flex items-center mb-4">
-            <img :src="avatar" alt="Avatar" class="w-24 h-24 rounded-full mr-4" v-if="avatar" />
-            <button @click="$refs.fileInput.click()" class="px-4 py-2 bg-blue-500 text-white rounded">Thay đổi
-                avatar</button>
-            <input id="avatar" type="file" @change="onFileChange" ref="fileInput" class="hidden" />
-        </div>
-
-        <form @submit.prevent="updateProfile" class="w-full max-w-sm">
-            <button type="submit" class="w-full px-4 py-2 bg-green-500 text-white rounded">Cập nhật hồ sơ</button>
-        </form>
-
-        <router-view />
+  <div class="bg-white shadow rounded-lg p-6">
+    <div class="flex items-center space-x-4">
+      <img class="h-16 w-16 rounded-full" :src="student.image" alt="Student Image">
+      <div>
+        <h2 class="text-xl font-medium text-gray-800">{{ student.name }}</h2>
+        <p class="text-gray-600">{{ student.course }}</p>
+      </div>
     </div>
+    <div class="mt-6">
+      <h3 class="text-lg font-medium text-gray-800">About</h3>
+      <p class="text-gray-600">{{ student.about }}</p>
+    </div>
+    <div class="mt-6">
+      <h3 class="text-lg font-medium text-gray-800">Contact Information</h3>
+      <div class="grid grid-cols-2 gap-4 mt-2">
+        <div>
+          <p class="text-gray-600">Email:</p>
+          <p class="text-gray-800">{{ student.email }}</p>
+        </div>
+        <div>
+          <p class="text-gray-600">Phone:</p>
+          <p class="text-gray-800">{{ student.phone }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
-import { ref } from 'vue';
-
 export default {
-    setup() {
-        const avatar = ref(null);
-
-        const onFileChange = (e) => {
-            let files = e.target.files || e.dataTransfer.files;
-            if (!files.length)
-                return;
-            createImage(files[0]);
-        };
-
-        const createImage = (file) => {
-            let reader = new FileReader();
-            reader.onload = (e) => {
-                avatar.value = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        };
-
-        const updateProfile = () => {
-            console.log(avatar.value);
-        };
-
-        return { avatar, onFileChange, updateProfile };
-    }
+  props: {
+    student: {
+      type: Object,
+      required: true,
+    },
+  },
 };
 </script>
