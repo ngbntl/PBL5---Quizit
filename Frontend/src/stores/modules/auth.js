@@ -71,7 +71,10 @@ export const useAuthStore = defineStore("auth", {
           router.push({ name: "login" });
         }
       } catch (error) {
-        if (error.response.data.detail == "Username already exists") {
+        if (
+          error.response.data.detail ==
+          "(2627, b\"Violation of UNIQUE KEY constraint 'unq_tch_ema'. Cannot insert duplicate key in object 'dbo.teacher'. The duplicate key value is (teacher6@gmail.com).DB-Lib error message 20018, severity 14:\\nGeneral SQL Server error: Check messages from the SQL Server\\n\")"
+        ) {
           useToast().error("Email đã tồn tại!");
         }
       }
