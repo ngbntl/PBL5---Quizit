@@ -50,9 +50,9 @@ export const useAuthStore = defineStore("auth", {
       try {
         if (data.role === "teacher") {
           const teacher = {
-            username: data.username,
+            email: data.email,
             password: data.password,
-            role: data.role,
+            name: data.name,
           };
           const response = await AuthService.signUpTeacher(teacher);
           console.log(response);
