@@ -109,7 +109,7 @@ export default {
         const role = ref("teacher");
         const passwordError = ref("");
         const showPassword = ref(false);
-
+        //const
         const togglePasswordVisibility = () => {
             showPassword.value = !showPassword.value;
         }
