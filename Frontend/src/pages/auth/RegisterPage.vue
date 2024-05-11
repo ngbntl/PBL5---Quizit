@@ -8,7 +8,7 @@
             <div class="img w-2/3 bg-white m-28 shadow-md">
                 <img src="/src/assets/img/register.png" alt="" />
             </div>
-            <form class="form my-28 mx-12 bg-white shadow-md p-12 w-2/3" @submit.prevent="submitForm">
+            <form class="form my-28 mx-12 bg-white shadow-md p-12 w-2/3" @submit.prevent="validateForm">
                 <h2 class="text-3xl font-bold text-center mb-12">Đăng ký tài khoản</h2>
 
                 <div class="mb-4">
@@ -78,7 +78,7 @@
                         {{ passwordError }}
                     </p>
                 </div>
-                <button @click="validateForm"
+                <button
                     class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                     Đăng ký
                 </button>
@@ -109,7 +109,7 @@ export default {
         const role = ref("teacher");
         const passwordError = ref("");
         const showPassword = ref(false);
-        //const
+
         const togglePasswordVisibility = () => {
             showPassword.value = !showPassword.value;
         }
