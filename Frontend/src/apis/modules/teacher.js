@@ -34,6 +34,19 @@ export default {
       }
     );
   },
+  uploadImage(formData) {
+    return Api().post(
+      `teacher/collection/question_bank/question/attachment?question_id=RN3YUyCVv8`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+  },
+
   getQuestionBank(collectionId) {
     return Api().get(
       `teacher/collection/question_bank/?collection_id=${collectionId}`,

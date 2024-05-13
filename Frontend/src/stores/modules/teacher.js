@@ -11,6 +11,7 @@ export const useTeacherStore = defineStore("teacher", {
     questions: [],
     bankId: "",
     groupId: "",
+    questionId: "",
   }),
 
   actions: {
@@ -57,7 +58,7 @@ export const useTeacherStore = defineStore("teacher", {
     async addQuestionBank(bank) {
       try {
         const response = await teacherService.addQuestionBank(bank);
-        this.questionBank = this.getQuestionBank(this.tmpCollectionId);
+        this.questionBank = await this.getQuestionBank(this.tmpCollectionId);
         return response.data;
       } catch (error) {
         console.error(error);
@@ -70,7 +71,16 @@ export const useTeacherStore = defineStore("teacher", {
           questionBankId,
           question
         );
-        this.questions = this.getQuestions(this.bankId);
+        this.questions = await this.getQuestions(this.bankId);
+
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async uploadImage(formData) {
+      try {
+        const response = await teacherService.uploadImage(formData);
         return response.data;
       } catch (error) {
         console.error(error);
@@ -79,7 +89,7 @@ export const useTeacherStore = defineStore("teacher", {
     async getStudents(groupId) {
       try {
         const response = await teacherService.getStudents(groupId);
-        console.log(response.data);
+        // console.log(response.data);
         return response.data;
       } catch (error) {
         console.error(error);
