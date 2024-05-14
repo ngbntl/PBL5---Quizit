@@ -43,8 +43,8 @@ export default {
 
         const toolbarOptions = [
             { 'header': [1, 2, 3, 4, 5, 6, false] },
-            'bold', 'italic', 'underline', 'strike', 'link', 'code', 'audio',
-            { 'color': [] }, { 'background': [] }, 'image',
+            'bold', 'italic', 'underline', 'strike', 'link', 'code',
+            { 'color': [] }, { 'background': [] },
             { 'list': 'ordered' }, { 'list': 'bullet' },
             { align: [] },
 

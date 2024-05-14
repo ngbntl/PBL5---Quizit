@@ -15,6 +15,11 @@
                 -->
                 <Editor @add-question="handleContentUpdate" :response="response" />
 
+                <label class="block mb-2 mt-4 font-bold">Đính kèm: </label>
+                <input type="file" @change="handleFileChange"
+                    class="input rounded-md px-8 py-2  border-2 border-transparent focus:outline-none focus:border-blue-500 placeholder-gray-400 transition-all duration-300 shadow-md"
+                    placeholder="Chọn file..." required="" />
+
                 <label class="block mb-2 mt-4 font-bold">Độ khó: </label>
                 <select v-model="difficulty"
                     class="input rounded-md px-8 py-2  border-2 border-transparent focus:outline-none focus:border-blue-500 placeholder-gray-400 transition-all duration-300 shadow-md">
@@ -58,13 +63,25 @@ export default {
         const difficulty = ref(1);
         const answers = ref([{ text: '', isCorrect: false }]);
         const collection = computed(() => ({ question: question.value, answers: answers.value }));
+        const file = ref(null);
+        const resetForm = () => {
+            content.value = null;
+            difficulty.value = 1;
+            answers.value = [{ text: '', isCorrect: false }];
+            file.value = null;
+        };
 
+
+
+        const handleFileChange = (e) => {
+            console.log('handleFileChange called', e.target.files);
+            file.value = e.target.files[0];
+        }
 
         const handleContentUpdate = (textFromEditor) => {
             content.value = textFromEditor.replace(/<\/?p>/g, '');
 
         }
-
 
 
         const showModal = () => {
@@ -85,17 +102,27 @@ export default {
             const questions = [question];
             const response = await teacherStore.addQuestion(id, questions);
 
+            const formData = new FormData();
+            formData.append('attachment', file.value);
+            const res = response.toString();
+            console.log(res)
+
+            await teacherStore.uploadFile(formData, res);
+
+
             console.log(response.toString());
             setTimeout(() => {
                 loading.value = false;
                 open.value = false;
             }, 1000);
+            resetForm();
         };
 
 
 
         const handleCancel = () => {
             open.value = false;
+            resetForm();
         };
 
         const addAnswer = () => {
@@ -112,8 +139,10 @@ export default {
             answers,
             content,
             difficulty,
+            file,
             handleContentUpdate,
-
+            handleFileChange,
+            resetForm,
             addAnswer,
             removeAnswer,
             collection,

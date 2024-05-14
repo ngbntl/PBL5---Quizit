@@ -34,9 +34,9 @@ export default {
       }
     );
   },
-  uploadImage(formData) {
+  uploadFile(formData, questionId) {
     return Api().post(
-      `teacher/collection/question_bank/question/attachment?question_id=RN3YUyCVv8`,
+      `teacher/collection/question_bank/question/attachment?question_id=${questionId}`,
       formData,
       {
         headers: {
@@ -68,7 +68,7 @@ export default {
     );
   },
   getStudents(groupId) {
-    return Api().get(`teacher/group/student/`, groupId, {
+    return Api().get(`teacher/group/student?group_id=${groupId}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -83,6 +83,13 @@ export default {
   },
   getHiddenGroups() {
     return Api().get(`teacher/group/?is_show=0`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+  },
+  addGroup(groupName) {
+    return Api().post(`teacher/group/`, groupName, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
