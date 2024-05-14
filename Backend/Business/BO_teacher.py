@@ -37,8 +37,8 @@ class BO_teacher:
             raise ValueError("Password is required!")
         if data.name is None:
             raise ValueError("Name is required!")
-        return self.dao_teacher.insert_teacher(email=data.email, hash_pswd=bcrypt_context.hash(data.password),
-                                               name=data.name)
+
+        return self.dao_teacher.insert_teacher(Teacher({'email':data.email, 'hash_pswd':bcrypt_context.hash(data.password),'name':data.name}))
 
     # UPDATE
     def update_teacher(self, teacher_id: str, data: Req_Teacher) -> None:

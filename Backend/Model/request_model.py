@@ -100,3 +100,13 @@ class Req_GroupTest(BaseModel):
     end: datetime = None
     duration: int = Field(None, ge=1, le=180)
     shuffle: bool = False
+
+
+class Req_StudentWork(BaseModel):
+    index: int = Field(ge=0)
+    answer: list[int] = None
+
+
+class Req_StudentTest(BaseModel):
+    student_id: str = Field(None, min_length=8, max_length=8)
+    group_test_id: str = Field(min_length=8, max_length=8)

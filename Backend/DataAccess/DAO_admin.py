@@ -1,13 +1,16 @@
+import pymssql
+
 from Backend.DataAccess import get_MS_database, generate_id
+from Backend.Model.DB_model import Admin
 
 
 class DAO_admin:
     # QUERY
-    def get_admin_by_credential(self, username, hash_pswd) -> dict | None:
+    def get_admin_by_credential(self, username, hash_pswd) -> Admin | None:
         with get_MS_database(True) as cursor:
             cursor.execute("SELECT * FROM [admin] WHERE [username]=%s AND [hash_pswd]=%s", (username, hash_pswd))
             row = cursor.fetchone()
-            return row if row else None
+            return Admin(row) if row else None
 
     # INSERT
     def insert_admin(self, username, hash_pswd, name) -> str:
@@ -19,7 +22,9 @@ class DAO_admin:
                     cursor.execute("INSERT INTO [admin]([id], [username], [hash_pswd], [name])  VALUES (%s, %s, %s, %s)",
                                    (id, username, hash_pswd, name))
                     return id
-                except Exception as e:
+                except pymssql.Error as e:
+                    if failed_count == 0 and id not in str(e.args[1]):
+                        raise e
                     failed_count += 1
                     if failed_count == 5:
                         raise e

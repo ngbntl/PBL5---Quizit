@@ -101,3 +101,16 @@ class Res_TestStructure(BaseModel):
     test_id: str
     question_bank_id: str
     number_of_question: list[Res_NumberOfQuestion] | None = None
+
+
+class Res_StudentWork(BaseModel):
+    pass
+
+
+class Res_StudentTest(BaseModel):
+    student_id: str
+    group_test_id: str
+    start: datetime | None = None
+    end: datetime | None = None
+    student_work: Res_StudentWork | None = None
+    score: float | None = None

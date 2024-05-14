@@ -1,8 +1,6 @@
 import asyncio
 import os
-
 from fastapi import UploadFile
-
 from Backend.Model.DB_model import Student
 from Backend.Model.request_model import Req_Student
 from Backend.DataAccess.DAO_student import DAO_student
@@ -19,17 +17,16 @@ class BO_student:
             self._dao_student = DAO_student()
         return self._dao_student
 
-        # SELECT
-
-    def authenticate(self, username: str, password: str) -> Student | None:
+    # SELECT
+    def authenticate(self, username: str, password: str) -> Student:
         student = self.dao_student.get_student_by_email(email=username)
         if student:
             if bcrypt_context.verify(secret=password, hash=student.hash_pswd):
                 return student
         return None
 
-    def get_student_by_id(self, student_id: str) -> Student | None:
-        return self.dao_student.get_student_by_id(student_id)
+    def get_student_by_id(self, student_id: str) -> Student:
+        return self.dao_student.get_student_by_id(student_id=student_id)
 
     # INSERT
     def sign_up(self, data: Req_Student) -> str:
@@ -39,15 +36,16 @@ class BO_student:
             raise ValueError("Password is required!")
         if data.name is None:
             raise ValueError("Name is required!")
-        return self.dao_student.insert_student(email=data.email, name=data.name,
-                                               hash_pswd=bcrypt_context.hash(data.password))
+
+        return self.dao_student.insert_student(
+            Student({'email':data.email, 'name':data.name, 'hash_pswd':bcrypt_context.hash(data.password)}))
 
     # UPDATE
-    def update_student(self, student_id: str, data: Req_Student):
+    def update_student(self, data: Req_Student):
         if data.password is not None:
-            self.dao_student.update_password(student_id=student_id, hash_pswd=bcrypt_context.hash(data.password))
+            self.dao_student.update_password(student_id=data.id, hash_pswd=bcrypt_context.hash(data.password))
         if data.name is not None:
-            self.dao_student.update_name(student_id=student_id, name=data.name)
+            self.dao_student.update_name(student_id=data.id, name=data.name)
 
     def update_is_banned(self, student_id: str, is_banned: bool) -> None:
         self.dao_student.update_is_banned(student_id=student_id, is_banned=is_banned)
@@ -61,7 +59,8 @@ class BO_student:
             raise ValueError("Not supported extension: " + str(IMAGE_EXTENSIONS))
         relative_path = os.path.join("Student", student_id, "Avatar", student_id + extension)
         abs_path = os.path.join(STATIC_PATH, relative_path)
-        await asyncio.gather(self.upload_avatar_path(student_id=student_id, avatar_path=relative_path), save_file(path=abs_path, file=image))
+        await asyncio.gather(self.upload_avatar_path(student_id=student_id, avatar_path=relative_path),
+                             save_file(path=abs_path, file=image))
         return relative_path
 
     async def upload_avatar_path(self, student_id: str, avatar_path: str):

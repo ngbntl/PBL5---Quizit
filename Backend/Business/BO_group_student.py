@@ -50,9 +50,9 @@ class BO_group_student:
     #         raise ValueError(f"group {group_id} does not belong to {teacher_id}")
     #     self.dao_group_student.update_join_requests(group_id=group_id, student_id=student_id, accept=accept)
 
-    def update_student_group(self, student_id: str, data: Req_GroupStudent):
+    def update_student_group(self, data: Req_GroupStudent):
         if data.is_show is not None:
-            self.dao_group_student.update_visibility(group_id=data.group_id, student_id=student_id,
+            self.dao_group_student.update_visibility(group_id=data.group_id, student_id=data.student_id,
                                                      visibility=data.is_show)
 
     # DELETE

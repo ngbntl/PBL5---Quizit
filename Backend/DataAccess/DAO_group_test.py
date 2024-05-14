@@ -1,21 +1,27 @@
-from Backend.DataAccess import get_MS_database, generate_id
-from datetime import datetime
+import pymssql
 
 from Backend.Model.DB_model import GroupTest
+from Backend.DataAccess import get_MS_database, generate_id
 
 
 class DAO_group_test:
     # SELECT
-    def get_group_test(self, group_id: str) -> list[GroupTest]:
+    def get_group_test_by_group(self, group_id: str) -> list[GroupTest]:
         with get_MS_database(True) as cursor:
             cursor.execute("SELECT * FROM [group_test] WHERE [group_id] = %s", (group_id,))
             return [GroupTest(row) for row in cursor.fetchall()]
+
+    def get_group_test_by_id(self, group_test_id: str) -> GroupTest:
+        with get_MS_database(True) as cursor:
+            cursor.execute("SELECT * FROM [group_test] WHERE [id] = %s", group_test_id)
+            row = cursor.fetchone()
+            return GroupTest(row) if row else None
+
 
     # INSERT
     def insert_group_test(self, data: GroupTest) -> str:
         id = generate_id(8)
         failed_count = 0
-        duplicate_PK = False
         with get_MS_database(False) as cursor:
             while True:
                 try:
@@ -23,20 +29,20 @@ class DAO_group_test:
                         "INSERT INTO [group_test]([id], [group_id], [test_id], [start], [end], [duration], [shuffle])  VALUES (%s, %s, %s, %s, %s, %s, %s)",
                         (id, data.group_id, data.test_id, data.start, data.end, data.duration, data.shuffle))
                     return id
-                except Exception as e:
-                    if duplicate_PK is False and id not in str(e.args[1]):
-                        raise e  # Another error. Not duplicate id
-                    duplicate_PK = True  # Not athor error. Duplicate id
+                except pymssql.Error as e:
+                    if failed_count == 0 and id not in str(e.args[1]):
+                        raise e
                     failed_count += 1
                     if failed_count == 5:
                         raise e
                     id = generate_id(8)
 
     # UPDATE
-    def update_time(self, group_test_id: str, star: datetime, end: datetime) -> None:
+    def update_group_test(self, data: GroupTest) -> None:
         with get_MS_database(False) as cursor:
-            cursor.execute("UPDATE [group_test] SET [start] = %s, [end] = %s WHERE [id] = %s",
-                           (star, end, group_test_id))
+            cursor.execute(
+                "UPDATE [group_test] SET [start]=%s, [end]=%s, [duration]=%s, [shuffle]=%s WHERE [id]=%s",
+                (data.start, data.end, data.duration, data.shuffle, data.id))
 
     # DELETE
     def delete_group_test(self, group_test_id: str) -> None:

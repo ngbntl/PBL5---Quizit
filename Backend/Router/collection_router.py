@@ -40,7 +40,8 @@ async def insert_collection(teacher: Annotated[Teacher, Depends(get_current_user
                             collection_service: Annotated[BO_collection, Depends()]):
 
     try:
-        return collection_service.insert_collection(teacher.id, data)
+        data.teacher_id = teacher.id
+        return collection_service.insert_collection(data)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
@@ -52,7 +53,8 @@ async def update_collection(teacher: Annotated[Teacher, Depends(get_current_user
     try:
         if data.id is None:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="id is required!")
-        collection_service.update_collection(teacher_id=teacher.id, data=data)
+        data.teacher_id = teacher.id
+        collection_service.update_collection(data=data)
     except HTTPException as e:
         raise e
     except Exception as e:

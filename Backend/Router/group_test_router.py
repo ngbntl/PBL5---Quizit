@@ -25,10 +25,33 @@ async def insert_group_test(teacher: Annotated[Teacher, Depends(get_current_user
 
 # SELECT
 @group_test_router.get('/', status_code=status.HTTP_200_OK)
-async def get_group_test(user: Annotated[Teacher | Student, Depends(get_current_user)],
+async def get_group_test(_: Annotated[Teacher | Student, Depends(get_current_user)],
                          group_test_service: Annotated[BO_group_test, Depends()],
                          group_id: Annotated[str, Query(min_length=8, max_length=8)]) -> list[Res_GroupTest]:
     try:
-        return group_test_service.get_group_test(group_id)
+        return [Res_GroupTest(**group_test.__dict__) for group_test in group_test_service.get_group_test_in_group(group_id)]
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+# UPDATE
+@group_test_router.put('/teacher', status_code=status.HTTP_200_OK)
+async def update_group_test(teacher: Annotated[Teacher, Depends(get_current_user)],
+                            data: Annotated[Req_GroupTest, Body()],
+                            group_test_service: Annotated[BO_group_test, Depends()]):
+    try:
+        return group_test_service.update_group_test(teacher.id, data)
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+# DELETE
+@group_test_router.delete('/teacher', status_code=status.HTTP_200_OK)
+async def delete_group_test(teacher: Annotated[Teacher, Depends(get_current_user)],
+                            group_test_id: Annotated[str, Query(min_length=8, max_length=8)],
+                            group_test_service: Annotated[BO_group_test, Depends()]):
+    try:
+        group_test_service.delete_group_test(teacher.id, group_test_id)
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+

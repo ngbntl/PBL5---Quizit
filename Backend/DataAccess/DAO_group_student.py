@@ -26,6 +26,12 @@ class DAO_group_student:
             """, (student_id, is_join))
             return [Group(record) for record in cursor.fetchall()]
 
+    def check_student_in_group(self, group_id: str, student_id: str) -> bool:
+        with get_MS_database(False) as cursor:
+            cursor.execute("SELECT TOP 1 * FROM [group_student] WHERE [group_id] = %s AND [student_id] = %s",
+                           (group_id, student_id))
+            return cursor.fetchone() is not None
+
     # INSERT
     def request_join(self, group_id: str, student_id: str) -> None:
         with get_MS_database(False) as cursor:

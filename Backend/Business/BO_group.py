@@ -24,15 +24,15 @@ class BO_group:
         return group
 
     # INSERT
-    def insert_group(self, teacher_id: str, data: Req_Group) -> str:
+    def insert_group(self, data: Req_Group) -> str:
         if data.name is None:
             raise Exception("name is required!")
-        return self.dao_group.insert_group(teacher_id, data.name)
+        return self.dao_group.insert_group(data.name)
 
     # UPDATE
-    def update_group(self, teacher_id: str, data: Req_Group):
-        if self.dao_group.check_owner(data.id, teacher_id) is False:
-            raise Exception(f"Group {data.id} is not belong to teacher {teacher_id}!")
+    def update_group(self, data: Req_Group):
+        if self.dao_group.check_owner(data.id, data.teacher_id) is False:
+            raise Exception(f"Group {data.id} is not belong to teacher {data.teacher_id}!")
         if data.is_show is not None:
             self.dao_group.update_visibility(group_id=data.id, is_show=data.is_show)
         if data.name is not None:

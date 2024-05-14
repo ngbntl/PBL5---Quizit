@@ -42,7 +42,7 @@ class BO_question:
             'question_bank_id': question_bank_id,
             'content': data.content,
             'answer': pickle.dumps([{'content': a.content, 'is_correct': a.is_correct} for a in
-                                    (data.answer if data.answer is not None else [])]),
+                                    (data.answer if isinstance(data.answer, list) else [])]),
             'difficulty': data.difficulty
         }))
 

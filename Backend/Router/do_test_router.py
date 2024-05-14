@@ -9,6 +9,6 @@ from Backend.Business.BO_group import BO_group
 from Backend.Business.BO_group_student import BO_group_student
 from Backend.Business.BO_authenticate import get_current_user
 
-do_test_router = APIRouter(prefix='student_test')
+do_test_router = APIRouter(prefix='/student_test')
 
-@do_test_router.get('/')
+# @do_test_router.get('/')

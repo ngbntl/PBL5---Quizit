@@ -69,6 +69,7 @@ create table [group]
     [teacher_id]        char(8) collate SQL_Latin1_General_CP1_CS_AS not null,
     [created_timestamp] datetime default getdate(),
     [is_show]           bit      default (1),
+    [image_path]        varchar(255),
     -- constraint
     constraint [pk_grp] primary key ([id]),
     constraint [fk_grp_tch] foreign key ([teacher_id]) references [teacher] (id),

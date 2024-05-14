@@ -1,6 +1,6 @@
+import pymssql
 from Backend.DataAccess import get_MS_database, generate_id
 from Backend.Model.DB_model import Collection
-from Backend.Model.request_model import Req_Collection
 
 
 class DAO_collection:
@@ -13,29 +13,33 @@ class DAO_collection:
     def get_collection_by_id(self, collection_id) -> Collection:
         with get_MS_database(True) as cursor:
             cursor.execute("SELECT * FROM [collection] WHERE [id]=%s", collection_id)
-            return Collection(cursor.fetchone())
+            row = cursor.fetchone()
+            return Collection(row) if row else None
 
     def check_owner(self, collection_id: str, teacher_id: str) -> bool:
         with get_MS_database(False) as cursor:
-            cursor.execute("SELECT [id] FROM [collection] WHERE [id]=%s AND [teacher_id]=%s", (collection_id, teacher_id))
+            cursor.execute("SELECT TOP 1 [id] FROM [collection] WHERE [id]=%s AND [teacher_id]=%s",
+                           (collection_id, teacher_id))
             return cursor.fetchone() is not None
 
     # INSERT
-    def insert_collection(self, teacher_id: str, name: str) -> str:
+    def insert_collection(self, data: Collection) -> str:
+        failed_count = 0
         with get_MS_database(False) as cursor:
-            failed_count = 0
             while True:
                 id = generate_id(8)
                 try:
                     cursor.execute("INSERT INTO [collection] ([id], [name], [teacher_id]) VALUES (%s, %s, %s)",
-                                   (id, name, teacher_id))
+                                   (id, data.name, data.teacher_id))
                     return id
-                except Exception as e:
+                except pymssql.Error as e:
+                    if failed_count == 0 and id not in str(e.args[1]):
+                        raise e
                     failed_count += 1
                     if failed_count == 5:
                         raise e
 
     # UPDATE
-    def update_name(self, id: str, name: str) -> None:
+    def update_name(self, id: str, name: str):
         with get_MS_database(False) as cursor:
             cursor.execute("UPDATE [collection] SET [name]=%s WHERE [id]=%s", (name, id))

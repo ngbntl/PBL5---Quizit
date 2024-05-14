@@ -1,3 +1,5 @@
+import pymssql
+
 from Backend.DataAccess import get_MS_database, generate_id
 from Backend.Model.DB_model import QuestionBank
 
@@ -31,7 +33,9 @@ class DAO_question_bank:
                     cursor.execute("INSERT INTO [question_bank] ([id], [collection_id], [name]) VALUES (%s, %s, %s)",
                                    (id, collection_id, name))
                     return id
-                except Exception as e:
+                except pymssql.Error as e:
+                    if failed_count == 0 and id not in str(e.args[1]):
+                        raise e
                     failed_count += 1
                     if failed_count == 5:
                         raise e

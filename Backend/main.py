@@ -1,4 +1,5 @@
-from Backend.WebSocket import app
+# from Backend.WebSocket import app
+from Backend.Router import app
 
 import logging
 

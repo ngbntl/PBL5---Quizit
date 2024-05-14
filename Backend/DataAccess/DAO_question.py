@@ -1,4 +1,7 @@
 import pickle
+
+import pymssql
+
 from Backend.DataAccess import get_MS_database, generate_id
 from Backend.Model.DB_model import Question, QuestionBank
 from Backend.Model.response_model import Res_NumberOfQuestion
@@ -7,34 +10,36 @@ from Backend.Model.response_model import Res_NumberOfQuestion
 class DAO_question:
     # INSERT
     def insert_question(self, question: Question) -> str:
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             failed_count = 0
             while True:
                 id = generate_id(10)
                 try:
                     cursor.execute(
-                        "SELECT ISNULL(MAX([order_number]) + 1, -32768) AS NEXT_ID FROM [question] WHERE [question_bank_id] = %s",
+                        "SELECT ISNULL(MAX([order_number]) + 1, -32768) FROM [question] WHERE [question_bank_id] = %s",
                         question.question_bank_id)
-                    next_order_number = cursor.fetchone()['NEXT_ID']
+                    next_order_number = cursor.fetchone()[0]
                     cursor.execute(
                         "INSERT INTO [question] ([id], [order_number], [question_bank_id], [content], [answer], [difficulty]) VALUES (%s, %s, %s, %s, %s, %s)",
                         (id, next_order_number, question.question_bank_id, question.content, question.answer,
                          question.difficulty))
                     return id
-                except Exception as e:
+                except pymssql.Error as e:
+                    if failed_count == 0 and id not in str(e.args[1]):
+                        raise e
                     failed_count += 1
                     if failed_count == 5:
                         raise e
 
     def insert_questions(self, question_bank_id: str, data: list[Question]) -> list[str]:
-        with get_MS_database(True) as cursor:
+        with get_MS_database(False) as cursor:
             failed_count = 0
             while True:
                 try:
                     cursor.execute(
-                        "SELECT ISNULL(MAX([order_number]) + 1, -32768) AS NEXT_ID FROM [question] WHERE [question_bank_id] = %s",
+                        "SELECT ISNULL(MAX([order_number]) + 1, -32768) FROM [question] WHERE [question_bank_id] = %s",
                         question_bank_id)
-                    next_order_number = cursor.fetchone()['NEXT_ID']
+                    next_order_number = cursor.fetchone()[0]
                     statement = "INSERT INTO [question] ([id], [order_number], [question_bank_id], [content], [answer], [difficulty]) VALUES (%s, %s, %s, %s, %s, %s)"
                     seq_of_parameters = [
                         (generate_id(10), next_order_number + i, question_bank_id, q.content, q.answer, q.difficulty)

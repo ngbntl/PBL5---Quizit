@@ -16,7 +16,7 @@ question_router = APIRouter(prefix='/question', tags=['question'])
 async def insert_questions(teacher: Annotated[Teacher, Depends(get_current_user)],
                            question_bank_id: Annotated[str, Query(min_length=8, max_length=8)],
                            data: Annotated[list[Req_Question], Body()],
-                           question_service: Annotated[BO_question, Depends()]) -> list[str]:
+                           question_service: Annotated[BO_question, Depends()]) -> list[str] | str:
     try:
         return question_service.insert_questions(teacher_id=teacher.id, question_bank_id=question_bank_id, data=data)
     except Exception as e:

@@ -9,8 +9,9 @@ from Backend.Business.BO_group import BO_group
 from Backend.Business.BO_group_student import BO_group_student
 from Backend.Business.BO_authenticate import get_current_user
 
-student_group_router = APIRouter(prefix='/group', tags=['group', 'student'])
-teacher_group_router = APIRouter(prefix='/group', tags=['group', 'teacher'])
+student_group_router = APIRouter(prefix='/group', tags=['group'])
+teacher_group_router = APIRouter(prefix='/group', tags=['group'])
+
 
 ### TEACHER ###
 @teacher_group_router.post('/', status_code=status.HTTP_201_CREATED)
@@ -18,20 +19,10 @@ async def insert_group(teacher: Annotated[Teacher, Depends(get_current_user)],
                        data: Annotated[Req_Group, Body()],
                        group_service: Annotated[BO_group, Depends()]):
     try:
-        return group_service.insert_group(teacher.id, data)
+        data.teacher_id = teacher.id
+        return group_service.insert_group(data)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-
-
-# @teacher_group_router.get('/', response_model=list[Res_Group], status_code=status.HTTP_200_OK,
-#                           response_model_exclude_unset=True)
-# async def get_groups(teacher: Annotated[Teacher, Depends(get_current_user)],
-#                      group_service: Annotated[group_business, Depends()],
-#                      is_show: Annotated[bool, Query()] = True):
-#     try:
-#
-#     except Exception as e:
-#         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 @teacher_group_router.get('/', response_model=Union[Res_Group, list[Res_Group]], status_code=status.HTTP_200_OK,
@@ -43,9 +34,11 @@ async def get_group(teacher: Annotated[Teacher, Depends(get_current_user)],
     try:
         if group_id is not None:
             group = group_service.get_group_by_id(group_id, teacher.id)
-            return Res_Group(id=group.id, name=group.name, created_timestamp=group.created_timestamp, is_show=group.is_show)
+            return Res_Group(id=group.id, name=group.name, created_timestamp=group.created_timestamp,
+                             is_show=group.is_show)
         else:
-            return [Res_Group(id=group.id, name=group.name, created_timestamp=group.created_timestamp, is_show=group.is_show) for group in
+            return [Res_Group(id=group.id, name=group.name, created_timestamp=group.created_timestamp,
+                              is_show=group.is_show) for group in
                     group_service.get_groups_by_teacher(teacher.id, is_show)]
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
@@ -56,7 +49,8 @@ async def update_visibility(teacher: Annotated[Teacher, Depends(get_current_user
                             data: Annotated[Req_Group, Body()],
                             group_service: Annotated[BO_group, Depends()]):
     try:
-        group_service.update_group(teacher.id, data)
+        data.teacher_id = teacher.id
+        group_service.update_group(data)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
@@ -116,7 +110,8 @@ async def get_groups(student: Annotated[Student, Depends(get_current_user)],
         if just_id:
             return group_student_service.get_group_id_by_student(student.id, join)
         else:
-            return [Res_Group(**group.__dict__) for group in group_student_service.get_groups_by_student(student_id=student.id, is_join=join)]
+            return [Res_Group(**group.__dict__) for group in
+                    group_student_service.get_groups_by_student(student_id=student.id, is_join=join)]
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
@@ -136,7 +131,8 @@ async def update_student_group(student: Annotated[Student, Depends(get_current_u
                                data: Annotated[Req_GroupStudent, Body()],
                                group_student_service: Annotated[BO_group_student, Depends()]):
     try:
-        group_student_service.update_student_group(student.id, data)
+        data.student_id = student.id
+        group_student_service.update_student_group(data)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 

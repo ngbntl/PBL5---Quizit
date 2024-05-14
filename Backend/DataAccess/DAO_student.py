@@ -2,7 +2,6 @@ import pymssql
 
 from Backend.DataAccess import get_MS_database, generate_id
 from Backend.Model.DB_model import Student
-from Backend.Model.request_model import Req_Student
 
 
 class DAO_student:
@@ -19,26 +18,21 @@ class DAO_student:
         with get_MS_database(True) as cursor:
             cursor.execute("SELECT * FROM [student] WHERE [id]=%s", (student_id,))
             row = cursor.fetchone()
-            if row is not None:
-                return Student(row)
-            return None
+            return Student(row) if row else None
 
     # INSERT
-    def insert_student(self, email: str, name: str, hash_pswd: str) -> str:
+    def insert_student(self, student: Student) -> str:
         failed_count = 0
         with get_MS_database(False) as cursor:
-            duplicate_PK = False
             while True:
                 id = generate_id(8)
                 try:
                     cursor.execute("INSERT INTO [student]([id], [email], [hash_pswd], [name])  VALUES (%s, %s, %s, %s)",
-                                   (id, email, hash_pswd, name))
+                                   (id, student.email, student.hash_pswd, student.name))
                     return id
                 except pymssql.Error as e:
-                    if duplicate_PK is False and id not in str(e.args[1]):
-                        raise e  # Another error. Not duplicate_PK
-                    duplicate_PK = True  # Not athor error. duplicate_PK
-
+                    if failed_count == 0 and id not in str(e.args[1]):
+                        raise e
                     failed_count += 1
                     if failed_count == 5:
                         raise e

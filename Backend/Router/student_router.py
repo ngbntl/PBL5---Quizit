@@ -7,9 +7,11 @@ from Backend.Model.response_model import Res_Student
 from Backend.Business.BO_student import BO_student
 from Backend.Business.BO_authenticate import get_current_user
 from Backend.Router.group_router import student_group_router
+from Backend.Router.student_test_router import student_test_router
 
 student_router = APIRouter(prefix='/student', tags=['student'])
 student_router.include_router(student_group_router)
+student_router.include_router(student_test_router)
 
 
 @student_router.post('/sign_up', status_code=status.HTTP_201_CREATED)
@@ -54,7 +56,8 @@ async def update(student: Annotated[Student, Depends(get_current_user)],
     :return:
     """
     try:
-        student_service.update_student(student_id=student.id, data=data)
+        data.id = student.id
+        student_service.update_student(data=data)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
 

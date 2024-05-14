@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 
 
@@ -115,3 +114,18 @@ class StudentTest:
         self.end: datetime | None = data.get("end")
         self.student_work: bytes | None = data.get("student_work")
         self.score: int | None = data.get("score")
+
+
+
+
+class StudentWork_Question:
+    def __init__(self, data: dict) -> None:
+        self.content: str | None = data.get("content")
+        self.answer: list | None = data.get("answer")
+        self.attachment: list[str] | None = data.get("attachment")
+        self.student_answer: bytes | None = data.get("student_answer")
+
+
+class StudentWork:
+    def __init__(self, data: dict) -> None:
+        self.student_work = data.get("student_work")

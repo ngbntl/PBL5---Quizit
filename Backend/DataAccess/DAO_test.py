@@ -1,3 +1,5 @@
+import pymssql
+
 from Backend.DataAccess import get_MS_database, generate_id
 from Backend.Model.DB_model import Test
 
@@ -10,9 +12,7 @@ class DAO_test:
             return [Test(t) for t in cursor.fetchall()]
 
     def check_owner(self, test_id: str, teacher_id: str) -> bool:
-        SQL = """
-            SELECT * FROM [test] JOIN [collection] ON [test].[collection_id]=[collection].[id] WHERE [test].[id]=%s AND [collection].[teacher_id]=%s
-        """
+        SQL = "SELECT * FROM [test] JOIN [collection] ON [test].[collection_id]=[collection].[id] WHERE [test].[id]=%s AND [collection].[teacher_id]=%s"
         with get_MS_database(False) as cursor:
             cursor.execute(SQL, (test_id, teacher_id))
             return cursor.fetchone() is not None
@@ -27,8 +27,9 @@ class DAO_test:
                     cursor.execute("INSERT INTO [test] ([id], [collection_id], [name]) VALUES (%s, %s, %s)",
                                    (id, data.collection_id, data.name))
                     return id
-                except Exception as e:
-                    failed_count += 1
+                except pymssql.Error as e:
+                    if failed_count == 0 and id not in str(e.args[1]):
+                        raise e
                     if failed_count == 5:
                         raise e
 

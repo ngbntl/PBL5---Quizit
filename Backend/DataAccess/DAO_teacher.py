@@ -10,34 +10,27 @@ class DAO_teacher:
         with get_MS_database(True) as cursor:
             cursor.execute("SELECT * FROM [teacher] WHERE [email]=%s", (email,))
             row = cursor.fetchone()
-            if row is not None:
-                return Teacher(row)
-            return None
+            return Teacher(row) if row else None
 
     def get_teacher_by_id(self, teacher_id: str) -> Teacher | None:
         with get_MS_database(True) as cursor:
             cursor.execute("SELECT * FROM [teacher] WHERE [id]=%s", (teacher_id,))
             row = cursor.fetchone()
-            if row is not None:
-                return Teacher(row)
-            return None
+            return Teacher(row) if row else None
 
     # INSERT
-    def insert_teacher(self, email: str, hash_pswd: str, name: str) -> str:
+    def insert_teacher(self, data: Teacher) -> str:
         failed_count = 0
         with get_MS_database(False) as cursor:
-            duplicate_id = False
             while True:
                 id = generate_id(8)
                 try:
                     cursor.execute("INSERT INTO [teacher]([id], [email], [hash_pswd], [name])  VALUES (%s, %s, %s, %s)",
-                                   (id, email, hash_pswd, name))
+                                   (id, data.email, data.hash_pswd, data.name))
                     return id
                 except pymssql.Error as e:
-                    if duplicate_id is False and id not in str(e.args[1]):
+                    if failed_count == 0 and id not in str(e.args[1]):
                         raise e
-                    duplicate_id = True
-
                     failed_count += 1
                     if failed_count == 5:
                         raise e
