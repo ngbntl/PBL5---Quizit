@@ -1,5 +1,16 @@
 <template>
-    <h1 class="text-2xl ml-10 mt-5">Bộ sưu tập: {{ collectionName }}</h1>
+    <div class="flex items-center">
+        <button @click="$router.go(-1)" class="ml-10 mt-5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+        </button>
+        <h1 class="text-2xl ml-10 mt-5">Bộ sưu tập: {{ collectionName }}</h1>
+
+    </div>
+
+
     <div class="flex justify-end m-4 -mt-4 mr-8">
         <add-question-bank />
     </div>

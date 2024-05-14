@@ -25,7 +25,7 @@
 
 
         <div class="flex justify-end items-center hover:cursor-pointer">
-            <router-link to="profile"> <a-avatar
+            <router-link :to="{name: 'teacher-profile'}"> <a-avatar
                     class="text-orange-600 bg-orange-200 absolute transform -translate-x-1/2 translate-y-1/2 top-0 ">B</a-avatar>
             </router-link>
         </div>

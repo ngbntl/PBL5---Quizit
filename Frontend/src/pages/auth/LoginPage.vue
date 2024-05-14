@@ -7,7 +7,7 @@
                 <img src="/src/assets/img/Exams-bro.png" alt="" />
             </div>
 
-            <form class="p-6 bg-white rounded shadow-md w-1/2" @submit.prevent="submitForm">
+            <form class="p-6 bg-white rounded shadow-md w-1/2" @submit.prevent="validateForm">
                 <h2 class="text-3xl font-bold text-center my-16">Đăng nhập</h2>
 
                 <div class="mb-4">
@@ -46,7 +46,8 @@
                                     ? 'border-red-500'
                                     : 'border-gray-300 focus:border-blue-500'
                             }`" placeholder="Mật khẩu" />
-                    <button v-if="!passwordError" class="absolute inset-y-0 right-0 pr-3 pb-1 flex items-center"
+                    <button type="button" v-if="!passwordError"
+                        class="absolute inset-y-0 right-0 pr-3 pb-1 flex items-center"
                         @click="togglePasswordVisibility">
                         <img v-if="showPassword" src="/src/assets/icon/show.png" alt="" class="h-6 w-6">
                         <img v-else src="/src/assets/icon/hide.png" alt="" class="h-6 w-6">
@@ -59,7 +60,7 @@
                 <p class="text-right text-blue-500 hover:text-blue-700 cursor-pointer pb-2">
                     Quên mật khẩu?
                 </p>
-                <button @click="validateForm"
+                <button
                     class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                     Đăng nhập
                 </button>
@@ -85,7 +86,7 @@ export default {
         const emailError = ref("");
         const passwordError = ref("");
         const role = ref("Teacher");
-        const showPassword = ref(true);
+        const showPassword = ref(false);
 
         const togglePasswordVisibility = () => {
             showPassword.value = !showPassword.value;

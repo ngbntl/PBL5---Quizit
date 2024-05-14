@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import teacherService from "../../apis/modules/teacher.js";
+import { useToast } from "vue-toastification";
 
 export const useTeacherStore = defineStore("teacher", {
   state: () => ({
@@ -11,9 +12,12 @@ export const useTeacherStore = defineStore("teacher", {
     questions: [],
     bankId: "",
     groupId: "",
+    questionId: "",
   }),
 
   actions: {
+    //collection
+
     async getCollections() {
       try {
         const response = await teacherService.getCollection();
@@ -34,6 +38,9 @@ export const useTeacherStore = defineStore("teacher", {
         console.error(error);
       }
     },
+
+    //question
+
     async getQuestionBank(collectionId) {
       try {
         const response = await teacherService.getQuestionBank(collectionId);
@@ -57,7 +64,7 @@ export const useTeacherStore = defineStore("teacher", {
     async addQuestionBank(bank) {
       try {
         const response = await teacherService.addQuestionBank(bank);
-        this.questionBank = this.getQuestionBank(this.tmpCollectionId);
+        this.questionBank = await this.getQuestionBank(this.tmpCollectionId);
         return response.data;
       } catch (error) {
         console.error(error);
@@ -70,16 +77,34 @@ export const useTeacherStore = defineStore("teacher", {
           questionBankId,
           question
         );
-        this.questions = this.getQuestions(this.bankId);
+        useToast().success("Đã thêm câu hỏi");
+
+        this.questions = await this.getQuestions(this.bankId);
+
         return response.data;
       } catch (error) {
         console.error(error);
+        useToast().error("Thêm thất bại");
       }
     },
+    async uploadFile(formData, questionId) {
+      try {
+        const response = await teacherService.uploadFile(formData, questionId);
+        this.questions = await this.getQuestions(this.bankId);
+
+        return response.data;
+      } catch (error) {
+        console.error(error);
+        useToast().error("Tải ảnh lên thất bại!");
+      }
+    },
+
+    //students
+
     async getStudents(groupId) {
       try {
         const response = await teacherService.getStudents(groupId);
-        console.log(response.data);
+        // console.log(response.data);
         return response.data;
       } catch (error) {
         console.error(error);
@@ -98,6 +123,14 @@ export const useTeacherStore = defineStore("teacher", {
       try {
         const response = await teacherService.getHiddenGroups();
         console.log(response.data);
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async addGroup(groupName) {
+      try {
+        const response = await teacherService.addGroup(groupName);
         return response.data;
       } catch (error) {
         console.error(error);

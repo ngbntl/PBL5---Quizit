@@ -7,9 +7,9 @@
                 <a-button key="submit" type="primary" :loading="loading" @click="handleOk">Xác nhận</a-button>
             </template>
             <div class="p-4">
-                <label class="block mb-2">Tên bộ sưu tập: </label>
+                <label class="block mb-2">Tên nhóm: </label>
 
-                <input v-model="collectionName"
+                <input v-model="groupName"
                     class="input rounded-md px-8 py-2  border-2 border-transparent focus:outline-none focus:border-blue-500 placeholder-gray-400 transition-all duration-300 shadow-md"
                     placeholder="Nhập tên..." required="" type="text" />
             </div>
@@ -26,8 +26,8 @@ export default {
         const teacherStore = useTeacherStore();
         const loading = ref(false);
         const open = ref(false);
-        const collectionName = ref('');
-        const collection = computed(() => ({ name: collectionName.value }));
+        const groupName = ref('');
+        const group = computed(() => ({ name: groupName.value }));
 
 
         const showModal = () => {
@@ -44,9 +44,9 @@ export default {
             }, 2000);
         };
 
-        const addCollection = async (name) => {
-            const result = await teacherStore.addCollection(name);
-            collectionName.value = result;
+        const addGroup = async (name) => {
+            const result = await teacherStore.addGroup(name);
+            groupName.value = result;
             open.value = false;
         };
 
@@ -57,12 +57,10 @@ export default {
         return {
             open,
             loading,
-            collectionName,
-            collection,
+            groupName,
             showModal,
             handleOk,
-            handleCancel,
-            addCollection
+            handleCancel
         };
     }
 }
