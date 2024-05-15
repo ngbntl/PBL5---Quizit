@@ -1,8 +1,13 @@
+import pickle
+
 from Backend.DataAccess.DAO_group import DAO_group
 from Backend.DataAccess.DAO_group_test import DAO_group_test
+from Backend.DataAccess.DAO_question import DAO_question
 from Backend.DataAccess.DAO_test import DAO_test
+from Backend.DataAccess.DAO_test_structure import DAO_test_structure
 from Backend.Model.DB_model import GroupTest
-from Backend.Model.request_model import Req_GroupTest
+from Backend.Model.request_model import Req_GroupTest, Req_NumberOfQuestion
+from Backend.Model.response_model import Res_StudentTestQuestion
 
 
 class BO_group_test:
@@ -10,6 +15,8 @@ class BO_group_test:
         self._dao_group_test = None
         self._dao_group = None
         self._dao_test = None
+        self._dao_test_structure = None
+        self._dao_question = None
 
     @property
     def dao_group_test(self):
@@ -29,6 +36,18 @@ class BO_group_test:
             self._dao_test = DAO_test()
         return self._dao_test
 
+    @property
+    def dao_test_structure(self):
+        if not self._dao_test_structure:
+            self._dao_test_structure = DAO_test_structure()
+        return self._dao_test_structure
+
+    @property
+    def dao_question(self):
+        if not self._dao_question:
+            self._dao_question = DAO_question()
+        return self._dao_question
+
     # INSERT
     def insert_group_test(self, teacher_id: str, data: Req_GroupTest) -> str:
         if self.dao_group.check_owner(data.group_id, teacher_id) is False:
@@ -40,8 +59,20 @@ class BO_group_test:
     def get_group_test_in_group(self, group_id: str) -> list[GroupTest]:
         return self.dao_group_test.get_group_test_by_group(group_id)
 
-    def generate_test_for_student(self, group_test_id: str) -> ...:
-        pass
+    def generate_student_work(self, group_test_id: str) -> list[Res_StudentTestQuestion]:
+        # Get group test by id
+        grp_ts = self.dao_group_test.get_group_test_by_id(group_test_id)
+        if grp_ts is None:
+            raise Exception(f"Group test {group_test_id} not found")
+        # Then get test by id
+        test = self.dao_test.get_test_by_id(grp_ts.test_id)
+        # Get test structure
+        test_struct = self.dao_test_structure.get_structure(test.id)
+        # For each test structure, get the number of question then get the question
+        for ts in test_struct:
+            noq: list[Req_NumberOfQuestion] = pickle.loads(ts.number_of_question)
+            for n in noq:
+                pass
 
     # UPDATE
     def update_group_test(self, teacher_id: str, data: Req_GroupTest):

@@ -17,6 +17,11 @@ class DAO_test:
             cursor.execute(SQL, (test_id, teacher_id))
             return cursor.fetchone() is not None
 
+    def get_test_by_id(self, test_id: str) -> Test:
+        with get_MS_database(True) as cursor:
+            cursor.execute("SELECT * FROM [test] WHERE [id]=%s", test_id)
+            return Test(cursor.fetchone())
+
     # INSERT
     def insert_test(self, data: Test) -> str:
         failed_count = 0

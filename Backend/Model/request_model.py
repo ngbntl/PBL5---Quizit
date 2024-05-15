@@ -108,5 +108,4 @@ class Req_StudentWork(BaseModel):
 
 
 class Req_StudentTest(BaseModel):
-    student_id: str = Field(None, min_length=8, max_length=8)
     group_test_id: str = Field(min_length=8, max_length=8)

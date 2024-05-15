@@ -17,7 +17,6 @@ class DAO_group_test:
             row = cursor.fetchone()
             return GroupTest(row) if row else None
 
-
     # INSERT
     def insert_group_test(self, data: GroupTest) -> str:
         id = generate_id(8)

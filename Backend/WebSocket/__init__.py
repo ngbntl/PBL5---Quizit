@@ -8,9 +8,11 @@ from starlette.websockets import WebSocketDisconnect
 from Backend.Business.BO_authenticate import get_current_user
 from Backend.Model.DB_model import Student
 from Backend.Router import app
+from Backend.WebSocket.Room_GroupTest import Room_GroupTest
+
 
 class ClientMessage:
-    GET_TEST = "get test"
+    JOIN_GROUP_TEST = "JOIN GROUP TEST"
 
     def __init__(self, data: dict):
         self.command = data.get('command')
@@ -36,7 +38,7 @@ class ConnectionManager:
 
 
 student_ws_manager = ConnectionManager()
-
+room_group_test: set[Room_GroupTest] = ()
 
 @app.websocket("/student")
 async def student_ws_endpoint(token: Annotated[str, Header()], websocket: WebSocket):
@@ -47,7 +49,12 @@ async def student_ws_endpoint(token: Annotated[str, Header()], websocket: WebSoc
     try:
         while True:
             msg = ClientMessage(json.loads((await websocket.receive_text())))
-            if msg.command == ClientMessage.GET_TEST:
-                pass
+            if msg.command == ClientMessage.JOIN_GROUP_TEST:
+                group_test_id = msg.detail['group_test_id']
+                for group_test in room_group_test:
+                    if group_test.id == group_test_id:
+                        group_test.students.append(student)
+                        break
+
     except WebSocketDisconnect:
         student_ws_manager.disconnect(websocket)

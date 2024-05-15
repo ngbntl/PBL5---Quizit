@@ -103,8 +103,11 @@ class Res_TestStructure(BaseModel):
     number_of_question: list[Res_NumberOfQuestion] | None = None
 
 
-class Res_StudentWork(BaseModel):
-    pass
+class Res_StudentTestQuestion(BaseModel):
+    content: str
+    answer: list[Res_Answer]
+    attachment: list[str] = []
+    student_choices: list[int] = []
 
 
 class Res_StudentTest(BaseModel):
@@ -112,5 +115,5 @@ class Res_StudentTest(BaseModel):
     group_test_id: str
     start: datetime | None = None
     end: datetime | None = None
-    student_work: Res_StudentWork | None = None
+    student_work: list[Res_StudentTestQuestion] | None = None
     score: float | None = None
