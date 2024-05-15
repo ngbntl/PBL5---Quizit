@@ -104,15 +104,15 @@ class Res_TestStructure(BaseModel):
 
 
 class Res_StudentTestQuestion(BaseModel):
-    content: str
-    answer: list[Res_Answer]
-    attachment: list[str] = []
-    student_choices: list[int] = []
+    content: str | None = None
+    answer: list[Res_Answer] | None = None
+    attachment: list[str] | None = None
+    student_choices: list[int] | None = None
 
 
 class Res_StudentTest(BaseModel):
-    student_id: str
-    group_test_id: str
+    student_id: str | None = None
+    group_test_id: str | None = None
     start: datetime | None = None
     end: datetime | None = None
     student_work: list[Res_StudentTestQuestion] | None = None

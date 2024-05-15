@@ -86,6 +86,18 @@ class DAO_question:
             cursor.execute(sql, (question_bank_id, offset, offset + length - 1))
             return [Question(q) for q in cursor.fetchall()]
 
+    def get_questions_in_bank_by_difficulty(self, question_bank_id: str, difficulty: int, number: int, shuffle: bool = False) -> list[Question]:
+        with get_MS_database(True) as cursor:
+            sql = """
+            SELECT TOP(%s) *
+            FROM [question]
+            WHERE [question_bank_id] = %s AND [difficulty] = %s
+            """
+            if shuffle:
+                sql += " ORDER BY NEWID()"
+            cursor.execute(sql, (number, question_bank_id, difficulty))
+            return [Question(q) for q in cursor.fetchall()]
+
     def summary(self, question_bank_id: str) -> list[Res_NumberOfQuestion]:
         with get_MS_database(True) as cursor:
             sql = "SELECT [difficulty], COUNT(*) as [number_of_question] FROM [question] WHERE [question_bank_id] = %s GROUP BY [difficulty]"

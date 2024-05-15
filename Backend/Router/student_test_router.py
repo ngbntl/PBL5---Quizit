@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Body, Query
+from fastapi import APIRouter, HTTPException, Depends, Body
 from starlette import status
 from typing import Annotated
 
@@ -15,7 +15,7 @@ student_test_router = APIRouter(prefix='/test', tags=['test'])
 @student_test_router.get('/', status_code=status.HTTP_200_OK)
 async def get_student_test(student: Annotated[Student, Depends(get_current_user)],
                            group_test_service: Annotated[BO_student_test, Depends()],
-                           data: Annotated[Req_StudentTest, Query(min_length=8, max_length=8)]) -> Res_StudentTest:
+                           data: Annotated[Req_StudentTest, Body()]) -> Res_StudentTest:
     try:
         data.student_id = student.id
         return group_test_service.get_student_test(data)
@@ -28,6 +28,7 @@ async def update_student_work(student: Annotated[Student, Depends(get_current_us
                               data: Annotated[Req_StudentWork, Body()],
                               group_test_service: Annotated[BO_student_test, Depends()]) -> float:
     try:
-        pass
+        return 5.0
+        # return group_test_service.submit(student.id, data)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

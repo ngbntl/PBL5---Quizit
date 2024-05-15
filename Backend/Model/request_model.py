@@ -103,9 +103,10 @@ class Req_GroupTest(BaseModel):
 
 
 class Req_StudentWork(BaseModel):
-    index: int = Field(ge=0)
-    answer: list[int] = None
+    group_test_id: str =  Field(min_length=8, max_length=8)
+    student_choices: list[list[Field(int, ge=0)]]
 
 
 class Req_StudentTest(BaseModel):
+    student_id: str = Field(None, min_length=8, max_length=8)
     group_test_id: str = Field(min_length=8, max_length=8)

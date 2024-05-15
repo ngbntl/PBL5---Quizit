@@ -37,10 +37,10 @@ async def get_group_test(_: Annotated[Teacher | Student, Depends(get_current_use
 # UPDATE
 @group_test_router.put('/teacher', status_code=status.HTTP_200_OK)
 async def update_group_test(teacher: Annotated[Teacher, Depends(get_current_user)],
-                            data: Annotated[Req_GroupTest, Body()],
-                            group_test_service: Annotated[BO_group_test, Depends()]):
+                            group_test_service: Annotated[BO_group_test, Depends()],
+                            data: Annotated[Req_GroupTest, Body()]):
     try:
-        return group_test_service.update_group_test(teacher.id, data)
+        group_test_service.update_group_test(teacher.id, data)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
