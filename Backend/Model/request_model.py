@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, conlist
 
 
 class Req_Admin(BaseModel):
@@ -40,6 +40,11 @@ class Req_GroupStudent(BaseModel):
     student_id: str = Field(None, min_length=8, max_length=8)
     is_join: bool = True
     is_show: bool = True
+
+    class Req_InsertedInformation(BaseModel):
+        student_id: conlist(str, min_length=1, max_length=8) = None
+        student_email: list[EmailStr] = None
+
 
 
 class Req_GroupTest(BaseModel):
@@ -103,8 +108,8 @@ class Req_GroupTest(BaseModel):
 
 
 class Req_StudentWork(BaseModel):
-    group_test_id: str =  Field(min_length=8, max_length=8)
-    student_choices: list[list[Field(int, ge=0)]]
+    group_test_id: str = Field(min_length=8, max_length=8)
+    student_choices: list[list[int]] = list[list[Field(None, ge=0)]]
 
 
 class Req_StudentTest(BaseModel):

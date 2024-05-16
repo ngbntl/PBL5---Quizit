@@ -39,10 +39,13 @@ class BO_group_student:
             raise ValueError("student_id is required!")
         self.dao_group_student.request_join(group_id=group_id, student_id=student_id)
 
-    def insert_students(self, teacher_id: str, group_id: str, list_id: str):
-        if DAO_group().check_owner(group_id, teacher_id) is False:
+    def insert_students(self, teacher_id: str, group_id: str, data: Req_GroupStudent.Req_InsertedInformation):
+        if self.dao_group.check_owner(group_id, teacher_id) is False:
             raise ValueError(f"group {group_id} does not belong to {teacher_id}")
-        self.dao_group_student.insert_students(group_id=group_id, list_id=list_id)
+        if data.student_id is not None:
+            self.dao_group_student.insert_students_by_id(group_id=group_id, list_id=data.student_id)
+        if data.student_email is not None:
+            self.dao_group_student.insert_students_by_email(group_id=group_id, list_email=data.student_email)
 
     # UPDATE
     # def update_join_requests(self, teacher_id: str, group_id: str, student_id: str, accept: bool):

@@ -42,7 +42,7 @@ class DAO_group_student:
                 cursor.execute("UPDATE [group_student] SET [is_join] = 1 WHERE [group_id] = %s AND [student_id] = %s",
                                (group_id, student_id))
 
-    def insert_students(self, group_id: str, list_id: list[str]) -> None:
+    def insert_students_by_id(self, group_id: str, list_id: list[str]) -> None:
         self.delete_students(group_id, list_id)
         with get_MS_database(False) as cursor:
             query = f"INSERT INTO [group_student]([group_id], [student_id], [is_join]) VALUES ('{group_id}', %s, 1)"
@@ -51,6 +51,18 @@ class DAO_group_student:
                     cursor.execute(query, student_id)
                 except Exception as e:
                     raise e
+
+    def insert_students_by_email(self, group_id: str, list_email: list[str]) -> None:
+        with get_MS_database(False) as cursor:
+            query = f"INSERT INTO [group_student]([group_id], [student_id], [is_join]) VALUES ('{group_id}', %s, 1)"
+            for email in list_email:
+                cursor.execute("SELECT [id] FROM [student] WHERE [email] = %s", email)
+                row = cursor.fetchone()
+                if row is not None:
+                    try:
+                        cursor.execute(query, row[0])
+                    except Exception as e:
+                        raise e
 
     # UPDATE
     # def update_join_requests(self, group_id: str, student_id: str, accept: bool) -> None:

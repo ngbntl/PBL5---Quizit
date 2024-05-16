@@ -57,11 +57,11 @@ async def update_visibility(teacher: Annotated[Teacher, Depends(get_current_user
 
 @teacher_group_router.post('/student', status_code=status.HTTP_201_CREATED)
 async def insert_students(teacher: Annotated[Teacher, Depends(get_current_user)],
-                          list_id: Annotated[list[Annotated[str, Body(min_length=8, max_length=8)]], Body()],
+                          data: Annotated[Req_GroupStudent.Req_InsertedInformation, Body()],
                           group_id: Annotated[str, Query(min_length=8, max_length=8)],
                           group_student_service: Annotated[BO_group_student, Depends()]):
     try:
-        group_student_service.insert_students(teacher_id=teacher.id, group_id=group_id, list_id=list_id)
+        group_student_service.insert_students(teacher_id=teacher.id, group_id=group_id, data=data)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
