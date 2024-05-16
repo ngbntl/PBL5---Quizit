@@ -23,8 +23,8 @@
                 </router-link>
             </a-menu-item>
 
-            <a-menu-item key="logout" class="">
-                <router-link to="/login" class="pl-8">
+            <a-menu-item key="logout" class="pl-8" @click="logout">
+                <router-link to="" class="pl-8">
                     <fa icon="fa-solid fa-right-from-bracket" /> Đăng xuất
                 </router-link>
             </a-menu-item>
@@ -33,7 +33,11 @@
 </template>
 <script lang="ts" setup>
     import { reactive, watch, h } from 'vue';
-   
+import { useAuthStore } from '../../stores/modules/auth';
+    const authStore = useAuthStore();
+    const logout = () => {
+        authStore.logout();
+    };
     const state = reactive({
        
         selectedKeys: ['1'],

@@ -14,7 +14,7 @@
 <script>
 import { ref, toRefs } from 'vue';
 import { useTeacherStore } from '../../stores/modules/teacher';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 
 export default {
     props: {
@@ -26,10 +26,15 @@ export default {
     setup(props) {
         const { cards } = toRefs(props);
         const router = useRouter();
+        const route = useRoute();
         const getGroupId = (id) => {
             const teacherStore = useTeacherStore();
             teacherStore.groupId = id;
-            router.push({ name: 'teacher-group-detail', params: { id: id } });
+            if (route.path == '/teacher/group') {
+                router.push({ name: 'teacher-group-detail', params: { id: id } });
+            } else {
+                router.push({ name: 'student-group-detail', params: { id: id } });
+            }
         };
 
         return {

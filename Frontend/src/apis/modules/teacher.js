@@ -1,6 +1,7 @@
 import Api from "../../apis";
 
 export default {
+  //Collection
   getCollection() {
     return Api().get("teacher/collection/", {
       headers: {
@@ -15,6 +16,8 @@ export default {
       },
     });
   },
+
+  //question
   addQuestionBank(bank) {
     return Api().post("teacher/collection/question_bank/", bank, {
       headers: {
@@ -67,6 +70,8 @@ export default {
       }
     );
   },
+
+  //groups
   getStudents(groupId) {
     return Api().get(`teacher/group/student?group_id=${groupId}`, {
       headers: {
@@ -95,6 +100,16 @@ export default {
       },
     });
   },
+  //test
+  getTests(group_id) {
+    return Api().get(`grouptest/?group_id=${group_id}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+  },
+
+  //profile
   getInfor() {
     return Api().get(`teacher/`, {
       headers: {

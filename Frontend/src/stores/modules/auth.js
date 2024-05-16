@@ -36,7 +36,7 @@ export const useAuthStore = defineStore("auth", {
             this.token = response.data.access_token;
             localStorage.setItem("token", this.token);
             this.isLoggedIn = true;
-            console.log(response);
+            useToast().success("Đăng nhập thành công");
             router.push({ name: "student - schedule" });
           }
         }
@@ -45,6 +45,12 @@ export const useAuthStore = defineStore("auth", {
           useToast().error("Email hoặc mật khẩu không đúng!");
         }
       }
+    },
+    async logout() {
+      this.isLoggedIn = false;
+      this.token = null;
+      localStorage.removeItem("token");
+      router.push({ name: "login" });
     },
     async signUp(data) {
       try {

@@ -14,5 +14,25 @@ export const useStudentStore = defineStore("student", {
         console.error(error);
       }
     },
+    async joinGroup(group_id) {
+      try {
+        const response = await studentService.joinGroup(group_id);
+        console.log(response.data);
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    //profile
+    async getInfor() {
+      try {
+        const response = await studentService.getInfor();
+        console.log(response.data);
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
   },
 });

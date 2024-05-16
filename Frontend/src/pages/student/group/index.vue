@@ -3,8 +3,9 @@
         <DownOutlined v-if="showGroup1" class="ml-4 mt-6" />
         <RightOutlined v-else class="ml-4 mt-6" />
         <h1 class="text-xl p-4">Nhóm</h1>
-    </div>
 
+    </div>
+    <join-group class="fixed -mt-10 mr-10 flex justify-end text-end right-0" />
     <div v-show="showGroup1" class="scroll-container">
         <Group :cards="cardshow" />
     </div>
@@ -26,8 +27,9 @@ import { defineComponent, onMounted, ref } from 'vue';
 import Group from '../../../components/group/Group.vue'
 import { DownOutlined, RightOutlined } from "@ant-design/icons-vue";
 import { useStudentStore } from '../../../stores/modules/student.js';
+import JoinGroup from '../../../components/modal/JoinGroup.vue';
 export default defineComponent({
-    components: { Group, DownOutlined, RightOutlined },
+    components: { Group, DownOutlined, RightOutlined, JoinGroup },
     setup() {
         const showGroup1 = ref(true);
         const showGroup2 = ref(false);

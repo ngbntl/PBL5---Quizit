@@ -25,7 +25,7 @@
 
 
         <div class="flex justify-end items-center hover:cursor-pointer">
-            <router-link :to="{name: 'teacher-profile'}"> <a-avatar
+            <router-link :to="currentProfileRoute"> <a-avatar
                     class="text-orange-600 bg-orange-200 absolute transform -translate-x-1/2 translate-y-1/2 top-0 ">B</a-avatar>
             </router-link>
         </div>
@@ -38,8 +38,22 @@
 </template>
 
 <script>
-export default {
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 
+export default {
+    setup() {
+        const route = useRoute();
+
+        const currentProfileRoute = computed(() => {
+            console.log(route.path)
+            return route.path.startsWith('/student') ? { name: 'student - profile' } : { name: 'teacher-profile' };
+        });
+
+        return {
+            currentProfileRoute
+        };
+    }
 }
 </script>
 

@@ -19,7 +19,7 @@ import { ref, watch } from 'vue'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import { QuillDeltaToHtmlConverter } from 'quill-delta-to-html'
-import ImageUploader from 'quill-image-uploader'
+
 import teacherService from "../../apis/modules/teacher.js";
 
 

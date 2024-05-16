@@ -99,12 +99,12 @@ export const useTeacherStore = defineStore("teacher", {
       }
     },
 
-    //students
+    //Groups
 
     async getStudents(groupId) {
       try {
         const response = await teacherService.getStudents(groupId);
-        // console.log(response.data);
+
         return response.data;
       } catch (error) {
         console.error(error);
@@ -136,6 +136,18 @@ export const useTeacherStore = defineStore("teacher", {
         console.error(error);
       }
     },
+
+    //test
+    async getTests(group_id) {
+      try {
+        const response = await teacherService.getTests(group_id);
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    //profile
     async getInfor() {
       try {
         const response = await teacherService.getInfor();
