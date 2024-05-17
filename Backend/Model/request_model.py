@@ -67,10 +67,22 @@ class Req_QuestionBank(BaseModel):
     name: str = Field(None, max_length=100)
 
 
+class Req_NumberOfQuestion(BaseModel):
+    difficulty: int = Field(ge=1, le=5)
+    number_of_question: int = Field(ge=1)
+
+
+class Req_TestStructure(BaseModel):
+    test_id: str = Field(None, min_length=8, max_length=8)
+    question_bank_id: str = Field(min_length=8, max_length=8)
+    number_of_question: list[Req_NumberOfQuestion]
+
+
 class Req_Test(BaseModel):
     id: str = Field(None, min_length=8, max_length=8)
     collection_id: str = Field(None, min_length=8, max_length=8)
     name: str = Field(None, max_length=100)
+    structure: list[Req_TestStructure]
 
 
 class Req_Answer(BaseModel):
@@ -84,17 +96,6 @@ class Req_Question(BaseModel):
     content: str = Field(None, max_length=512)
     answer: list[Req_Answer] = None
     difficulty: int = Field(None, ge=1, le=5)
-
-
-class Req_NumberOfQuestion(BaseModel):
-    difficulty: int = Field(ge=1, le=5)
-    number_of_question: int = Field(ge=1)
-
-
-class Req_TestStructure(BaseModel):
-    test_id: str = Field(min_length=8, max_length=8)
-    question_bank_id: str = Field(min_length=8, max_length=8)
-    number_of_question: list[Req_NumberOfQuestion]
 
 
 class Req_GroupTest(BaseModel):

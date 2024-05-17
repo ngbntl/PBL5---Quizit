@@ -7,10 +7,8 @@ from Backend.Business.BO_test import BO_test
 from Backend.Model.DB_model import Teacher
 from Backend.Business.BO_authenticate import get_current_user
 from Backend.Model.request_model import Req_Test
-from Backend.Router.test_structure_router import test_structure_router
 
 test_router = APIRouter(prefix='/test', tags=['test'])
-test_router.include_router(test_structure_router)
 
 # SELECT
 @test_router.get('/')

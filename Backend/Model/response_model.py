@@ -98,9 +98,17 @@ class Res_NumberOfQuestion(BaseModel):
 
 
 class Res_TestStructure(BaseModel):
-    test_id: str
+    test_id: str | None = None
     question_bank_id: str
     number_of_question: list[Res_NumberOfQuestion] | None = None
+
+
+class Res_Test(BaseModel):
+    id: str
+    collection_id: str
+    name: str
+    created_timestamp: datetime
+    structure: list[Res_TestStructure] | None = None
 
 
 class Res_StudentTestQuestion(BaseModel):
