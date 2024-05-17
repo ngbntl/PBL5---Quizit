@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, Body, Query
+from fastapi.responses import StreamingResponse
 from typing import Annotated
 
 from starlette import status
@@ -11,12 +12,12 @@ from Backend.Model.request_model import Req_Test
 test_router = APIRouter(prefix='/test', tags=['test'])
 
 # SELECT
-@test_router.get('/')
+@test_router.get('/', status_code=status.HTTP_200_OK)
 async def get_tests(teacher: Annotated[Teacher, Depends(get_current_user)],
                     collection_id: Annotated[str, Query(min_length=8, max_length=8)],
                     test_service: Annotated[BO_test, Depends()]):
     try:
-        return test_service.get_test_by_collection(collection_id)
+        return test_service.get_test_by_collection(collection_id, teacher.id)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
