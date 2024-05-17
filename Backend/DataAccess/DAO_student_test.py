@@ -20,6 +20,11 @@ class DAO_student_test:
             row = cursor.fetchone()
             return StudentTest(row) if row else None
 
+    def get_studentwork_by_test(self, group_test_id: str) -> list[StudentTest]:
+        with get_MS_database(True) as cursor:
+            cursor.execute("SELECT * FROM [student_test] WHERE [group_test_id]=%s", (group_test_id,))
+            return [StudentTest(row) for row in cursor.fetchall()]
+
     # UPDATE
     def submit(self, data: StudentTest):
         with get_MS_database(False) as cursor:

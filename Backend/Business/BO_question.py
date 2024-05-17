@@ -1,16 +1,15 @@
-import asyncio
 import os
 import pickle
 import shutil
-
+import asyncio
 from fastapi import UploadFile
-
-from Backend.Business import STATIC_PATH, save_file, ACCEPTED_FILE_EXTENSIONS
+from Backend.Model.DB_model import Question
+from Backend.Model.request_model import Req_Question
 from Backend.DataAccess import generate_id
 from Backend.DataAccess.DAO_question import DAO_question
 from Backend.DataAccess.DAO_question_bank import DAO_question_bank
-from Backend.Model.DB_model import Question
-from Backend.Model.request_model import Req_Question
+from Backend.Business import STATIC_PATH, save_file, ACCEPTED_FILE_EXTENSIONS
+from Backend.Model.response_model import Res_Question
 
 
 class BO_question:
@@ -37,26 +36,17 @@ class BO_question:
             return components[-2]
 
     # INSERT
-    def insert_question(self, question_bank_id: str, data: Req_Question) -> str:
-        return self.dao_question.insert_question(Question({
-            'question_bank_id': question_bank_id,
-            'content': data.content,
-            'answer': pickle.dumps([{'content': a.content, 'is_correct': a.is_correct} for a in
-                                    (data.answer if isinstance(data.answer, list) else [])]),
-            'difficulty': data.difficulty
-        }))
+    def insert_question(self, data: Req_Question) -> str:
+        return self.dao_question.insert_question(Question.construct_from_req(data))
 
-    def insert_questions(self, teacher_id: str, question_bank_id: str, data: list[Req_Question]) -> list[str]:
-        if self.dao_question_bank.check_owner(teacher_id=teacher_id, question_bank_id=question_bank_id) is False:
+    def insert_questions(self, question_bank_id: str, data: list[Req_Question], teacher_id: str = None) -> list[str]:
+        if teacher_id is not None and self.dao_question_bank.check_owner(teacher_id=teacher_id,
+                                                                         question_bank_id=question_bank_id) is False:
             raise ValueError(f"Teacher {teacher_id} is not owner of question bank {question_bank_id}!")
         if len(data) == 1:
-            return [self.insert_question(question_bank_id, data[0])]
-        return self.dao_question.insert_questions(question_bank_id, [Question({
-            'content': q.content,
-            'answer': pickle.dumps([{'content': a.content, 'is_correct': a.is_correct} for a in
-                                    (q.answer if q.answer is not None else [])]),
-            'difficulty': q.difficulty
-        }) for q in data])
+            data[0].question_bank_id = question_bank_id
+            return [self.insert_question(data[0])]
+        return self.dao_question.insert_questions(question_bank_id, [Question.construct_from_req(q) for q in data])
 
     async def insert_attachment(self, teacher_id: str, question_id: str, attachment: list[UploadFile]):
         if self.dao_question.check_owner(teacher_id=teacher_id, question_id=question_id) is False:
@@ -87,10 +77,10 @@ class BO_question:
         return attachment_path
 
     # SELECT
-    def get_questions_in_bank(self, teacher_id: str, question_bank_id: str, offset: int, length: int) -> list[Question]:
+    def get_questions_in_bank(self, teacher_id: str, question_bank_id: str, offset: int, length: int) -> list[Res_Question]:
         if self.dao_question_bank.check_owner(teacher_id=teacher_id, question_bank_id=question_bank_id) is False:
             raise ValueError(f"Teacher {teacher_id} is not owner of question bank {question_bank_id}!")
-        return self.dao_question.get_questions_in_bank(question_bank_id, offset=offset, length=length)
+        return [q.convert_to_res() for q in self.dao_question.get_questions_in_bank(question_bank_id, offset=offset, length=length)]
 
     def summary(self, teacher_id: str, question_bank_id: str):
         if self.dao_question_bank.check_owner(teacher_id=teacher_id, question_bank_id=question_bank_id) is False:
@@ -101,13 +91,14 @@ class BO_question:
     def update_questions(self, teacher_id: str, question_bank_id: str, data: list[Req_Question]):
         if self.dao_question_bank.check_owner(teacher_id=teacher_id, question_bank_id=question_bank_id) is False:
             raise ValueError(f"Teacher {teacher_id} is not owner of question bank {question_bank_id}!")
-        self.dao_question.update_questions(question_bank_id, [Question({
-            'id': q.id,
-            'content': q.content,
-            'answer': pickle.dumps([{'content': a.content, 'is_correct': a.is_correct} for a in
-                                    q.answer]) if q.answer is not None else None,
-            'difficulty': q.difficulty
-        }) for q in data])
+        self.dao_question.update_questions(question_bank_id, [Question.construct_from_req(q) for q in data])
+        # self.dao_question.update_questions(question_bank_id, [Question({
+        #     'id': q.id,
+        #     'content': q.content,
+        #     'answer': pickle.dumps([{'content': a.content, 'is_correct': a.is_correct} for a in
+        #                             q.answer]) if q.answer is not None else None,
+        #     'difficulty': q.difficulty
+        # }) for q in data])
 
     # DELETE
     def delete_questions(self, teacher_id: str, question_bank_id: str, question_ids: list[str]):

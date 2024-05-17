@@ -1,4 +1,8 @@
+import pickle
 from datetime import datetime
+
+from Backend.Model.request_model import Req_Question
+from Backend.Model.response_model import Res_Question, Res_StudentTest
 
 
 class Admin:
@@ -73,6 +77,7 @@ class Answer:
         self.content: str | None = data.get("content")
         self.is_correct: bool | None = data.get("is_correct")
 
+
 class Question:
     def __init__(self, data: dict) -> None:
         self.id: str | None = data.get("id")
@@ -83,6 +88,19 @@ class Question:
         self.attachment: bytes | None = data.get("attachment")
         self.difficulty: int | None = data.get("difficulty")
 
+    @classmethod
+    def construct_from_req(cls, req: Req_Question):
+        question = cls(req.model_dump())
+        question.answer = pickle.dumps([{'content': a.content, 'is_correct': a.is_correct} for a in
+                                        (req.answer if isinstance(req.answer, list) else [])])
+        return question
+
+    def convert_to_res(self) -> Res_Question:
+        return Res_Question(id=self.id, order_number=self.order_number, content=self.content,
+                            answer=pickle.loads(self.answer),
+                            attachment=pickle.loads(self.attachment) if self.attachment else None,
+                            difficulty=self.difficulty)
+
 
 class Test:
     def __init__(self, data: dict) -> None:
@@ -90,6 +108,7 @@ class Test:
         self.collection_id: str | None = data.get("collection_id")
         self.name: str | None = data.get("name")
         self.created_timestamp: datetime | None = data.get("created_timestamp")
+
 
 class NumberOfQuestion:
     def __init__(self, data: dict) -> None:
@@ -127,7 +146,9 @@ class StudentTest:
         self.student_work: bytes | None = data.get("student_work")
         self.score: int | None = data.get("score")
 
-
+    def convert_to_res(self) -> Res_StudentTest:
+        return Res_StudentTest(student_id=self.student_id, group_test_id=self.group_test_id, start=self.start,
+                               end=self.end, student_work=pickle.loads(self.student_work), score=self.score)
 
 
 class StudentWork_Question:

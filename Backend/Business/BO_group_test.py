@@ -3,11 +3,12 @@ import pickle
 from Backend.DataAccess.DAO_group import DAO_group
 from Backend.DataAccess.DAO_group_test import DAO_group_test
 from Backend.DataAccess.DAO_question import DAO_question
+from Backend.DataAccess.DAO_student_test import DAO_student_test
 from Backend.DataAccess.DAO_test import DAO_test
 from Backend.DataAccess.DAO_test_structure import DAO_test_structure
-from Backend.Model.DB_model import GroupTest, TestStructure, Question
+from Backend.Model.DB_model import GroupTest, TestStructure, Question, StudentTest
 from Backend.Model.request_model import Req_GroupTest, Req_NumberOfQuestion
-from Backend.Model.response_model import Res_StudentTestQuestion
+from Backend.Model.response_model import Res_StudentTestQuestion, Res_GroupTest, Res_StudentTest
 
 
 class BO_group_test:
@@ -17,6 +18,7 @@ class BO_group_test:
         self._dao_test = None
         self._dao_test_structure = None
         self._dao_question = None
+        self._dao_student_test = None
 
     @property
     def dao_group_test(self):
@@ -48,6 +50,12 @@ class BO_group_test:
             self._dao_question = DAO_question()
         return self._dao_question
 
+    @property
+    def dao_student_test(self):
+        if not self._dao_student_test:
+            self._dao_student_test = DAO_student_test()
+        return self._dao_student_test
+
     # INSERT
     def insert_group_test(self, teacher_id: str, data: Req_GroupTest) -> str:
         if self.dao_group.check_owner(data.group_id, teacher_id) is False:
@@ -56,8 +64,9 @@ class BO_group_test:
         return self.dao_group_test.insert_group_test(group_test)
 
     # SELECT
-    def get_group_test_in_group(self, group_id: str) -> list[GroupTest]:
-        return self.dao_group_test.get_group_test_by_group(group_id)
+    def get_group_test_in_group(self, group_id: str) -> list[Res_GroupTest]:
+        return [Res_GroupTest(**group_test.__dict__) for group_test in
+                self.dao_group_test.get_group_test_by_group(group_id)]
 
     def get_group_test_by_id(self, group_test_id: str) -> GroupTest:
         return self.dao_group_test.get_group_test_by_id(group_test_id)
@@ -79,11 +88,18 @@ class BO_group_test:
                 n = Req_NumberOfQuestion(**n)
                 # get n.number_of_question questions from question bank ts.question_bank_id with difficulty n.difficulty
                 # random order if grp_ts.shuffle is True
-                questions: list[Question] = self.dao_question.get_questions_in_bank_by_difficulty(ts.question_bank_id, n.difficulty, n.number_of_question, grp_ts.shuffle)
+                questions: list[Question] = self.dao_question.get_questions_in_bank_by_difficulty(ts.question_bank_id,
+                                                                                                  n.difficulty,
+                                                                                                  n.number_of_question,
+                                                                                                  grp_ts.shuffle)
                 for q in questions:
-                    student_work.append(Res_StudentTestQuestion(content=q.content, answer=pickle.loads(q.answer), attachment=pickle.loads(q.attachment) if q.attachment else None))
+                    student_work.append(Res_StudentTestQuestion(content=q.content, answer=pickle.loads(q.answer),
+                                                                attachment=pickle.loads(
+                                                                    q.attachment) if q.attachment else None))
         return student_work
 
+    def get_studentwork_by_test(self, group_test_id: str) -> list[Res_StudentTest]:
+        return [sw.convert_to_res() for sw in self.dao_student_test.get_studentwork_by_test(group_test_id)]
 
     # UPDATE
     def update_group_test(self, teacher_id: str, data: Req_GroupTest):

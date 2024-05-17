@@ -1,4 +1,3 @@
-import pickle
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Body, Query, UploadFile, File
 from starlette import status
@@ -16,11 +15,11 @@ question_router = APIRouter(prefix='/question', tags=['question'])
 async def insert_questions(teacher: Annotated[Teacher, Depends(get_current_user)],
                            question_bank_id: Annotated[str, Query(min_length=8, max_length=8)],
                            data: Annotated[list[Req_Question], Body()],
-                           question_service: Annotated[BO_question, Depends()]) -> list[str] | str:
+                           question_service: Annotated[BO_question, Depends()]):
     try:
         return question_service.insert_questions(teacher_id=teacher.id, question_bank_id=question_bank_id, data=data)
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
 @question_router.post('/attachment', status_code=status.HTTP_200_OK)
@@ -32,7 +31,7 @@ async def insert_attachment(teacher: Annotated[Teacher, Depends(get_current_user
         return await question_service.insert_attachment(teacher_id=teacher.id, question_id=question_id,
                                                         attachment=attachment)
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
 # SELECT
@@ -43,15 +42,11 @@ async def get_questions_in_bank(teacher: Annotated[Teacher, Depends(get_current_
                                 offset: int = Query(default=1, ge=1),
                                 length: int = Query(default=50, ge=0, le=100)) -> list[Res_Question]:
     try:
-        return [Res_Question(id=ques.id, order_number=ques.order_number, content=ques.content,
-                             answer=pickle.loads(ques.answer),
-                             attachment=pickle.loads(ques.attachment) if ques.attachment else None,
-                             difficulty=ques.difficulty) for ques in
-                question_service.get_questions_in_bank(teacher_id=teacher.id, question_bank_id=question_bank_id,
-                                                       offset=offset, length=length)]
+        return question_service.get_questions_in_bank(teacher_id=teacher.id, question_bank_id=question_bank_id,
+                                                      offset=offset, length=length)
 
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
 @question_router.get('/summary', status_code=status.HTTP_200_OK, response_model=list[Res_NumberOfQuestion])
@@ -61,7 +56,7 @@ async def question_summary(teacher: Annotated[Teacher, Depends(get_current_user)
     try:
         return question_service.summary(teacher_id=teacher.id, question_bank_id=question_bank_id)
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
 # UPDATE
@@ -73,7 +68,7 @@ async def update_questions(teacher: Annotated[Teacher, Depends(get_current_user)
     try:
         question_service.update_questions(teacher_id=teacher.id, question_bank_id=question_bank_id, data=data)
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
 # DELETE
@@ -86,7 +81,7 @@ async def delete_questions(teacher: Annotated[Teacher, Depends(get_current_user)
         question_service.delete_questions(teacher_id=teacher.id, question_bank_id=question_bank_id,
                                           question_ids=list_id)
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
 @question_router.delete('/attachment', status_code=status.HTTP_200_OK)
@@ -96,4 +91,4 @@ async def delete_attachment(teacher: Annotated[Teacher, Depends(get_current_user
     try:
         question_service.delete_attachment(teacher_id=teacher.id, attachment_path=attachment_path)
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'File \'{attachment_path}\' not found')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

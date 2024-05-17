@@ -6,7 +6,7 @@ from Backend.Business.BO_group_test import BO_group_test
 from Backend.Model.DB_model import Teacher, Student
 from Backend.Business.BO_authenticate import get_current_user
 from Backend.Model.request_model import Req_GroupTest
-from Backend.Model.response_model import Res_GroupTest
+from Backend.Model.response_model import Res_GroupTest, Res_StudentTest
 
 group_test_router = APIRouter(prefix='/grouptest', tags=['grouptest'])
 
@@ -29,8 +29,17 @@ async def get_group_test(_: Annotated[Teacher | Student, Depends(get_current_use
                          group_test_service: Annotated[BO_group_test, Depends()],
                          group_id: Annotated[str, Query(min_length=8, max_length=8)]) -> list[Res_GroupTest]:
     try:
-        return [Res_GroupTest(**group_test.__dict__) for group_test in
-                group_test_service.get_group_test_in_group(group_id)]
+        return group_test_service.get_group_test_in_group(group_id)
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@group_test_router.get('/studentwork', status_code=status.HTTP_200_OK)
+async def get_studentwork(teacher: Annotated[Teacher, Depends(get_current_user)],
+                          group_test_service: Annotated[BO_group_test, Depends()],
+                          group_test_id: Annotated[str, Query(min_length=8, max_length=8)]) -> list[Res_StudentTest]:
+    try:
+        return group_test_service.get_studentwork_by_test(group_test_id)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
