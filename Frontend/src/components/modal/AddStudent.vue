@@ -7,9 +7,9 @@
                 <a-button key="submit" type="primary" :loading="loading" @click="handleOk">Xác nhận</a-button>
             </template>
             <div class="p-4">
-                <label class="block mb-2">Tên bộ sưu tập: </label>
+                <label class="block mb-2">Email: </label>
 
-                <vue-tags-input v-model="tag" :tags="tags" @tags-changed="newTags => tags = newTags" />
+                <vue3-tags-input :tags="tags" placeholder="nhập email..." @on-tags-changed="handleChangeTag" />
 
 
 
@@ -21,16 +21,16 @@
 <script>
 import { ref, computed } from 'vue';
 import { useTeacherStore } from '../../stores/modules/teacher';
-import VueTagsInput from '@johmun/vue-tags-input'
+import Vue3TagsInput from 'vue3-tags-input';
 export default {
-    components: { VueTagsInput },
+    components: { Vue3TagsInput },
     setup() {
         const teacherStore = useTeacherStore();
         const loading = ref(false);
         const open = ref(false);
-        const collectionName = ref('');
-        const collection = computed(() => ({ name: collectionName.value }));
-        const tag = ref('');
+
+
+
         const tags = ref([]);
 
         const updateTags = (newTags) => {
@@ -43,7 +43,7 @@ export default {
 
         const handleOk = async () => {
             loading.value = true;
-            addCollection(collection.value)
+
 
             setTimeout(() => {
                 loading.value = false;
@@ -51,11 +51,7 @@ export default {
             }, 2000);
         };
 
-        const addCollection = async (name) => {
-            const result = await teacherStore.addCollection(name);
-            collectionName.value = result;
-            open.value = false;
-        };
+
 
         const handleCancel = () => {
             open.value = false;
@@ -64,15 +60,14 @@ export default {
         return {
             open,
             loading,
-            collectionName,
-            collection,
-            tag,
+
+
             tags,
             updateTags,
             showModal,
             handleOk,
             handleCancel,
-            addCollection
+
         };
     }
 }

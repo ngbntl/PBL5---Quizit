@@ -16,17 +16,30 @@
                 <RightOutlined v-else @click="toggleRequests" class="ml-4 mt-4" />
                 <h1 class="text-xl ml-8 mt-6">Yêu cầu tham gia</h1>
             </div>
-            <!-- <div class="student" v-for="student in students" :key="student.id" v-show="showStudents">
-            <Card :student="student" />
-        </div> -->
+            <div class="student" v-for="request in requests" :key="request.id" v-show="showRequests">
+                <Card :student="request" />
+
+                <div class="absolute right-16 top-1/4 mt-8 space-x-5"><button @click="acceptRequest(request.id)"
+                        class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-3 rounded-full">
+                        <fa icon="fa-check" class="rounded-full" />
+                    </button>
+                    <button @click="deleteRequest(request.id)"
+                        class="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-full">
+                        <fa icon="fa-x" class="rounded-full" />
+
+                    </button>
+                </div>
+            </div>
 
         </div>
         <div>
             <div class="flex items-center">
-                <DownOutlined v-if="showStudents" @click="toggleStudents" class="ml-4 mt-4" />
-                <RightOutlined v-else @click="toggleStudents" class="ml-4 mt-4" />
-                <h1 class="text-xl ml-8 mt-6">Danh sách sinh viên</h1>
-                <add-student />
+                <DownOutlined v-if="showStudents" class="ml-4 mt-4 hover:cursor-pointer" @click="toggleStudents" />
+                <RightOutlined v-else class="ml-4 mt-4  hover:cursor-pointer" @click="toggleStudents" />
+                <h1 class="text-xl ml-8 mt-6 hover:cursor-pointer" @click="toggleStudents">Danh sách sinh viên</h1>
+                <div class="absolute right-10 mt-4" v-show="showStudents">
+                    <add-student />
+                </div>
             </div>
             <div class="student" v-for="student in students" :key="student.id" v-show="showStudents">
                 <Card :student="student" />
@@ -38,10 +51,10 @@
                 <DownOutlined v-if="showTests" @click="toggleTests" class="ml-4 mt-4" />
                 <RightOutlined v-else @click="toggleTests" class="ml-4 mt-4" />
                 <h1 class="text-xl ml-8 mt-6">Bài kiểm tra</h1>
-
+                <add-test />
             </div>
             <div class="student" v-for="test in tests" :key="test.id" v-show="showTests">
-                <Test :test="test" />
+                <TestCard :test="test" />
             </div>
 
         </div>
@@ -55,11 +68,13 @@ import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import Card from '../../../components/profile/Card.vue';
 import { DownOutlined, RightOutlined } from "@ant-design/icons-vue";
-import Test from '../../../components/test/Test.vue';
 import AddStudent from '../../../components/modal/AddStudent.vue';
+import TestCard from '../../../components/questionBank/TestCard.vue';
+import AddTest from '../../../components/modal/AddTest.vue';
 
 export default {
-    components: { Card, DownOutlined, RightOutlined, Test, AddStudent },
+    components: { Card, DownOutlined, RightOutlined, TestCard, AddStudent, AddTest },
+
     setup() {
         const teacherStore = useTeacherStore();
         const students = ref([]);
@@ -69,7 +84,7 @@ export default {
         const showRequests = ref(true);
         const showTests = ref(true);
         const tests = ref([]);
-
+        const requests = ref([]);
 
         const toggleTests = () => {
             showTests.value = !showTests.value;
@@ -84,6 +99,8 @@ export default {
         onMounted(async () => {
             students.value = await teacherStore.getStudents(groupId);
             tests.value = await teacherStore.getTests(groupId);
+            requests.value = await teacherStore.getRequests(groupId);
+            console.log(tests.value)
         });
 
         return {
@@ -94,6 +111,7 @@ export default {
             showRequests,
             showTests,
             tests,
+            requests,
 
             toggleTests,
             toggleRequests,

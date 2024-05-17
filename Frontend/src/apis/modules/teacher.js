@@ -100,6 +100,16 @@ export default {
       },
     });
   },
+  getRequests(group_id) {
+    return Api().get(
+      `teacher/group/student?group_id=${group_id}&is_join=false`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+  },
   //test
   getTests(group_id) {
     return Api().get(`grouptest/?group_id=${group_id}`, {

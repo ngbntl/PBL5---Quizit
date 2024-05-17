@@ -136,6 +136,14 @@ export const useTeacherStore = defineStore("teacher", {
         console.error(error);
       }
     },
+    async getRequests(group_id) {
+      try {
+        const response = await teacherService.getRequests(group_id);
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
 
     //test
     async getTests(group_id) {

@@ -61,10 +61,12 @@ export default {
             console.log(id);
             questions.value = await teacherStore.getQuestions(id);
             questions.value.forEach(question => {
-                if (question.attachment) {
-                    question.attachment = question.attachment.replace(/\\\\/g, '/');
-                }
-            });
+                question.attachment.forEach(img => {
+                    img = img.replace(/\\\\/g, '/');
+                })
+
+            }
+            );
             console.log(questions.value);
         });
         watch(() => teacherStore.questions, (newQuestion) => {

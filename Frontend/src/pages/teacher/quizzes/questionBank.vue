@@ -11,11 +11,25 @@
     </div>
 
 
-    <div class="flex justify-end m-4 -mt-4 mr-8">
-        <add-question-bank />
+
+
+    <div class="flex flex-wrap group hover:cursor-pointer hover:text-blue-500" @click="toggleQuestionBanks">
+        <DownOutlined v-if="showQuestionBanks" class="ml-4 mt-6" />
+        <RightOutlined v-else class="ml-4 mt-6" />
+        <h1 class="text-xl p-4">Ngân hàng câu hỏi</h1>
+        <div class="absolute right-10 m-4 mr-8" v-show="showQuestionBanks">
+            <add-question-bank />
+        </div>
     </div>
-    <div class="flex flex-wrap">
+    <div class="flex flex-wrap" v-show="showQuestionBanks">
         <Bank v-for="(item, index) in banks" :key="index" :collection="item" @click="getName(item.name)" />
+    </div>
+
+
+    <div class="flex flex-wrap group hover:cursor-pointer hover:text-blue-500" @click="toggleTests">
+        <DownOutlined v-if="showTests" class="ml-4 mt-6" />
+        <RightOutlined v-else class="ml-4 mt-6" />
+        <h1 class="text-xl p-4">Đề thi</h1>
     </div>
 
     <router-view />
@@ -27,12 +41,16 @@ import { useTeacherStore } from '../../../stores/modules/teacher.js';
 import { useRoute } from 'vue-router';
 import Bank from '../../../components/questionBank/Bank.vue';
 import Addform from '../../../components/modal/Addform.vue';
+import { DownOutlined, RightOutlined } from "@ant-design/icons-vue";
+
 import AddQuestionBank from '../../../components/modal/AddQuestionBank.vue';
 export default defineComponent({
     components: {
         Bank,
         Addform,
-        AddQuestionBank
+        AddQuestionBank,
+        DownOutlined,
+        RightOutlined
     },
 
     setup() {
@@ -40,6 +58,16 @@ export default defineComponent({
         const teacherStore = useTeacherStore();
         const route = useRoute();
         const collectionName = teacherStore.collectionName;
+        const showQuestionBanks = ref(false);
+        const showTests = ref(false);
+
+        const toggleQuestionBanks = () => {
+            showQuestionBanks.value = !showQuestionBanks.value;
+        };
+        const toggleTests = () => {
+            showTests.value = !showTests.value;
+        };
+
         onMounted(async () => {
             const id = route.params.id;
             banks.value = await teacherStore.getQuestionBank(id);
@@ -54,6 +82,10 @@ export default defineComponent({
         return {
             banks,
             collectionName,
+            showQuestionBanks,
+            showTests,
+            toggleTests,
+            toggleQuestionBanks,
             getName,
         };
     }

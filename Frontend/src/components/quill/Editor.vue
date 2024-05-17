@@ -50,27 +50,27 @@ export default {
 
         ]
 
-        const modules = {
-            name: 'imageUploader',
-            module: ImageUploader,
-            options: {
-                upload: file => {
-                    return new Promise((resolve, reject) => {
-                        const formData = new FormData()
-                        formData.append('file', file)
+        // const modules = {
+        //     name: 'imageUploader',
+        //     module: ImageUploader,
+        //     options: {
+        //         upload: file => {
+        //             return new Promise((resolve, reject) => {
+        //                 const formData = new FormData()
+        //                 formData.append('file', file)
 
-                        teacherService.uploadImage(formData, props.response)
-                            .then(res => {
-                                resolve(res)
-                            })
-                            .catch(err => {
-                                reject('Upload failed')
-                                console.error('Error:', err)
-                            })
-                    })
-                }
-            }
-        }
+        //                 teacherService.uploadImage(formData, props.response)
+        //                     .then(res => {
+        //                         resolve(res)
+        //                     })
+        //                     .catch(err => {
+        //                         reject('Upload failed')
+        //                         console.error('Error:', err)
+        //                     })
+        //             })
+        //         }
+        //     }
+        // }
 
 
         let delta = undefined
@@ -100,7 +100,7 @@ export default {
             toolbarOptions,
             content,
             editorOption,
-            modules,
+            //  modules,
         }
     }
 }
