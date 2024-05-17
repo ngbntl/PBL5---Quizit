@@ -110,6 +110,7 @@ class GroupTest:
         self.id: str | None = data.get("id")
         self.group_id: str | None = data.get("group_id")
         self.test_id: str | None = data.get("test_id")
+        self.name: str | None = data.get("name")
         self.start: datetime | None = data.get("start")
         self.end: datetime | None = data.get("end")
         self.duration: int | None = data.get("duration")

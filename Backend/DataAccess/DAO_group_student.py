@@ -49,8 +49,8 @@ class DAO_group_student:
             for student_id in list_id:
                 try:
                     cursor.execute(query, student_id)
-                except Exception as e:
-                    raise e
+                finally:
+                    continue
 
     def insert_students_by_email(self, group_id: str, list_email: list[str]) -> None:
         with get_MS_database(False) as cursor:
@@ -61,8 +61,8 @@ class DAO_group_student:
                 if row is not None:
                     try:
                         cursor.execute(query, row[0])
-                    except Exception as e:
-                        raise e
+                    finally:
+                        continue
 
     # UPDATE
     # def update_join_requests(self, group_id: str, student_id: str, accept: bool) -> None:

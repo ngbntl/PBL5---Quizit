@@ -6,7 +6,7 @@ from Backend.DataAccess.DAO_group_test import DAO_group_test
 from Backend.Model.DB_model import StudentTest
 from Backend.DataAccess.DAO_student_test import DAO_student_test
 from Backend.Model.request_model import Req_StudentTest, Req_StudentWork
-from Backend.Model.response_model import Res_StudentTest
+from Backend.Model.response_model import Res_StudentTest, Res_StudentTestQuestion
 
 
 class BO_student_test:
@@ -44,9 +44,12 @@ class BO_student_test:
         student_test = self.dao_student_test.get_student_test(
             StudentTest(data.model_dump(exclude_none=True, exclude_unset=True)))
         if student_test is not None:
-            return Res_StudentTest(student_id=student_test.student_id, group_test_id=student_test.group_test_id,
-                                   start=student_test.start, end=student_test.end, score=student_test.score,
-                                   student_work=pickle.loads(student_test.student_work))
+            if student_test.end is None:
+                return Res_StudentTest(student_id=student_test.student_id, group_test_id=student_test.group_test_id,
+                                       start=student_test.start, end=student_test.end, score=student_test.score,
+                                       student_work=pickle.loads(student_test.student_work))
+            else:
+                raise Exception("Student has already been submitted the test")
         # Student test does not exist. Now create.
         return self.insert_student_test(data)
 
@@ -67,14 +70,31 @@ class BO_student_test:
             StudentTest({'student_id': student_id, 'group_test_id': data.group_test_id}))
         if student_test is None:
             raise Exception("Student test does not exist")
-        if datetime.now() < student_test.start:
-            raise Exception("Student test has not started yet")
-        if datetime.now() > student_test.end:
-            raise Exception("Student test has ended")
+        if student_test.end is not None:
+            raise Exception("Student test has already been submitted")
 
-        std_tst = Res_StudentTest(student_id=student_test.student_id, group_test_id=student_test.group_test_id,
-                                  start=student_test.start, end=student_test.end, score=student_test.score,
-                                  student_work=pickle.loads(student_test.student_work))
-        student_choices = data.student_choices
-        for index in range(student_choices):
-            std_tst.student_work[index].student_choices = student_choices[index]
+        std_tst = Res_StudentTest(student_work=pickle.loads(student_test.student_work))
+
+        for index, choice in enumerate(data.student_choices):
+            std_tst.student_work[index].student_choices = choice
+
+        student_test.student_work = pickle.dumps(std_tst.dump_student_work())
+        student_test.end = datetime.now()
+        score = student_test.score = self.calculate_point(std_tst.student_work)
+        self.dao_student_test.submit(student_test)
+        return score
+
+    def calculate_point(self, student_work: list[Res_StudentTestQuestion]) -> float:
+        score = 0
+        for question in student_work:
+            if question.student_choices is None:
+                continue
+            question_score = .0
+            num_correct = 0
+            for index, a in enumerate(question.answer):
+                if a.is_correct:
+                    num_correct += 1
+                    if index in question.student_choices:  # check if student choose this answer
+                        question_score += 1
+            score += question_score / num_correct
+        return score / len(student_work)

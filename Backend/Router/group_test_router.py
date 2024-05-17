@@ -29,7 +29,8 @@ async def get_group_test(_: Annotated[Teacher | Student, Depends(get_current_use
                          group_test_service: Annotated[BO_group_test, Depends()],
                          group_id: Annotated[str, Query(min_length=8, max_length=8)]) -> list[Res_GroupTest]:
     try:
-        return [Res_GroupTest(**group_test.__dict__) for group_test in group_test_service.get_group_test_in_group(group_id)]
+        return [Res_GroupTest(**group_test.__dict__) for group_test in
+                group_test_service.get_group_test_in_group(group_id)]
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
@@ -54,4 +55,3 @@ async def delete_group_test(teacher: Annotated[Teacher, Depends(get_current_user
         group_test_service.delete_group_test(teacher.id, group_test_id)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-

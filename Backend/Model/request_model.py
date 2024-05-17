@@ -46,11 +46,11 @@ class Req_GroupStudent(BaseModel):
         student_email: list[EmailStr] = None
 
 
-
 class Req_GroupTest(BaseModel):
     id: str = Field(None, min_length=8, max_length=8)
     group_id: str = Field(None, min_length=8, max_length=8)
     test_id: str = Field(None, min_length=8, max_length=8)
+    name: str = Field(None, max_length=100)
     start: datetime = None
     end: datetime = None
 

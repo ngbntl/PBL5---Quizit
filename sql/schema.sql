@@ -164,6 +164,7 @@ create table [group_test]
     [id]                char(8) collate SQL_Latin1_General_CP1_CS_AS,
     [group_id]          char(8) collate SQL_Latin1_General_CP1_CS_AS not null,
     [test_id]           char(8) collate SQL_Latin1_General_CP1_CS_AS not null,
+    [name]              nvarchar(100),
     [start]             datetime,
     [end]               datetime,
     [created_timestamp] datetime default getdate(),
@@ -178,6 +179,8 @@ create table [group_test]
     constraint [ck_grtes_dur2] check ((CAST([end] AS float) - CAST([start] AS float)) * 24 * 60 >= [duration]),
 )
 
+alter table [group_test]
+add [name] nvarchar(100);
 
 -- student_test
 create table [student_test]

@@ -28,7 +28,6 @@ async def update_student_work(student: Annotated[Student, Depends(get_current_us
                               data: Annotated[Req_StudentWork, Body()],
                               group_test_service: Annotated[BO_student_test, Depends()]) -> float:
     try:
-        return 5.0
-        # return group_test_service.submit(student.id, data)
+        return group_test_service.submit(student.id, data)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

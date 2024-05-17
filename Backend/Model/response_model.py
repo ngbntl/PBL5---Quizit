@@ -117,3 +117,6 @@ class Res_StudentTest(BaseModel):
     end: datetime | None = None
     student_work: list[Res_StudentTestQuestion] | None = None
     score: float | None = None
+
+    def dump_student_work(self):
+        return [question.model_dump() for question in self.student_work]
