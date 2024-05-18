@@ -60,6 +60,16 @@ class BO_group_test:
     def insert_group_test(self, teacher_id: str, data: Req_GroupTest) -> str:
         if self.dao_group.check_owner(data.group_id, teacher_id) is False:
             raise Exception(f"Teacher {teacher_id} is not the owner of group {data.group_id}")
+        if data.group_id is None:
+            raise Exception("Group id is required")
+        if data.test_id is None:
+            raise Exception("Test id is required")
+        if data.start is None:
+            raise Exception("Start time is required")
+        if data.end is None:
+            raise Exception("End time is required")
+        if data.duration is None:
+            raise Exception("Duration is required")
         group_test = GroupTest(data.model_dump(exclude_none=True, exclude_unset=True, exclude={'id'}))
         return self.dao_group_test.insert_group_test(group_test)
 
