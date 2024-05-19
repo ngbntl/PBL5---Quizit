@@ -26,7 +26,7 @@ class BO_teacher:
                 return teacher
         return None
 
-    def get_teacher_by_id(self, teacher_id: str) -> Teacher | None:
+    def get_teacher_by_id(self, teacher_id: str) -> Teacher:
         return self.dao_teacher.get_teacher_by_id(teacher_id)
 
     # INSERT
@@ -38,14 +38,14 @@ class BO_teacher:
         if data.name is None:
             raise ValueError("Name is required!")
 
-        return self.dao_teacher.insert_teacher(Teacher({'email':data.email, 'hash_pswd':bcrypt_context.hash(data.password),'name':data.name}))
+        return self.dao_teacher.insert_teacher(data.to_DB_model())
 
     # UPDATE
-    def update_teacher(self, teacher_id: str, data: Req_Teacher) -> None:
-        if data.password is not None:
-            self.update_password(teacher_id=teacher_id, password=data.password)
-        if data.name is not None:
-            self.update_name(teacher_id=teacher_id, name=data.name)
+    def update_teacher(self, data: Req_Teacher) -> None:
+        if data.id is None:
+            raise ValueError("Teacher ID is required!")
+
+        self.dao_teacher.update_teacher(data.to_DB_model())
 
     def update_password(self, teacher_id: str, password: str) -> None:
         self.dao_teacher.update_password(teacher_id=teacher_id, hash_pswd=bcrypt_context.hash(password))
@@ -65,7 +65,8 @@ class BO_teacher:
             raise ValueError("Not supported extension: " + str(IMAGE_EXTENSIONS))
         relative_path = os.path.join("Teacher", teacher_id, "Avatar", teacher_id + extension)
         abs_path = os.path.join(STATIC_PATH, relative_path)
-        await asyncio.gather(self.upload_avatar_path(teacher_id=teacher_id, avatar_path=relative_path), save_file(path=abs_path, file=image))
+        await asyncio.gather(self.upload_avatar_path(teacher_id=teacher_id, avatar_path=relative_path),
+                             save_file(path=abs_path, file=image))
         return relative_path
 
     async def upload_avatar_path(self, teacher_id: str, avatar_path: str):

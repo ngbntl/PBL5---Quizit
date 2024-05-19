@@ -23,11 +23,9 @@ async def get_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depen
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
-        token = create_access_token({"id": teacher.id, "email": teacher.email, "role": role})
+        return Res_Token(access_token=create_access_token({"id": teacher.id, "email": teacher.email, "role": role}), token_type='bearer')
 
-        return Res_Token(**{"access_token": token, "token_type": 'bearer'})
-
-    if role == "student":
+    elif role == "student":
         student_service = BO_student()
         student: Student = student_service.authenticate(form_data.username, form_data.password)
         if not student:
@@ -37,14 +35,14 @@ async def get_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depen
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
-        token = create_access_token({"id": student.id, "email": student.email, "role": role})
+        return Res_Token(access_token=create_access_token({"id": student.id, "email": student.email, "role": role}), token_type='bearer')
 
-        return Res_Token(**{"access_token": token, "token_type": 'bearer'})
-
-    if role == "admin":
+    elif role == "admin":
         pass
+
+
 
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail="Need role: ['teacher', 'student', 'admin']",
+        detail="Valid role: ['teacher', 'student', 'admin']",
     )

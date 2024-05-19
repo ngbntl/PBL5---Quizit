@@ -25,14 +25,12 @@ async def insert_question_bank(teacher: Annotated[Teacher, Depends(get_current_u
 
 
 # SELECT
-@question_bank_router.get('/', response_model=list[Res_QuestionBank], status_code=status.HTTP_200_OK,
-                          response_model_exclude_unset=True)
+@question_bank_router.get('/', status_code=status.HTTP_200_OK)
 async def get_question_banks_by_collection(teacher: Annotated[Teacher, Depends(get_current_user)],
                                            collection_id: Annotated[str, Query(min_length=8, max_length=8)],
                                            question_bank_service: Annotated[BO_question_bank, Depends()]):
     try:
-        return [Res_QuestionBank(id=question_bank.id, name=question_bank.name,
-                                 created_timestamp=question_bank.created_timestamp) for question_bank in
+        return [Res_QuestionBank.from_DB_model(question_bank) for question_bank in
                 question_bank_service.get_question_banks_by_collection(teacher_id=teacher.id,
                                                                        collection_id=collection_id)]
     except Exception as e:
@@ -43,7 +41,7 @@ async def get_question_banks_by_collection(teacher: Annotated[Teacher, Depends(g
 @question_bank_router.patch('/', status_code=status.HTTP_204_NO_CONTENT)
 async def update_question_bank(teacher: Annotated[Teacher, Depends(get_current_user)],
                                data: Annotated[Req_QuestionBank, Body()],
-                               question_bank_service: Annotated[BO_question_bank, Depends()]) -> None:
+                               question_bank_service: Annotated[BO_question_bank, Depends()]):
     try:
         question_bank_service.update_question_bank(teacher_id=teacher.id, data=data)
     except Exception as e:

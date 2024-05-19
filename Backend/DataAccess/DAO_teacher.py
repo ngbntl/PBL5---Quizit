@@ -40,6 +40,23 @@ class DAO_teacher:
         with get_MS_database(False) as cursor:
             cursor.execute("UPDATE [teacher] SET [hash_pswd]=%s WHERE [id]=%s", (hash_pswd, teacher_id))
 
+    def update_teacher(self, teacher: Teacher):
+        with get_MS_database(False) as cursor:
+            sql = "UPDATE [teacher] SET "
+            placeholders = []
+            values = []
+            if teacher.hash_pswd is not None:
+                placeholders.append("[hash_pswd]=%s")
+                values.append(teacher.hash_pswd)
+            if teacher.name is not None:
+                placeholders.append("[name]=%s")
+                values.append(teacher.name)
+            if len(placeholders) == 0:
+                return
+            sql += ",".join(placeholders) + " WHERE [id]=%s"
+            values.append(teacher.id)
+            cursor.execute(sql, tuple(values))
+
     def update_name(self, teacher_id: str, name: str):
         with get_MS_database(False) as cursor:
             cursor.execute("UPDATE [teacher] SET [name]=%s WHERE [id]=%s", (name, teacher_id))

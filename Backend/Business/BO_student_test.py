@@ -1,12 +1,11 @@
-import pickle
 from datetime import datetime
 
 from Backend.Business.BO_group_test import BO_group_test
 from Backend.DataAccess.DAO_group_test import DAO_group_test
-from Backend.Model.DB_model import StudentTest
+from Backend.Model.DB_model import StudentTest, StudentWork_Question
 from Backend.DataAccess.DAO_student_test import DAO_student_test
-from Backend.Model.request_model import Req_StudentTest, Req_StudentWork
-from Backend.Model.response_model import Res_StudentTest, Res_StudentTestQuestion
+from Backend.Model.request_model import Req_StudentWork
+from Backend.Model.response_model import Res_StudentTest
 
 
 class BO_student_test:
@@ -33,68 +32,54 @@ class BO_student_test:
             self._bo_group_test = BO_group_test()
         return self._bo_group_test
 
-    def get_student_test(self, data: Req_StudentTest) -> Res_StudentTest:
-        group_test = self.dao_group_test.get_group_test_by_id(data.group_test_id)
+    def get_student_test_by_group_test_id(self, student_id: str, group_test_id: str) -> StudentTest:
+        group_test = self.dao_group_test.get_group_test_by_id(group_test_id)
         if group_test is None:
             raise Exception("Group test does not exist")
         if datetime.now() < group_test.start:
             raise Exception("Group test has not started yet")
         if datetime.now() > group_test.end:
             raise Exception("Group test has ended")
-        student_test = self.dao_student_test.get_student_test(
-            StudentTest(data.model_dump(exclude_none=True, exclude_unset=True)))
+        student_test = self.dao_student_test.get_student_test_by_group_test_id(student_id, group_test_id)
         if student_test is not None:
-            if student_test.end is None:
-                return Res_StudentTest(student_id=student_test.student_id, group_test_id=student_test.group_test_id,
-                                       start=student_test.start, end=student_test.end, score=student_test.score,
-                                       student_work=pickle.loads(student_test.student_work))
+            if student_test.end is None:  # Student test exists but not submitted
+                return student_test
             else:
                 raise Exception("Student has already been submitted the test")
         # Student test does not exist. Now create.
-        return self.insert_student_test(data)
+        return self.insert_student_test(student_id, group_test_id)
 
     # INSERT
-    def insert_student_test(self, data: Req_StudentTest) -> Res_StudentTest:
-        student_work = self.bo_group_test.generate_student_work(data.group_test_id)
-        student_test = StudentTest({'student_id': data.student_id, 'group_test_id': data.group_test_id,
-                                    'student_work': pickle.dumps(student_work)})
+    def insert_student_test(self, student_id: str, group_test_id: str) -> StudentTest:
+        student_work = self.bo_group_test.generate_student_work(group_test_id)
+        student_test = StudentTest(student_id=student_id, group_test_id=group_test_id, student_work=student_work)
         self.dao_student_test.insert_student_test(student_test)
-        return Res_StudentTest(student_id=data.student_id, group_test_id=data.group_test_id, student_work=student_work)
+        return Res_StudentTest.from_DB_model(student_test)
 
     def get_student_work(self, student_id: str, group_test_id: str):
         return self.dao_student_test.get_student_work(student_id, group_test_id)
 
     # UPDATE
     def submit(self, student_id: str, data: Req_StudentWork) -> float:
-        student_test = self.dao_student_test.get_student_test(
-            StudentTest({'student_id': student_id, 'group_test_id': data.group_test_id}))
+        student_test = self.dao_student_test.get_student_test_by_group_test_id(student_id, data.group_test_id)
         if student_test is None:
             raise Exception("Student test does not exist")
         if student_test.end is not None:
             raise Exception("Student test has already been submitted")
+        for index, answer in enumerate(data.student_answer):
+            student_test.student_work[index].student_answer = answer
 
-        std_tst = Res_StudentTest(student_work=pickle.loads(student_test.student_work))
-
-        for index, choice in enumerate(data.student_choices):
-            std_tst.student_work[index].student_choices = choice
-
-        student_test.student_work = pickle.dumps(std_tst.dump_student_work())
         student_test.end = datetime.now()
-        score = student_test.score = self.calculate_point(std_tst.student_work)
+        student_test.score = self.calculate_point(student_test.student_work)
         self.dao_student_test.submit(student_test)
-        return score
+        return student_test.score
 
-    def calculate_point(self, student_work: list[Res_StudentTestQuestion]) -> float:
-        score = 0
-        for question in student_work:
-            if question.student_choices is None:
+    def calculate_point(self, student_work: list[StudentWork_Question]) -> float:
+        score = .0
+        for sw_question in student_work:
+            if sw_question.student_answer is None:
                 continue
-            question_score = .0
-            num_correct = 0
-            for index, a in enumerate(question.answer):
-                if a.is_correct:
-                    num_correct += 1
-                    if index in question.student_choices:  # check if student choose this answer
-                        question_score += 1
-            score += question_score / num_correct
+
+            score += len(set(sw_question.student_answer) & sw_question.answer.correct) / len(sw_question.answer.correct)
+
         return score / len(student_work)

@@ -12,11 +12,11 @@ GO
 -- admin
 create table [admin]
 (
-    [id]        char(8) collate SQL_Latin1_General_CP1_CS_AS,
-    [username]  varchar(255),
-    [hash_pswd] varchar(255),
-    [name]      nvarchar(100),
-    [is_banned] bit default 0,
+    [id]        char(8)        collate SQL_Latin1_General_CP1_CS_AS,
+    [username]  varchar(255)  ,
+    [hash_pswd] varchar(255)  ,
+    [name]      nvarchar(100) ,
+    [is_banned] bit default 0 ,
     -- constraint
     constraint [pk_adm] primary key ([id]),
     constraint [unq_adm_username] unique ([username]),
@@ -26,14 +26,14 @@ create table [admin]
 -- student
 create table [student]
 (
-    [id]                char(8) collate SQL_Latin1_General_CP1_CS_AS,
-    [email]             varchar(100) not null,
-    [name]              nvarchar(100),
-    [hash_pswd]         varchar(255),
+    [id]                char(8)        collate SQL_Latin1_General_CP1_CS_AS,
+    [email]             varchar(100)  ,
+    [name]              nvarchar(100) ,
+    [hash_pswd]         varchar(255)  ,
     [avatar_path]       varchar(255),
-    [is_banned]         bit      default 0,
-    [created_timestamp] datetime default getdate(),
-    [is_verified]       bit      default 0,
+    [is_banned]         bit            default 0,
+    [created_timestamp] datetime       default getdate(),
+    [is_verified]       bit            default 0,
     -- constraint
     constraint [pk_stu] primary key ([id]),
     constraint [unq_stu_ema] unique ([email]),
@@ -45,11 +45,11 @@ CREATE INDEX [idx_stu_ema] ON [student] ([email]);
 -- teacher
 create table [teacher]
 (
-    [id]                char(8) collate SQL_Latin1_General_CP1_CS_AS,
-    [email]             varchar(100) not null,
-    [name]              nvarchar(100),
-    [hash_pswd]         varchar(255),
-    [avatar_path]       varchar(255),
+    [id]                char(8)               collate SQL_Latin1_General_CP1_CS_AS,
+    [email]             varchar(100)  not null,
+    [name]              nvarchar(100)         ,
+    [hash_pswd]         varchar(255)          ,
+    [avatar_path]       varchar(255)          ,
     [is_banned]         bit      default 0,
     [created_timestamp] datetime default getdate(),
     [is_verified]       bit      default 0,

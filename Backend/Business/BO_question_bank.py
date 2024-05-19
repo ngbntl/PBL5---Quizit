@@ -23,22 +23,22 @@ class BO_question_bank:
 
     # INSERT
     def insert_question_bank(self, teacher_id: str, data: Req_QuestionBank) -> str:
-        collection_id = data.collection_id
-        name = data.name
-        if collection_id is None:
+        if data.collection_id is None:
             raise Exception("collection_id is required")
-        if self.dao_collection.check_owner(collection_id=collection_id, teacher_id=teacher_id) is False:
-            raise Exception(f"teacher {teacher_id} is not the owner of collection {collection_id}")
-        return self.dao_question_bank.insert_question_bank(collection_id=collection_id, name=name)
+        if self.dao_collection.check_owner(collection_id=data.collection_id, teacher_id=teacher_id) is False:
+            raise Exception(f"teacher {teacher_id} is not the owner of collection {data.collection_id}")
+        return self.dao_question_bank.insert_question_bank(data.to_DB_model())
 
     # SELECT
     def get_question_banks_by_collection(self, teacher_id: str, collection_id: str) -> list[QuestionBank]:
         if self.dao_collection.check_owner(collection_id, teacher_id) is False:
             raise Exception(f"teacher {teacher_id} is not the owner of collection {collection_id}")
+
         return self.dao_question_bank.get_question_banks_by_collection(collection_id)
 
     # UPDATE
     def update_question_bank(self, teacher_id: str, data: Req_QuestionBank):
         if self.dao_collection.check_owner(self.dao_question_bank.get_collection_id(data.id), teacher_id) is False:
             raise Exception(f"teacher {teacher_id} is not the owner of question bank {data.id}")
-        self.dao_question_bank.update_name(question_bank_id=data.id, name=data.name)
+
+        self.dao_question_bank.update(data.to_DB_model())

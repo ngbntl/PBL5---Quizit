@@ -23,14 +23,14 @@ class DAO_collection:
             return cursor.fetchone() is not None
 
     # INSERT
-    def insert_collection(self, data: Collection) -> str:
+    def insert_collection(self, colelction: Collection) -> str:
         failed_count = 0
         with get_MS_database(False) as cursor:
             while True:
                 id = generate_id(8)
                 try:
                     cursor.execute("INSERT INTO [collection] ([id], [name], [teacher_id]) VALUES (%s, %s, %s)",
-                                   (id, data.name, data.teacher_id))
+                                   (id, colelction.name, colelction.teacher_id))
                     return id
                 except pymssql.Error as e:
                     if failed_count == 0 and id not in str(e.args[1]):
@@ -40,6 +40,16 @@ class DAO_collection:
                         raise e
 
     # UPDATE
-    def update_name(self, id: str, name: str):
+    def update_collection(self, colelction: Collection):
         with get_MS_database(False) as cursor:
-            cursor.execute("UPDATE [collection] SET [name]=%s WHERE [id]=%s", (name, id))
+            sql = "UPDATE [collection] SET "
+            placeholder = list()
+            values = tuple()
+            if colelction.name is not None:
+                placeholder.append("[name]=%s")
+                values += (colelction.name,)
+            if len(values) == 0:
+                return
+            sql += ",".join(placeholder) + " WHERE [id]=%s"
+            values += (colelction.id,)
+            cursor.execute(sql, values)

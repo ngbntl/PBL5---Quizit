@@ -26,7 +26,7 @@ class BO_student:
         return None
 
     def get_student_by_id(self, student_id: str) -> Student:
-        return self.dao_student.get_student_by_id(student_id=student_id)
+        return self.dao_student.get_student_by_id(student_id)
 
     # INSERT
     def sign_up(self, data: Req_Student) -> str:
@@ -34,18 +34,12 @@ class BO_student:
             raise ValueError("Email is required!")
         if data.password is None:
             raise ValueError("Password is required!")
-        if data.name is None:
-            raise ValueError("Name is required!")
 
-        return self.dao_student.insert_student(
-            Student({'email':data.email, 'name':data.name, 'hash_pswd':bcrypt_context.hash(data.password)}))
+        return self.dao_student.insert_student(data.to_DB_model())
 
     # UPDATE
     def update_student(self, data: Req_Student):
-        if data.password is not None:
-            self.dao_student.update_password(student_id=data.id, hash_pswd=bcrypt_context.hash(data.password))
-        if data.name is not None:
-            self.dao_student.update_name(student_id=data.id, name=data.name)
+        self.dao_student.update_student(data.to_DB_model())
 
     def update_is_banned(self, student_id: str, is_banned: bool) -> None:
         self.dao_student.update_is_banned(student_id=student_id, is_banned=is_banned)

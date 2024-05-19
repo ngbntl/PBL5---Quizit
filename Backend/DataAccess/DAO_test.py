@@ -1,3 +1,5 @@
+import pickle
+
 import pymssql
 
 from Backend.DataAccess import get_MS_database, generate_id
@@ -24,6 +26,13 @@ class DAO_test:
 
     # INSERT
     def insert_test(self, data: Test) -> str:
+        if data.collection_id is None:
+            raise ValueError("The collection_id is required!")
+        if data.name is None:
+            raise ValueError("The name is required!")
+        if data.structure is None:
+            raise ValueError("The structure is required!")
+
         failed_count = 0
         with get_MS_database(False) as cursor:
             while True:
@@ -31,10 +40,14 @@ class DAO_test:
                 try:
                     cursor.execute("INSERT INTO [test] ([id], [collection_id], [name]) VALUES (%s, %s, %s)",
                                    (id, data.collection_id, data.name))
+                    cursor.executemany(
+                        "INSERT INTO [test_structure] ([test_id], [question_bank_id], [number_of_question]) VALUES (%s, %s, %s)",
+                        [(id, ts.question_bank_id, pickle.dumps(ts.number_of_question)) for ts in data.structure])
                     return id
                 except pymssql.Error as e:
                     if failed_count == 0 and id not in str(e.args[1]):
                         raise e
+                    failed_count += 1
                     if failed_count == 5:
                         raise e
 

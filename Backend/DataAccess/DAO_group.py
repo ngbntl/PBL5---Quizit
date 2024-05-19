@@ -9,7 +9,7 @@ class DAO_group:
     def get_groups_by_teacher(self, teacher_id: str, is_show: bool = True) -> list[Group]:
         with get_MS_database(True) as cursor:
             cursor.execute("SELECT * FROM [group] WHERE [teacher_id] = %s AND [is_show] = %s", (teacher_id, is_show))
-            return [Group(record) for record in cursor.fetchall()]
+            return [Group(row) for row in cursor.fetchall()]
 
     def get_group_by_id(self, group_id: str) -> Group:
         with get_MS_database(True) as cursor:
@@ -24,6 +24,8 @@ class DAO_group:
 
     # INSERT
     def insert_group(self, data: Group) -> str:
+        if data.name is None:
+            raise Exception("name is required!")
         failed_count = 0
         with get_MS_database(False) as cursor:
             while True:
@@ -36,14 +38,23 @@ class DAO_group:
                     if failed_count == 0 and id not in str(e.args[1]):
                         raise e
                     failed_count += 1
-                    if failed_count > 5:
+                    if failed_count == 5:
                         raise e
 
     # UPDATE
-    def update_visibility(self, group_id: str, is_show: bool):
+    def update_group(self, data: Group):
         with get_MS_database(False) as cursor:
-            cursor.execute("UPDATE [group] SET [is_show] = %s WHERE [id] = %s", (is_show, group_id))
-
-    def update_group_name(self, group_id: str, name: str):
-        with get_MS_database(False) as cursor:
-            cursor.execute("UPDATE [group] SET [name] = %s WHERE [id] = %s", (name, group_id))
+            sql = "UPDATE [group] SET "
+            placeholder = []
+            values = tuple()
+            if data.name is not None:
+                placeholder.append("[name] = %s")
+                values += (data.name,)
+            if data.is_show is not None:
+                placeholder.append("[is_show] = %s")
+                values += (data.is_show,)
+            if len(values) == 0:
+                raise Exception("No data to update!")
+            sql += ",".join(placeholder) + " WHERE [id] = %s AND [teacher_id] = %s"
+            values += (data.id, data.teacher_id)
+            cursor.execute(sql, values)

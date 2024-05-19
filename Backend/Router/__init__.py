@@ -5,7 +5,6 @@ from fastapi.staticfiles import StaticFiles
 from Backend.Router.auth_router import auth_router
 from Backend.Router.teacher_router import teacher_router
 from Backend.Router.student_router import student_router
-from Backend.Router.group_test_router import group_test_router
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="Backend/Static"), name="static")
@@ -21,4 +20,3 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(teacher_router)
 app.include_router(student_router)
-app.include_router(group_test_router)

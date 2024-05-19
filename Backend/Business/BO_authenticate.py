@@ -13,6 +13,7 @@ def create_access_token(data: dict, expires_delta=timedelta(minutes=ACCESS_TOKEN
     encode.update({'exp': expires})
     return jwt.encode(encode, SECRET_KEY, algorithm=HASH_ALGORITHM)
 
+
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     credentials_exception = HTTPException(
         status_code=starlette.status.HTTP_401_UNAUTHORIZED,
@@ -23,11 +24,11 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         payload = jwt.decode(token, SECRET_KEY, algorithms=[HASH_ALGORITHM])
         role = payload.get("role")
         if role == "teacher":
-            return Teacher({'id': payload.get('id'), 'email': payload.get('email')})
+            return Teacher(id=payload.get('id'), email=payload.get('email'))
         elif role == "student":
-            return Student({'id': payload.get('id'), 'email': payload.get('email')})
+            return Student(id=payload.get('id'), email=payload.get('email'))
         elif role == "admin":
-            return Admin({'id': payload.get('id'), 'username': payload.get('username')})
+            return Admin(id=payload.get('id'), username=payload.get('username'))
         else:
             raise credentials_exception
 

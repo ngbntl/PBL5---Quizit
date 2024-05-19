@@ -10,9 +10,7 @@ class DAO_student:
         with get_MS_database(True) as cursor:
             cursor.execute("SELECT * FROM [student] WHERE [email]=%s", (email,))
             row = cursor.fetchone()
-            if row is not None:
-                return Student(row)
-            return None
+            return Student(row) if row else None
 
     def get_student_by_id(self, student_id: str) -> Student | None:
         with get_MS_database(True) as cursor:
@@ -20,8 +18,20 @@ class DAO_student:
             row = cursor.fetchone()
             return Student(row) if row else None
 
+    def get_student_list_id_by_list_email(self, list_email: list[str]) -> list[str]:
+        list_email = list(set(list_email))
+        with get_MS_database(False) as cursor:
+            if len(list_email) == 1:
+                cursor.execute(f"SELECT [id] FROM [student] WHERE [email] = %s", list_email[0])
+            else:
+                cursor.execute(f"SELECT [id] FROM [student] WHERE [email] IN {tuple(list_email)}")
+            return [record[0] for record in cursor.fetchall()]
+
     # INSERT
     def insert_student(self, student: Student) -> str:
+        if student.name is None:
+            raise ValueError("Name is required!")
+
         failed_count = 0
         with get_MS_database(False) as cursor:
             while True:
@@ -38,14 +48,6 @@ class DAO_student:
                         raise e
 
     # UPDATE
-    def update_password(self, student_id: str, hash_pswd: str):
-        with get_MS_database(False) as cursor:
-            cursor.execute("UPDATE [student] SET [hash_pswd]=%s WHERE [id]=%s", (hash_pswd, student_id))
-
-    def update_name(self, student_id: str, name: str):
-        with get_MS_database(False) as cursor:
-            cursor.execute("UPDATE [student] SET [name]=%s WHERE [id]=%s", (name, student_id))
-
     def update_is_banned(self, student_id: str, is_banned: bool):
         with get_MS_database(False) as cursor:
             cursor.execute("UPDATE [student] SET [is_banned]=%s WHERE [id]=%s", (is_banned, student_id))
@@ -57,3 +59,20 @@ class DAO_student:
     def update_avatar_path(self, student_id: str, avatar_path: str):
         with get_MS_database(False) as cursor:
             cursor.execute("UPDATE [student] SET [avatar_path]=%s WHERE [id]=%s", (avatar_path, student_id))
+
+    def update_student(self, student):
+        with get_MS_database(False) as cursor:
+            sql = "UPDATE [student] SET "
+            placeholder = []
+            params = tuple()
+            if student.hash_pswd is not None:
+                placeholder.append("[hash_pswd] = %s")
+                params += (student.hash_pswd,)
+            if student.name is not None:
+                placeholder.append("[name] = %s")
+                params += (student.name,)
+            if len(params) == 0:
+                return
+            sql += ",".join(placeholder) + " WHERE [id] = %s"
+            params += (student.id,)
+            cursor.execute(sql, params)

@@ -1,16 +1,17 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Body, Query, UploadFile, File
 from starlette import status
-from Backend.Business.BO_authenticate import get_current_user
-from Backend.Business.BO_question import BO_question
 from Backend.Model.DB_model import Teacher
 from Backend.Model.request_model import Req_Question
 from Backend.Model.response_model import Res_Question, Res_NumberOfQuestion
+from Backend.Business.BO_authenticate import get_current_user
+from Backend.Business.BO_question import BO_question
 
 question_router = APIRouter(prefix='/question', tags=['question'])
 
 
 # INSERT
+# update: 2024-05-18: change the Req_Question format
 @question_router.post('/', status_code=status.HTTP_200_OK)
 async def insert_questions(teacher: Annotated[Teacher, Depends(get_current_user)],
                            question_bank_id: Annotated[str, Query(min_length=8, max_length=8)],
@@ -26,7 +27,7 @@ async def insert_questions(teacher: Annotated[Teacher, Depends(get_current_user)
 async def insert_attachment(teacher: Annotated[Teacher, Depends(get_current_user)],
                             question_id: Annotated[str, Query(min_length=10, max_length=10)],
                             attachment: Annotated[list[UploadFile], File()],
-                            question_service: Annotated[BO_question, Depends()]) -> list[str]:
+                            question_service: Annotated[BO_question, Depends()]):
     try:
         return await question_service.insert_attachment(teacher_id=teacher.id, question_id=question_id,
                                                         attachment=attachment)
@@ -40,21 +41,22 @@ async def get_questions_in_bank(teacher: Annotated[Teacher, Depends(get_current_
                                 question_bank_id: Annotated[str, Query(min_length=8, max_length=8)],
                                 question_service: Annotated[BO_question, Depends()],
                                 offset: int = Query(default=1, ge=1),
-                                length: int = Query(default=50, ge=0, le=100)) -> list[Res_Question]:
+                                length: int = Query(default=50, ge=1, le=100)):
     try:
-        return question_service.get_questions_in_bank(teacher_id=teacher.id, question_bank_id=question_bank_id,
-                                                      offset=offset, length=length)
+        return [Res_Question.from_DB_model(question) for question in
+                question_service.get_questions_in_bank(teacher_id=teacher.id, question_bank_id=question_bank_id,
+                                                       offset=offset, length=length)]
 
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@question_router.get('/summary', status_code=status.HTTP_200_OK, response_model=list[Res_NumberOfQuestion])
+@question_router.get('/summary', status_code=status.HTTP_200_OK)
 async def question_summary(teacher: Annotated[Teacher, Depends(get_current_user)],
                            question_bank_id: Annotated[str, Query(min_length=8, max_length=8)],
-                           question_service: Annotated[BO_question, Depends()]) -> int:
+                           question_service: Annotated[BO_question, Depends()]):
     try:
-        return question_service.summary(teacher_id=teacher.id, question_bank_id=question_bank_id)
+        return [Res_NumberOfQuestion.from_DB_model(noq) for noq in question_service.summary(teacher_id=teacher.id, question_bank_id=question_bank_id)]
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 

@@ -17,23 +17,24 @@ class BO_group:
     def get_groups_by_teacher(self, teacher_id: str, is_show: bool = True) -> list[Group]:
         return self.dao_group.get_groups_by_teacher(teacher_id=teacher_id, is_show=is_show)
 
-    def get_group_by_id(self, group_id: str, teacher_id: str | None = None) -> Group:
+    def get_group_by_id(self, teacher_id: str, group_id: str) -> Group:
         group = self.dao_group.get_group_by_id(group_id)
-        if teacher_id and group.teacher_id != teacher_id:
+        if group.teacher_id != teacher_id:
             raise Exception(f"Group {group_id} is not belong to teacher {teacher_id}!")
         return group
 
     # INSERT
     def insert_group(self, data: Req_Group) -> str:
-        if data.name is None:
-            raise Exception("name is required!")
-        return self.dao_group.insert_group(data.name)
+        if data.teacher_id is None:
+            raise Exception("teacher_id is required!")
+        return self.dao_group.insert_group(data.to_DB_model())
 
     # UPDATE
     def update_group(self, data: Req_Group):
-        if self.dao_group.check_owner(data.id, data.teacher_id) is False:
-            raise Exception(f"Group {data.id} is not belong to teacher {data.teacher_id}!")
-        if data.is_show is not None:
-            self.dao_group.update_visibility(group_id=data.id, is_show=data.is_show)
-        if data.name is not None:
-            self.dao_group.update_group_name(group_id=data.id, name=data.name)
+        group = data.to_DB_model()
+        if group.id is None:
+            raise Exception("id is required!")
+        if group.teacher_id is None:
+            raise Exception("teacher_id is required!")
+
+        self.dao_group.update_group(group)

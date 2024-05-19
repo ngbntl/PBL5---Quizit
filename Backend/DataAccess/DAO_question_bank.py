@@ -24,14 +24,14 @@ class DAO_question_bank:
             return cursor.fetchone() is not None
 
     # INSERT
-    def insert_question_bank(self, collection_id: str, name: str) -> str:
+    def insert_question_bank(self, question_bank: QuestionBank) -> str:
         with get_MS_database(False) as cursor:
             failed_count = 0
             while True:
                 id = generate_id(8)
                 try:
                     cursor.execute("INSERT INTO [question_bank] ([id], [collection_id], [name]) VALUES (%s, %s, %s)",
-                                   (id, collection_id, name))
+                                   (id, question_bank.collection_id, question_bank.name))
                     return id
                 except pymssql.Error as e:
                     if failed_count == 0 and id not in str(e.args[1]):
@@ -41,6 +41,16 @@ class DAO_question_bank:
                         raise e
 
     # UPDATE
-    def update_name(self, question_bank_id: str, name: str):
+    def update(self, question_bank: QuestionBank):
         with get_MS_database(False) as cursor:
-            cursor.execute("UPDATE [question_bank] SET [name] = %s WHERE [id] = %s", (name, question_bank_id))
+            sql = "UPDATE [question_bank] SET "
+            placeholder = list()
+            values = tuple()
+            if question_bank.name is not None:
+                placeholder.append("[name] = %s")
+                values += (question_bank.name,)
+            if len(placeholder) == 0:
+                return
+            sql += ",".join(placeholder) + " WHERE [id] = %s"
+            values += (question_bank.id,)
+            cursor.execute(sql, values)

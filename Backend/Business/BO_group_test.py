@@ -1,14 +1,12 @@
-import pickle
-
 from Backend.DataAccess.DAO_group import DAO_group
 from Backend.DataAccess.DAO_group_test import DAO_group_test
 from Backend.DataAccess.DAO_question import DAO_question
 from Backend.DataAccess.DAO_student_test import DAO_student_test
 from Backend.DataAccess.DAO_test import DAO_test
 from Backend.DataAccess.DAO_test_structure import DAO_test_structure
-from Backend.Model.DB_model import GroupTest, TestStructure, Question, StudentTest
-from Backend.Model.request_model import Req_GroupTest, Req_NumberOfQuestion
-from Backend.Model.response_model import Res_StudentTestQuestion, Res_GroupTest, Res_StudentTest
+from Backend.Model.DB_model import GroupTest, TestStructure, Question, StudentWork_Question, StudentTest
+from Backend.Model.request_model import Req_GroupTest
+from Backend.Model.response_model import Res_StudentTest
 
 
 class BO_group_test:
@@ -70,46 +68,43 @@ class BO_group_test:
             raise Exception("End time is required")
         if data.duration is None:
             raise Exception("Duration is required")
-        group_test = GroupTest(data.model_dump(exclude_none=True, exclude_unset=True, exclude={'id'}))
-        return self.dao_group_test.insert_group_test(group_test)
+
+        return self.dao_group_test.insert_group_test(data.to_DB_model())
 
     # SELECT
-    def get_group_test_in_group(self, group_id: str) -> list[Res_GroupTest]:
-        return [Res_GroupTest(**group_test.__dict__) for group_test in
-                self.dao_group_test.get_group_test_by_group(group_id)]
+    def get_group_test_in_group(self, group_id: str) -> list[GroupTest]:
+        return self.dao_group_test.get_group_test_by_group(group_id)
 
     def get_group_test_by_id(self, group_test_id: str) -> GroupTest:
         return self.dao_group_test.get_group_test_by_id(group_test_id)
 
-    def generate_student_work(self, group_test_id: str) -> list[Res_StudentTestQuestion]:
+    def generate_student_work(self, group_test_id: str) -> list[StudentWork_Question]:
         # Get group test by id
-        grp_ts = self.get_group_test_by_id(group_test_id)
-        if grp_ts is None:
+        group_test = self.get_group_test_by_id(group_test_id)
+        if group_test is None:
             raise Exception(f"Group test {group_test_id} not found")
-        student_work = []
+        student_work_question = []
         # Then get test by id
-        test = self.dao_test.get_test_by_id(grp_ts.test_id)
+        test = self.dao_test.get_test_by_id(group_test.test_id)
         # Get test structure
-        test_struct: list[TestStructure] = self.dao_test_structure.get_structure(test.id)
+        test_structer: list[TestStructure] = self.dao_test_structure.get_structure(test.id)
         # For each test structure, get the number of question then get the question
-        for ts in test_struct:
-            noq: list[dict] = pickle.loads(ts.number_of_question)
-            for n in noq:
-                n = Req_NumberOfQuestion(**n)
+        for ts in test_structer:
+            for n in ts.number_of_question:  # n: NumberOfQuestion
                 # get n.number_of_question questions from question bank ts.question_bank_id with difficulty n.difficulty
-                # random order if grp_ts.shuffle is True
+                # random order if group_test.shuffle is True
                 questions: list[Question] = self.dao_question.get_questions_in_bank_by_difficulty(ts.question_bank_id,
                                                                                                   n.difficulty,
                                                                                                   n.number_of_question,
-                                                                                                  grp_ts.shuffle)
+                                                                                                  group_test.shuffle)
                 for q in questions:
-                    student_work.append(Res_StudentTestQuestion(content=q.content, answer=pickle.loads(q.answer),
-                                                                attachment=pickle.loads(
-                                                                    q.attachment) if q.attachment else None))
-        return student_work
+                    student_work_question.append(
+                        StudentWork_Question(content=q.content, answer=q.answer,
+                                             attachment=q.attachment, student_answer=None))
+        return student_work_question
 
-    def get_studentwork_by_test(self, group_test_id: str) -> list[Res_StudentTest]:
-        return [sw.convert_to_res() for sw in self.dao_student_test.get_studentwork_by_test(group_test_id)]
+    def get_studentwork_by_test(self, group_test_id: str) -> list[StudentTest]:
+        return self.dao_student_test.get_student_tests(group_test_id)
 
     # UPDATE
     def update_group_test(self, teacher_id: str, data: Req_GroupTest):
