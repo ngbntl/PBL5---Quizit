@@ -18,15 +18,22 @@ import { defineComponent, ref, onMounted, watch } from 'vue';
 import Collection from '../../../components/collection/Collection.vue';
 import { useTeacherStore } from '../../../stores/modules/teacher.js';
 import Addform from '../../../components/modal/Addform.vue';
+import { DownOutlined, RightOutlined } from "@ant-design/icons-vue";
 
 export default defineComponent({
     components: {
         Collection,
-        Addform
+        Addform,
+        DownOutlined,
+        RightOutlined,
+
     },
     setup() {
         const collections = ref([]);
         const teacherStore = useTeacherStore();
+
+
+
 
         const getName = (name) => {
             teacherStore.collectionName = name;
@@ -42,6 +49,8 @@ export default defineComponent({
 
         return {
             collections,
+
+
             getName
         };
     }

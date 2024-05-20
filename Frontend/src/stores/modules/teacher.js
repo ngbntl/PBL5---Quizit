@@ -31,8 +31,26 @@ export const useTeacherStore = defineStore("teacher", {
     async addCollection(name) {
       try {
         const response = await teacherService.addCollection(name);
-        console.log(response.data);
+        // console.log(response.data);
         this.collections = this.getCollections();
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async addTest(test) {
+      try {
+        const response = await teacherService.addTest(test);
+        useToast().success("Đã tạo bài kiểm tra");
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async getTests(collection_id) {
+      try {
+        const response = await teacherService.getTests(collection_id);
+        console.log(response.data);
         return response.data;
       } catch (error) {
         console.error(error);
@@ -44,7 +62,7 @@ export const useTeacherStore = defineStore("teacher", {
     async getQuestionBank(collectionId) {
       try {
         const response = await teacherService.getQuestionBank(collectionId);
-        console.log(response.data);
+        // console.log(response.data);
         this.questionBank = response.data;
         return response.data;
       } catch (error) {
@@ -144,6 +162,22 @@ export const useTeacherStore = defineStore("teacher", {
         console.error(error);
       }
     },
+    async addStudent(studentId, groupId) {
+      try {
+        const response = await teacherService.addStudent(studentId, groupId);
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async refuseStudent(studentId, groupId) {
+      try {
+        const response = await teacherService.refuseStudent(studentId, groupId);
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
 
     //test
     async getTests(group_id) {
@@ -154,7 +188,23 @@ export const useTeacherStore = defineStore("teacher", {
         console.error(error);
       }
     },
-
+    async addTestInGroup(data) {
+      try {
+        const response = await teacherService.addTestInGroup(data);
+        useToast().success("Đã tạo bài kiểm tra");
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async getGroupTests(group_id) {
+      try {
+        const response = await teacherService.getGroupTests(group_id);
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
     //profile
     async getInfor() {
       try {

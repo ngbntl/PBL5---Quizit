@@ -2,12 +2,10 @@
 
     <div class="bg-gray-100 shadow-lg rounded-lg p-6 w-64 h-64 m-4">
         <h2 class="text-2xl font-semibold mb-4">{{ test.name }}</h2>
-        <p class="font-bold">Bắt đầu: </p>
-        <p class="text-gray-700">{{formatDate( test.start) }}</p>
-        <p class="font-bold">Kết thúc: </p>
-        <p class="text-gray-700">{{ formatDate(test.end) }}</p>
-        <p class="font-bold">Thời gian làm bài: </p>
-        <p class="text-gray-700">{{ test.duration }}</p>
+
+        <p class="font-bold">Ngày tạo: </p>
+        <p class="text-gray-700">{{formatDate( test.created_timestamp)}}</p>
+
     </div>
 </template>
 

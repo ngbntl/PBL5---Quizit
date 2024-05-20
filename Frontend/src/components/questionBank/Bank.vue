@@ -16,11 +16,11 @@
                         Chỉnh sửa
                     </button>
                 </router-link>
-                <button
+                <!-- <button
                     class="bg-red-500 cursor-pointer text-white px-4 py-2 rounded-md transition duration-150 hover:bg-red-700"
                     type="button">
                     Xóa
-                </button>
+                </button> -->
             </div>
         </div>
     </div>

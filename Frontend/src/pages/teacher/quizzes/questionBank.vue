@@ -11,25 +11,30 @@
     </div>
 
 
-
+    <div class="flex justify-end m-4 -mt-4 mr-8">
+        <add-question-bank />
+    </div>
 
     <div class="flex flex-wrap group hover:cursor-pointer hover:text-blue-500" @click="toggleQuestionBanks">
         <DownOutlined v-if="showQuestionBanks" class="ml-4 mt-6" />
         <RightOutlined v-else class="ml-4 mt-6" />
         <h1 class="text-xl p-4">Ngân hàng câu hỏi</h1>
-        <div class="absolute right-10 m-4 mr-8" v-show="showQuestionBanks">
-            <add-question-bank />
-        </div>
     </div>
+
     <div class="flex flex-wrap" v-show="showQuestionBanks">
         <Bank v-for="(item, index) in banks" :key="index" :collection="item" @click="getName(item.name)" />
     </div>
 
 
-    <div class="flex flex-wrap group hover:cursor-pointer hover:text-blue-500" @click="toggleTests">
-        <DownOutlined v-if="showTests" class="ml-4 mt-6" />
-        <RightOutlined v-else class="ml-4 mt-6" />
-        <h1 class="text-xl p-4">Đề thi</h1>
+    <div class="flex items-center group cursor-pointer text-blue-500 hover:text-blue-700">
+        <DownOutlined v-if="showTests" class="ml-4  transform transition-transform duration-200" @click="toggleTests" />
+        <RightOutlined v-else class="ml-4  transform transition-transform duration-200" @click="toggleTests" />
+        <h1 class="text-xl p-4 transition-colors duration-200" @click="toggleTests">Đề thi</h1>
+        <add-test v-show="showTests" class="ml-auto transition-opacity duration-200" />
+    </div>
+
+    <div class="flex flex-wrap" v-show="showTests">
+        <Test v-for="(item, index) in tests" :key="index" :test="item" />
     </div>
 
     <router-view />
@@ -42,15 +47,18 @@ import { useRoute } from 'vue-router';
 import Bank from '../../../components/questionBank/Bank.vue';
 import Addform from '../../../components/modal/Addform.vue';
 import { DownOutlined, RightOutlined } from "@ant-design/icons-vue";
+import AddTest from '../../../components/modal/AddTest.vue';
 
 import AddQuestionBank from '../../../components/modal/AddQuestionBank.vue';
+import Test from '../../../components/questionBank/Test.vue';
 export default defineComponent({
     components: {
         Bank,
         Addform,
         AddQuestionBank,
         DownOutlined,
-        RightOutlined
+        RightOutlined, AddTest,
+        Test
     },
 
     setup() {
@@ -58,20 +66,26 @@ export default defineComponent({
         const teacherStore = useTeacherStore();
         const route = useRoute();
         const collectionName = teacherStore.collectionName;
-        const showQuestionBanks = ref(false);
-        const showTests = ref(false);
+        const showQuestionBanks = ref(true);
+        const tests = ref([]);
+
+
 
         const toggleQuestionBanks = () => {
             showQuestionBanks.value = !showQuestionBanks.value;
         };
+
+        const showTests = ref(true);
         const toggleTests = () => {
             showTests.value = !showTests.value;
         };
 
+
         onMounted(async () => {
             const id = route.params.id;
             banks.value = await teacherStore.getQuestionBank(id);
-            console.log(banks.value);
+            tests.value = await teacherStore.getTests(id);
+            //console.log(tests.value)
         });
         const getName = (name) => {
             teacherStore.questionsName = name;
@@ -84,6 +98,7 @@ export default defineComponent({
             collectionName,
             showQuestionBanks,
             showTests,
+            tests,
             toggleTests,
             toggleQuestionBanks,
             getName,

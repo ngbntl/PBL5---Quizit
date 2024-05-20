@@ -29,8 +29,8 @@
                 <h1 class="text-xl ml-8 mt-6">Bài kiểm tra</h1>
 
             </div>
-            <div class="student" v-for="test in tests" :key="test.id" v-show="showTests">
-                <Test :test="test" />
+            <div class="flex flex-wrap justify-between" v-show="showTests">
+                <TestCard class="m-2 max-w-xs" :test="test" v-for="test in tests" :key="test.id" />
             </div>
 
         </div>
@@ -44,10 +44,10 @@ import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import Card from '../../../components/profile/Card.vue';
 import { DownOutlined, RightOutlined } from "@ant-design/icons-vue";
-import Test from '../../../components/test/Test.vue';
+import TestCard from '../../../components/questionBank/TestCard.vue';
 
 export default {
-    components: { Card, DownOutlined, RightOutlined, Test },
+    components: { Card, DownOutlined, RightOutlined, TestCard },
     setup() {
         const teacherStore = useTeacherStore();
         const students = ref([]);
@@ -71,7 +71,7 @@ export default {
 
         onMounted(async () => {
             students.value = await teacherStore.getStudents(groupId);
-            tests.value = await teacherStore.getTests(groupId);
+            tests.value = await teacherStore.getGroupTests(groupId);
         });
 
         return {

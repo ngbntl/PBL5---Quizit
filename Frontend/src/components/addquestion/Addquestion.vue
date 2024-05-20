@@ -16,16 +16,27 @@
                 <Editor @add-question="handleContentUpdate" :response="response" />
 
                 <label class="block mb-2 mt-4 font-bold">Đính kèm: </label>
-                <input type="file" @change="handleFileChange"
-                    class="input rounded-md px-8 py-2  border-2 border-transparent focus:outline-none focus:border-blue-500 placeholder-gray-400 transition-all duration-300 shadow-md"
-                    placeholder="Chọn file..." required="" />
+                <label for="file-upload"
+                    class="input rounded-md px-8 py-2  border-2 border-transparent focus:outline-none focus:border-blue-500 placeholder-gray-400 transition-all duration-300 shadow-md">
+                    Chọn file...
+                </label>
+                <input id="file-upload" type="file" @change="handleFileChange" class="file-input hidden" multiple />
 
+                <div class="mt-4">
+                    <h2 class="font-bold">Files đã chọn:</h2>
+                    <ul>
+                        <li v-for="(f, index) in file" :key="index">{{ f.name }}</li>
+                    </ul>
+                </div>
                 <label class="block mb-2 mt-4 font-bold">Độ khó: </label>
                 <select v-model="difficulty"
                     class="input rounded-md px-8 py-2  border-2 border-transparent focus:outline-none focus:border-blue-500 placeholder-gray-400 transition-all duration-300 shadow-md">
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+
                 </select>
                 <label class="block mb-2 mt-4 font-bold">Đáp án: </label>
                 <div v-for="(answer, index) in answers" :key="index">
@@ -63,7 +74,7 @@ export default {
         const difficulty = ref(1);
         const answers = ref([{ text: '', isCorrect: false }]);
         const collection = computed(() => ({ question: question.value, answers: answers.value }));
-        const file = ref(null);
+        const file = ref([]);
         const resetForm = () => {
             content.value = null;
             difficulty.value = 1;
@@ -75,7 +86,8 @@ export default {
 
         const handleFileChange = (e) => {
             console.log('handleFileChange called', e.target.files);
-            file.value = e.target.files[0];
+            // file.value = e.target.files[0];
+            file.value = Array.from(e.target.files);
         }
 
         const handleContentUpdate = (textFromEditor) => {
@@ -92,25 +104,36 @@ export default {
         const handleOk = async () => {
 
             loading.value = true;
+            const answerTexts = answers.value.map(answer => answer.text);
+            const correctAnswers = answers.value
+                .map((answer, index) => answer.isCorrect ? index : -1)
+                .filter(index => index !== -1);
+
             const question = {
                 content: content.value,
-                answer: answers.value
-                    .map(answer => answer.isCorrect ? { content: answer.text, is_correct: answer.isCorrect } : { content: answer.text }),
-                difficulty: difficulty.value
+                answer: {
+                    text: answerTexts,
+                    correct: correctAnswers
+                },
+                difficulty: parseInt(difficulty.value)
             };
 
             const questions = [question];
+
+
             const response = await teacherStore.addQuestion(id, questions);
 
             const formData = new FormData();
-            formData.append('attachment', file.value);
+            file.value.forEach((f, index) => {
+                formData.append('attachment' + index, f);
+            });
             const res = response.toString();
-            console.log(res)
-
+            //console.log(res)
+            console.log(formData.value);
             await teacherStore.uploadFile(formData, res);
 
 
-            console.log(response.toString());
+            //console.log(response.toString());
             setTimeout(() => {
                 loading.value = false;
                 open.value = false;

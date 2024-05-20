@@ -63,7 +63,7 @@ export default {
 
 <style>
 .scroll-container {
-    max-height: 80vh; /* Adjust this value to fit your needs */
+    max-height: 80vh; 
     overflow-y: auto;
 }
 </style>

@@ -29,17 +29,18 @@ const student = [
         name: "student - profile",
         component: () => import("../pages/student/profile/index.vue"),
       },
-      // {
-      //   path: "profile/edit",
-      //   name: "student - profile - edit",
-      //   component: () => import("../pages/student/profile/Edit.vue"),
-      // },
+
       // {
       //   path: "profile/change-password",
       //   name: "student - profile - change-password",
       //   component: () => import("../pages/student/profile/ChangePassword.vue"),
       // },
     ],
+  },
+  {
+    path: "/test",
+    name: "student-test",
+    component: () => import("../pages/student/test/Test.vue"),
   },
 ];
 export default student;

@@ -16,7 +16,23 @@ export default {
       },
     });
   },
-
+  addTest(test) {
+    return Api().post("teacher/collection/test/", test, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+  },
+  getTests(collection_id) {
+    return Api().get(
+      `teacher/collection/test/?collection_id=${collection_id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+  },
   //question
   addQuestionBank(bank) {
     return Api().post("teacher/collection/question_bank/", bank, {
@@ -110,15 +126,41 @@ export default {
       }
     );
   },
+
+  addStudent(studentId, groupId) {
+    return Api().post(`teacher/group/student?group_id=${groupId}`, studentId, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+  },
+  refuseStudent(studentId, groupId) {
+    return Api().delete(
+      `teacher/group/student?group_id=${groupId}`,
+      studentId,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+  },
+
   //test
-  getTests(group_id) {
+  getGroupTests(group_id) {
     return Api().get(`grouptest/?group_id=${group_id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
   },
-
+  addTestInGroup(data) {
+    return Api().post(`grouptest/teacher/`, data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+  },
   //profile
   getInfor() {
     return Api().get(`teacher/`, {
