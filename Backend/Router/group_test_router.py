@@ -27,12 +27,13 @@ async def insert_group_test(teacher: Annotated[Teacher, Depends(get_current_user
 
 # SELECT
 @teacher_group_test_router.get('/', status_code=status.HTTP_200_OK)
+@student_group_test_router.get('/', status_code=status.HTTP_200_OK)
 async def get_group_test(_: Annotated[Teacher | Student, Depends(get_current_user)],
                          group_test_service: Annotated[BO_group_test, Depends()],
                          group_id: Annotated[str, Query(min_length=8, max_length=8)]):
     try:
         return [Res_GroupTest.from_DB_model(group_test) for group_test in
-                group_test_service.get_group_test_by_group(group_id)]
+                group_test_service.get_group_test_in_group(group_id)]
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
