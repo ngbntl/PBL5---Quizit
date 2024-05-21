@@ -6,7 +6,7 @@ from Backend.Business.BO_group_test import BO_group_test
 from Backend.Business.BO_student_test import BO_student_test
 from Backend.Model.DB_model import Teacher, Student
 from Backend.Business.BO_authenticate import get_current_user
-from Backend.Model.request_model import Req_GroupTest, Req_StudentTest, Req_StudentWork
+from Backend.Model.request_model import Req_GroupTest, Req_StudentWork
 from Backend.Model.response_model import Res_GroupTest, Res_StudentTest
 
 teacher_group_test_router = APIRouter(prefix='/grouptest', tags=['grouptest'])
