@@ -204,7 +204,7 @@ class StudentTest:
         self.start: datetime | None = data.get("start")
         self.end: datetime | None = data.get("end")
         self.student_work: list[StudentWork_Question] | bytes | None = data.get("student_work")
-        self.score: int | None = data.get("score")
+        self.score: float | None = data.get("score")
 
         if isinstance(self.student_work, bytes):
             self.student_work = pickle.loads(self.student_work)

@@ -103,8 +103,14 @@ class BO_group_test:
                                              attachment=q.attachment, student_answer=None))
         return student_work_question
 
-    def get_studentwork_by_test(self, group_test_id: str) -> list[StudentTest]:
+    def get_studentworks(self, group_test_id: str) -> list[StudentTest]:
         return self.dao_student_test.get_student_tests(group_test_id)
+
+    def get_studentwork(self, group_test_id: str, student_id: str) -> StudentTest:
+        return self.dao_student_test.get_student_test(group_test_id, student_id)
+
+    def get_studentpoints_by_test(self, group_test_id: str) -> list[StudentTest]:
+        return self.dao_student_test.get_student_points(group_test_id)
 
     # UPDATE
     def update_group_test(self, teacher_id: str, data: Req_GroupTest):

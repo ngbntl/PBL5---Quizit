@@ -39,11 +39,28 @@ async def get_group_test(_: Annotated[Teacher | Student, Depends(get_current_use
 
 
 @teacher_group_test_router.get('/studentwork', status_code=status.HTTP_200_OK)
-async def get_studentwork(teacher: Annotated[Teacher, Depends(get_current_user)],
-                          group_test_service: Annotated[BO_group_test, Depends()],
-                          group_test_id: Annotated[str, Query(min_length=8, max_length=8)]):
+async def get_studentworks(teacher: Annotated[Teacher, Depends(get_current_user)],
+                           group_test_service: Annotated[BO_group_test, Depends()],
+                           group_test_id: Annotated[str, Query(min_length=8, max_length=8)],
+                           student_id: Annotated[str, Query(min_length=8, max_length=8)] = None):
     try:
-        return [Res_StudentTest.from_DB_model(student_test) for student_test in group_test_service.get_studentwork_by_test(group_test_id)]
+        if student_id is not None:
+            return Res_StudentTest.from_DB_model(group_test_service.get_studentwork(group_test_id, student_id))
+
+        return [Res_StudentTest.from_DB_model(student_test) for student_test in
+                group_test_service.get_studentworks(group_test_id)]
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@teacher_group_test_router.get('/studentpoint', status_code=status.HTTP_200_OK, response_model=list[Res_StudentTest],
+                               response_model_exclude_none=True)
+async def get_studentpoint(teacher: Annotated[Teacher, Depends(get_current_user)],
+                           group_test_service: Annotated[BO_group_test, Depends()],
+                           group_test_id: Annotated[str, Query(min_length=8, max_length=8)]):
+    try:
+        return [Res_StudentTest.from_DB_model(student_test) for student_test in
+                group_test_service.get_studentpoints_by_test(group_test_id)]
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
