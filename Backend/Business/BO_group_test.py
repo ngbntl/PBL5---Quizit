@@ -4,7 +4,7 @@ from Backend.DataAccess.DAO_question import DAO_question
 from Backend.DataAccess.DAO_student_test import DAO_student_test
 from Backend.DataAccess.DAO_test import DAO_test
 from Backend.DataAccess.DAO_test_structure import DAO_test_structure
-from Backend.Model.DB_model import GroupTest, TestStructure, Question, StudentWork_Question, StudentTest
+from Backend.Model.DB_model import GroupTest, TestStructure, Question, StudentWork_Question, StudentTest, Student
 from Backend.Model.request_model import Req_GroupTest
 from Backend.Model.response_model import Res_StudentTest
 
@@ -109,7 +109,7 @@ class BO_group_test:
     def get_studentwork(self, group_test_id: str, student_id: str) -> StudentTest:
         return self.dao_student_test.get_student_test(group_test_id, student_id)
 
-    def get_studentpoints_by_test(self, group_test_id: str) -> list[StudentTest]:
+    def get_studentpoints(self, group_test_id: str) -> list[tuple[Student, float]]:
         return self.dao_student_test.get_student_points(group_test_id)
 
     # UPDATE

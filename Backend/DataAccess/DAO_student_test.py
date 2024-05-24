@@ -1,7 +1,7 @@
 import pickle
 
 from Backend.DataAccess import get_MS_database
-from Backend.Model.DB_model import StudentTest
+from Backend.Model.DB_model import StudentTest, Student
 
 
 class DAO_student_test:
@@ -32,10 +32,15 @@ class DAO_student_test:
             row = cursor.fetchone()
             return StudentTest(row) if row else None
 
-    def get_student_points(self, group_test_id: str) -> list[StudentTest]:
+    def get_student_points(self, group_test_id: str) -> list[tuple[Student, float]]:
         with get_MS_database(True) as cursor:
-            cursor.execute("SELECT [student_id], [score] FROM [student_test] WHERE [group_test_id]=%s", (group_test_id,))
-            return [StudentTest(row) for row in cursor.fetchall()]
+            sql = """
+                SELECT s.[id], s.[name], s.[avatar_path], st.[score] 
+                FROM [student_test] st JOIN [student] s ON st.[student_id] = s.[id]
+                WHERE [group_test_id]=%s
+            """
+            cursor.execute(sql, (group_test_id,))
+            return [(Student(row), row['score']) for row in cursor.fetchall()]
 
     # UPDATE
     def submit(self, data: StudentTest):

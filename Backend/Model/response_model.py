@@ -181,5 +181,13 @@ class Res_StudentTest(BaseModel):
     def from_DB_model(cls, student_test: StudentTest):
         return cls(student_id=student_test.student_id, group_test_id=student_test.group_test_id,
                    start=student_test.start, end=student_test.end,
-                   student_work=[Res_StudentWork_Question.from_DB_model(sw) for sw in student_test.student_work] if student_test.student_work else None,
+                   student_work=[Res_StudentWork_Question.from_DB_model(sw) for sw in
+                                 student_test.student_work] if student_test.student_work else None,
                    score=student_test.score)
+
+
+class Res_StudentPoint(BaseModel):
+    student_id: str | None = None
+    name: str | None = None
+    avatar_path: str | None = None
+    point: float | None = None
