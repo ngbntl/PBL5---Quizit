@@ -50,7 +50,7 @@ export const useAuthStore = defineStore("auth", {
       this.isLoggedIn = false;
       this.token = null;
       localStorage.removeItem("token");
-      router.push({ name: "login" });
+      //router.push({ name: "login" });
     },
     async signUp(data) {
       try {

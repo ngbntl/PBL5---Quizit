@@ -85,7 +85,7 @@ export default defineComponent({
             const id = route.params.id;
             banks.value = await teacherStore.getQuestionBank(id);
             tests.value = await teacherStore.getTests(id);
-            //console.log(tests.value)
+
         });
         const getName = (name) => {
             teacherStore.questionsName = name;
@@ -93,6 +93,10 @@ export default defineComponent({
         watch(() => teacherStore.questionBank, (newQuestionBank) => {
             banks.value = newQuestionBank;
         });
+        watch(() => teacherStore.testInCollection, (newTests) => {
+            tests.value = newTests;
+        });
+
         return {
             banks,
             collectionName,

@@ -43,11 +43,9 @@
                 <h1 class="text-xl ml-8 my-0" @click="toggleTests">Bài kiểm tra</h1>
                 <group-test class="ml-auto" v-show="showTests" />
             </div>
-            <div class="flex flex-wrap justify-between" v-for="groupTest in groupTests" :key="groupTest.id"
-                v-show="showTests">
-                <TestCard class="m-2 " :test="groupTest" />
+            <div class="flex flex-wrap justify-start" v-show="showTests">
+                <TestCard class="m-2" v-for="groupTest in groupTests" :key="groupTest.id" :test="groupTest" />
             </div>
-
         </div>
     </div>
 
@@ -80,19 +78,22 @@ export default {
         const tests = ref([]);
         const requests = ref([]);
         const groupTests = ref([])
-        const toggleTests = () => {
+        const toggleTests = async () => {
+
             showTests.value = !showTests.value;
         }
         const toggleRequests = () => {
             showRequests.value = !showRequests.value;
         }
-        const toggleStudents = () => {
+        const toggleStudents = async () => {
+
             showStudents.value = !showStudents.value;
+
         }
 
         onMounted(async () => {
             students.value = await teacherStore.getStudents(groupId);
-            tests.value = await teacherStore.getTests(groupId);
+            //  tests.value = await teacherStore.getTests(groupId);
             requests.value = await teacherStore.getRequests(groupId);
             groupTests.value = await teacherStore.getGroupTests(groupId);
             console.log(groupTests.value)

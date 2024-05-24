@@ -148,14 +148,14 @@ export default {
 
   //test
   getGroupTests(group_id) {
-    return Api().get(`grouptest/?group_id=${group_id}`, {
+    return Api().get(`teacher/grouptest/?group_id=${group_id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
   },
   addTestInGroup(data) {
-    return Api().post(`grouptest/teacher/`, data, {
+    return Api().post(`teacher/grouptest/`, data, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },

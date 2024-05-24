@@ -30,7 +30,8 @@
 
             </div>
             <div class="flex flex-wrap justify-between" v-show="showTests">
-                <TestCard class="m-2 max-w-xs" :test="test" v-for="test in tests" :key="test.id" />
+                <TestCard class="m-2 max-w-xs" :test="test" v-for="test in tests" :key="test.id"
+                    @click="getGroupTestId(test.id)" />
             </div>
 
         </div>
@@ -45,11 +46,13 @@ import { useRoute } from 'vue-router';
 import Card from '../../../components/profile/Card.vue';
 import { DownOutlined, RightOutlined } from "@ant-design/icons-vue";
 import TestCard from '../../../components/questionBank/TestCard.vue';
+import { useStudentStore } from '../../../stores/modules/student';
 
 export default {
     components: { Card, DownOutlined, RightOutlined, TestCard },
     setup() {
         const teacherStore = useTeacherStore();
+        const studentStore = useStudentStore();
         const students = ref([]);
         const route = useRoute();
         const groupId = route.params.id;
@@ -59,6 +62,10 @@ export default {
         const tests = ref([]);
 
 
+        const getGroupTestId = (group_test_id) => {
+            studentStore.group_test_id = group_test_id;
+            localStorage.setItem("group_test_id", group_test_id);
+        }
         const toggleTests = () => {
             showTests.value = !showTests.value;
         }
@@ -70,8 +77,8 @@ export default {
         }
 
         onMounted(async () => {
-            students.value = await teacherStore.getStudents(groupId);
-            tests.value = await teacherStore.getGroupTests(groupId);
+            students.value = await studentStore.getStudentsInGroup(groupId);
+            tests.value = await studentStore.getGroupTests(groupId);
         });
 
         return {
@@ -82,7 +89,7 @@ export default {
             showRequests,
             showTests,
             tests,
-
+            getGroupTestId,
             toggleTests,
             toggleRequests,
             toggleStudents

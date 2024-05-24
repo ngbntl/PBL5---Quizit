@@ -33,20 +33,19 @@
 </template>
 <script lang="ts" setup>
     import { reactive, watch, h } from 'vue';
-import { useAuthStore } from '../../stores/modules/auth';
-    const authStore = useAuthStore();
-    const logout = () => {
-        authStore.logout();
-    };
+    import { useRouter } from 'vue-router';
+   
+    const router = useRouter();
+
     const state = reactive({
-       
         selectedKeys: ['1'],
         openKeys: ['sub1'],
-        
     });
-    
-   
-   
+
+    const logout = () => {
+        localStorage.removeItem('token');
+        router.push('/login');
+    }
 </script>
 
 <style>

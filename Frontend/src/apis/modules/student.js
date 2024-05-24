@@ -22,6 +22,20 @@ export default {
     );
   },
 
+  getStudentsInGroup(group_id) {
+    return Api().get(`student/group/students/?group_id=${group_id}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+  },
+  getGroupTests(group_id) {
+    return Api().get(`student/grouptest/?group_id=${group_id}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+  },
   //profile
   getInfor() {
     return Api().get("student/", {
@@ -29,5 +43,17 @@ export default {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
+  },
+
+  //Test
+  getTest(group_test_id) {
+    return Api().get(
+      `student/grouptest/studentwork?group_test_id=${group_test_id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
   },
 };

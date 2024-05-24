@@ -1,14 +1,17 @@
 <template>
     <profile :user="teacher" />
+    <update-profile class="flex justify-center items-center" />
 </template>
 
 <script>
 import Profile from '../../../components/profile/Profile.vue'
 import { useTeacherStore } from '../../../stores/modules/teacher';
 import { ref, onMounted } from 'vue';
+import UpdateProfile from '../../../components/modal/updateProfile.vue';
 export default {
     components: {
-        Profile
+        Profile,
+        UpdateProfile
     },
     setup() {
         const teacher = ref({});

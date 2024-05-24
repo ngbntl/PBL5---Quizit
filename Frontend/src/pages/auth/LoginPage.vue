@@ -27,6 +27,7 @@
                             </label>
                         </div>
                     </div>
+                    <p class="text-red-500" v-if="roleError">{{ roleError }}</p>
                 </div>
 
                 <div class="mb-4">
@@ -88,6 +89,16 @@ export default {
         const role = ref("Teacher");
         const showPassword = ref(false);
 
+
+        const roleError = ref("");
+
+        const validateRole = () => {
+            if (role.value === "") {
+                roleError.value = "Vui lòng chọn vai trò.";
+            } else {
+                roleError.value = "";
+            }
+        };
         const togglePasswordVisibility = () => {
             showPassword.value = !showPassword.value;
         };
@@ -112,11 +123,13 @@ export default {
         };
 
         const validateForm = () => {
+            validateRole();
             validateEmail();
             validatePassword();
             if (emailError.value || passwordError.value) {
                 return;
             }
+
             submitForm();
         };
 
@@ -138,6 +151,8 @@ export default {
             emailError,
             passwordError,
             showPassword,
+            roleError,
+            validateRole,
             togglePasswordVisibility,
             validateEmail,
             validatePassword,

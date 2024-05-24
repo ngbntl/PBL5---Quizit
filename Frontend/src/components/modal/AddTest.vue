@@ -1,7 +1,7 @@
 <template>
     <div>
         <a-button type="primary" @click="showModal">Tạo bài kiểm tra</a-button>
-        <a-modal v-model:open="open" title="tạo bải kiểm tra" @ok="handleOk">
+        <a-modal v-model:open="open" title="Tạo bải kiểm tra" @ok="handleOk">
             <template #footer>
                 <a-button key="back" @click="handleCancel">Hủy</a-button>
                 <a-button key="submit" type="primary" :loading="loading" @click="handleOk">Xác nhận</a-button>
@@ -13,7 +13,7 @@
                     class="w-2/3 px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:shadow-outline"
                     placeholder="Nhập tên bài kiểm tra" />
             </div>
-            <div class="flex items-center p-4">
+            <!-- <div class="flex items-center p-4">
                 <label class="w-1/3 mb-2">Chọn bộ sưu tập: </label>
                 <select name="" id=""
                     class="w-2/3 px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:shadow-outline"
@@ -22,7 +22,7 @@
                         {{ collection.name }}
                     </option>
                 </select>
-            </div>
+            </div> -->
 
 
             <div v-for="(struct, idx) in structure" :key="idx" class="p-4">
@@ -46,10 +46,13 @@
                             <label class="w-1/2 mb-2">Độ khó: </label>
                             <select name="" id=""
                                 class="w-1/2 px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:shadow-outline"
-                                v-model="num.difficulty">
+                                v-model.number="num.difficulty">
                                 <option value="1">1</option>
                                 <option value="2">2</option>
                                 <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+
                             </select>
                         </div>
                         <div class="w-2/3 pl-2 flex items-center">
@@ -84,18 +87,21 @@
 </template>
 
 <script>
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 import { useTeacherStore } from "../../stores/modules/teacher";
 import Vue3TagsInput from "vue3-tags-input";
+import router from '../../router';
+import { useRouter } from 'vue-router';
 export default {
     components: { Vue3TagsInput },
     setup() {
         const teacherStore = useTeacherStore();
         const loading = ref(false);
         const open = ref(false);
-        const collections = ref([]);
+        const collections = ref('');
         const selectedCollection = ref(null);
-        const name = ref('')
+        const name = ref('');
+        const router = useRouter()
         const structure = ref([
             {
                 question_bank_id: null,
@@ -107,21 +113,21 @@ export default {
                 ]
             }
         ]);
-        const test = ref({
-            collection_id: selectedCollection.value,
+        const test = computed(() => ({
+            collection_id: collections.value,
             name: name.value,
             structure: structure.value
-        });
+        }));
 
-        watch(selectedCollection, async (newCollectionId) => {
-            if (newCollectionId) {
-                questionBanks.value = await teacherStore.getQuestionBank(
-                    newCollectionId
-                );
-                test.value.collection_id = newCollectionId;
+        // watch(selectedCollection, async (newCollectionId) => {
+        //     if (newCollectionId) {
+        //         questionBanks.value = await teacherStore.getQuestionBank(
+        //             newCollectionId
+        //         );
+        //         test.value.collection_id = newCollectionId;
 
-            }
-        });
+        //     }
+        // });
         watch(name, (newName) => {
             test.value.name = newName;
         });
@@ -157,9 +163,15 @@ export default {
         const removeSNumberQuestion = (struct, numindex) => {
             struct.number_of_question.splice(numindex, 1);
         }
-        const showModal = () => {
+        const showModal = async () => {
             open.value = true;
-            collections.value = teacherStore.collections;
+            collections.value = router.currentRoute.value.params.id;
+            teacherStore.tmpCollectionId = collections.value;
+
+            questionBanks.value = await teacherStore.getQuestionBank(
+                collections.value
+            );
+            console.log(collections.value)
         };
 
         const handleOk = async () => {

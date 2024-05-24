@@ -125,7 +125,7 @@ export default {
 
             const formData = new FormData();
             file.value.forEach((f, index) => {
-                formData.append('attachment' + index, f);
+                formData.append('attachment', f);
             });
             const res = response.toString();
             //console.log(res)

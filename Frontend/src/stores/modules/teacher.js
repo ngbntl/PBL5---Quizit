@@ -13,6 +13,7 @@ export const useTeacherStore = defineStore("teacher", {
     bankId: "",
     groupId: "",
     questionId: "",
+    testInCollection: [],
   }),
 
   actions: {
@@ -41,7 +42,8 @@ export const useTeacherStore = defineStore("teacher", {
     async addTest(test) {
       try {
         const response = await teacherService.addTest(test);
-        useToast().success("Đã tạo bài kiểm tra");
+        useToast().success("Đã tạo đề thi");
+        this.testInCollection = await this.getTests(this.tmpCollectionId);
         return response.data;
       } catch (error) {
         console.error(error);
@@ -50,7 +52,8 @@ export const useTeacherStore = defineStore("teacher", {
     async getTests(collection_id) {
       try {
         const response = await teacherService.getTests(collection_id);
-        console.log(response.data);
+        // console.log(response.data);
+        this.testInCollection = response.data;
         return response.data;
       } catch (error) {
         console.error(error);
@@ -165,8 +168,11 @@ export const useTeacherStore = defineStore("teacher", {
     async addStudent(studentId, groupId) {
       try {
         const response = await teacherService.addStudent(studentId, groupId);
+        this.getStudents(groupId);
+        useToast().success("Đã thêm học sinh");
         return response.data;
       } catch (error) {
+        useToast().error("Thêm thất bại");
         console.error(error);
       }
     },

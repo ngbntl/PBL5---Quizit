@@ -17,25 +17,28 @@
         </a-modal>
     </div>
 </template>
-
 <script>
 import { ref, computed } from 'vue';
 import { useTeacherStore } from '../../stores/modules/teacher';
 import Vue3TagsInput from 'vue3-tags-input';
+import { useRoute } from 'vue-router';
 export default {
     components: { Vue3TagsInput },
     setup() {
         const teacherStore = useTeacherStore();
         const loading = ref(false);
         const open = ref(false);
-
-
+        const route = useRoute();
 
         const tags = ref([]);
 
-        const updateTags = (newTags) => {
+        const handleChangeTag = (newTags) => {
             tags.value = newTags;
         }
+
+        const data = computed(() => ({
+            student_email: tags.value
+        }));
 
         const showModal = () => {
             open.value = true;
@@ -43,15 +46,14 @@ export default {
 
         const handleOk = async () => {
             loading.value = true;
-
+            console.log(data.value)
+            await teacherStore.addStudent(data.value, route.params.id)
 
             setTimeout(() => {
                 loading.value = false;
                 open.value = false;
             }, 2000);
         };
-
-
 
         const handleCancel = () => {
             open.value = false;
@@ -60,14 +62,12 @@ export default {
         return {
             open,
             loading,
-
-
             tags,
-            updateTags,
+            data,
             showModal,
             handleOk,
             handleCancel,
-
+            handleChangeTag // Make sure to return this method
         };
     }
 }

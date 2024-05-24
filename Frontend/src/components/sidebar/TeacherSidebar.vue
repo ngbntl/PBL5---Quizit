@@ -24,7 +24,7 @@
                 </router-link>
             </a-menu-item>
 
-            <a-menu-item key="logout" class="">
+            <a-menu-item key="logout" class="" @click="logout">
                 <router-link to="/login" class="pl-8">
                     <fa icon="fa-solid fa-right-from-bracket" /> Đăng xuất
                 </router-link>
@@ -34,6 +34,8 @@
 </template>
 <script lang="ts" setup>
     import { reactive, watch, h } from 'vue';
+import { useRouter } from 'vue-router';
+
    
     const state = reactive({
        
@@ -42,7 +44,11 @@
         
     });
     
-   
+    const logout = () => {
+        const router = useRouter()
+        localStorage.removeItem('token');
+        router.push('/login');
+    }
    
 </script>
 

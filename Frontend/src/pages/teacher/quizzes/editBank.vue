@@ -18,12 +18,17 @@
             <p class="ml-4 p-4">
                 {{ question.content }}
             </p>
-            <img v-if="question.attachment" :src="'http://localhost:4444/static/'+ question.attachment"
-                class="p-10 w-1/2" />
+            <div v-if="question.attachment">
+                <img v-for="(img, index) in question.attachment" :key="index"
+                    :src="'http://localhost:4444/static/'+ img" class="p-10 w-1/2" />
+            </div>
 
             <p class="ml-4 font-bold">
                 Đáp án: </p>
             <answer :answers="question.answer" class="p-4" />
+            <p class="ml-4 mb-4 font-bold">
+                độ khó: {{ question.difficulty }}</p>
+
         </div>
     </div>
 </template>
@@ -59,15 +64,15 @@ export default {
             const id = route.currentRoute.value.params.id;
             teacherStore.bankId = id;
             console.log(id);
-            questions.value = await teacherStore.getQuestions(id);
-            questions.value.forEach(question => {
-                question.attachment.forEach(img => {
-                    img = img.replace(/\\\\/g, '/');
-                })
-
-            }
-            );
-            console.log(questions.value);
+            const rawQuestions = await teacherStore.getQuestions(id);
+            questions.value = rawQuestions.map(question => ({
+                ...question,
+                answer: {
+                    text: question.answer.text,
+                    correct: question.answer.correct,
+                },
+                attachment: question.attachment ? question.attachment.map(img => img.replace(/\\\\/g, '/')) : [],
+            }));
         });
         watch(() => teacherStore.questions, (newQuestion) => {
             questions.value = newQuestion;
