@@ -1,27 +1,32 @@
 <template>
-    <div class="flex justify-center space-x-2 mb-4">
+
+
+    <div class="grid grid-cols-3 gap-2 shadow-md p-6 ">
         <div v-for="index in totalQuestions" :key="index" @click="goToQuestion(index)"
-            class="cursor-pointer border rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100">{{
-            index }}</div>
+            class="cursor-pointer border rounded-full w-10 h-10 flex items-center justify-center hover:bg-gray-100"
+            :class="{ 'bg-green-200': answeredQuestions.includes(index-1) }">
+            {{ index }}
+        </div>
     </div>
+
 </template>
 
 <script>
-import { ref } from 'vue';
-
 export default {
     props: {
-        totalQuestions: Number // Số lượng câu hỏi
+        totalQuestions: Number, // Số lượng câu hỏi
+        answeredQuestions: Array // Mảng chứa các câu hỏi đã được trả lời
     },
-    setup(props) {
-        const goToQuestion = (index) => {
-            // Code chuyển đến câu hỏi ở vị trí index
-        }
-
-        return {
-            totalQuestions: ref(props.totalQuestions),
-            goToQuestion
+    methods: {
+        goToQuestion(index) {
+            this.$emit('go-to-question', index);
         }
     }
-}
+};
 </script>
+
+<style scoped>
+.bg-green-200 {
+    background-color: #c6f6d5;
+}
+</style>

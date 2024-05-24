@@ -4,6 +4,7 @@ import studentService from "../../apis/modules/student.js";
 export const useStudentStore = defineStore("student", {
   state: () => ({
     group_test_id: "",
+    duration: 0,
   }),
 
   actions: {

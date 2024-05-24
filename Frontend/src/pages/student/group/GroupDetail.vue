@@ -31,7 +31,7 @@
             </div>
             <div class="flex flex-wrap justify-between" v-show="showTests">
                 <TestCard class="m-2 max-w-xs" :test="test" v-for="test in tests" :key="test.id"
-                    @click="getGroupTestId(test.id)" />
+                    @click="getGroupTestId(test.id, test.duration)" />
             </div>
 
         </div>
@@ -62,8 +62,9 @@ export default {
         const tests = ref([]);
 
 
-        const getGroupTestId = (group_test_id) => {
+        const getGroupTestId = (group_test_id, duration) => {
             studentStore.group_test_id = group_test_id;
+            localStorage.setItem("duration", duration);
             localStorage.setItem("group_test_id", group_test_id);
         }
         const toggleTests = () => {

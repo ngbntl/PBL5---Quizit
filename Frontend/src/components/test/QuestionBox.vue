@@ -4,12 +4,19 @@
         <h2 class="text-lg font-semibold mb-2">{{ question.content }}</h2>
 
         <div v-if="question.attachment">
-            <img v-for="(img, index) in question.attachment" :key="index" :src="'http://localhost:4444/static/'+ img"
-                class="p-10 w-1/2" />
+            <div v-for="(file, index) in question.attachment" :key="index">
+                <img v-if="file.endsWith('.jpg') || file.endsWith('.png')" :src="'http://localhost:4444/static/'+ file"
+                    class="p-10 w-1/2" />
+                <audio class="ml-4" v-else-if="file.endsWith('.mp3')" controls
+                    :src="'http://localhost:4444/static/'+ file">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
         </div>
         <ul>
             <li v-for="(choice, index) in question.answer.text" :key="index"
-                class="p-2 cursor-pointer border rounded-lg hover:bg-gray-100" @click="selectAnswer(index, $event)">
+                class="p-2 cursor-pointer my-3 border rounded-lg  hover:bg-gray-100"
+                @click="selectAnswer(index, $event)">
                 <input v-if="question.answer.correct.length > 1" type="checkbox" :value="choice"
                     v-model="userAnswers[question.id]" @click.stop>
                 <input v-else type="radio" :value="choice" v-model="userAnswers[question.id]" @click.stop>
