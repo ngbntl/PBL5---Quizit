@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from fastapi import APIRouter, HTTPException, Depends, Body, Query, Header
+from fastapi import APIRouter, HTTPException, Depends, Body, Query
 from typing import Annotated
 from starlette import status
 
@@ -9,7 +9,7 @@ from Backend.Business.BO_student_test import BO_student_test
 from Backend.Model.DB_model import Teacher, Student
 from Backend.Business.BO_authenticate import get_current_user
 from Backend.Model.request_model import Req_GroupTest, Req_StudentWork
-from Backend.Model.response_model import Res_GroupTest, Res_StudentTest, Res_StudentPoint, Res_Student
+from Backend.Model.response_model import Res_GroupTest, Res_StudentTest, Res_StudentPoint
 from Backend.Router.annotate import QUERY_LEN_8
 
 teacher_group_test_router = APIRouter(prefix='/grouptest', tags=['grouptest'])
