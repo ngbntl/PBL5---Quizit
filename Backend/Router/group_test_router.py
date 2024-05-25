@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from fastapi import APIRouter, HTTPException, Depends, Body, Query
+from fastapi import APIRouter, HTTPException, Depends, Body, Query, Header
 from typing import Annotated
 from starlette import status
 
@@ -10,7 +10,7 @@ from Backend.Model.DB_model import Teacher, Student
 from Backend.Business.BO_authenticate import get_current_user
 from Backend.Model.request_model import Req_GroupTest, Req_StudentWork
 from Backend.Model.response_model import Res_GroupTest, Res_StudentTest, Res_StudentPoint, Res_Student
-from Backend.Router.annotate import QUERY_GROUP_ID
+from Backend.Router.annotate import QUERY_LEN_8
 
 teacher_group_test_router = APIRouter(prefix='/grouptest', tags=['grouptest'])
 student_group_test_router = APIRouter(prefix='/grouptest', tags=['grouptest'])
@@ -94,8 +94,8 @@ async def delete_group_test(teacher: Annotated[Teacher, Depends(get_current_user
 @student_group_test_router.get('/calendar', status_code=status.HTTP_200_OK)
 async def get_group_test_in_time(student: Annotated[Teacher | Student, Depends(get_current_user)],
                                  student_test_service: Annotated[BO_student_test, Depends()],
-                                 start: Annotated[datetime, Body()],
-                                 end: Annotated[datetime, Body()]):
+                                 start: Annotated[datetime, Query()],
+                                 end: Annotated[datetime, Query()]):
     try:
         return [Res_GroupTest.from_DB_model(group_test) for group_test in
                 student_test_service.get_group_test_in_time(student.id, start, end)]
@@ -106,7 +106,7 @@ async def get_group_test_in_time(student: Annotated[Teacher | Student, Depends(g
 @student_group_test_router.get('/studentwork/', status_code=status.HTTP_200_OK)
 async def get_student_test(student: Annotated[Student, Depends(get_current_user)],
                            group_test_service: Annotated[BO_student_test, Depends()],
-                           group_test_id: Annotated[str, Query(min_length=8, max_length=8)]):
+                           group_test_id: QUERY_LEN_8):
     try:
         return Res_StudentTest.from_DB_model(
             group_test_service.get_student_test_by_group_test_id(student.id, group_test_id))
@@ -127,7 +127,7 @@ async def update_student_work(student: Annotated[Student, Depends(get_current_us
 @student_group_test_router.get('/history', status_code=status.HTTP_200_OK)
 async def get_history(student: Annotated[Student, Depends(get_current_user)],
                       group_test_service: Annotated[BO_student_test, Depends()],
-                      group_id: QUERY_GROUP_ID):
+                      group_id: QUERY_LEN_8):
     try:
         return [Res_StudentTest.from_DB_model(student_test) for student_test in
                 group_test_service.get_history(student.id, group_id)]
