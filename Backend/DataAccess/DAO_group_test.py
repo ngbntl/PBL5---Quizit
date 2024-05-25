@@ -26,6 +26,7 @@ class DAO_group_test:
                 (student_id, start, end))
             return [GroupTest(row) for row in cursor.fetchall()]
 
+
     # INSERT
     def insert_group_test(self, data: GroupTest) -> str:
         id = generate_id(8)

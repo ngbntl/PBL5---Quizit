@@ -10,6 +10,7 @@ from Backend.Model.DB_model import Teacher, Student
 from Backend.Business.BO_authenticate import get_current_user
 from Backend.Model.request_model import Req_GroupTest, Req_StudentWork
 from Backend.Model.response_model import Res_GroupTest, Res_StudentTest, Res_StudentPoint, Res_Student
+from Backend.Router.annotate import QUERY_GROUP_ID
 
 teacher_group_test_router = APIRouter(prefix='/grouptest', tags=['grouptest'])
 student_group_test_router = APIRouter(prefix='/grouptest', tags=['grouptest'])
@@ -119,5 +120,16 @@ async def update_student_work(student: Annotated[Student, Depends(get_current_us
                               group_test_service: Annotated[BO_student_test, Depends()]) -> float:
     try:
         return group_test_service.submit(student.id, data)
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@student_group_test_router.get('/history', status_code=status.HTTP_200_OK)
+async def get_history(student: Annotated[Student, Depends(get_current_user)],
+                      group_test_service: Annotated[BO_student_test, Depends()],
+                      group_id: QUERY_GROUP_ID):
+    try:
+        return [Res_StudentTest.from_DB_model(student_test) for student_test in
+                group_test_service.get_history(student.id, group_id)]
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

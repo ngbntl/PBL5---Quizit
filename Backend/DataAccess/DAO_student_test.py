@@ -42,6 +42,18 @@ class DAO_student_test:
             cursor.execute(sql, (group_test_id,))
             return [(Student(row), row['score']) for row in cursor.fetchall()]
 
+    def get_student_test_history(self, student_id: str, group_id: str) -> list[StudentTest]:
+        sql = """
+            SELECT [group_test_id], [start], [end], [score] FROM [student_test] 
+            WHERE [group_test_id] IN (SELECT [id] FROM [group_test] WHERE [group_id] = %s)
+            AND [student_id] = %s
+        """
+        with get_MS_database(True) as cursor:
+            cursor.execute(
+                sql,
+                (group_id, student_id))
+            return [StudentTest(row) for row in cursor.fetchall()]
+
     # UPDATE
     def submit(self, data: StudentTest):
         with get_MS_database(False) as cursor:
