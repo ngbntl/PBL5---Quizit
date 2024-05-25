@@ -22,10 +22,9 @@ class DAO_group_test:
     def get_group_test_for_student(self, student_id: str, start: datetime, end: datetime) -> list[GroupTest]:
         with get_MS_database(True) as cursor:
             cursor.execute(
-                "SELECT * FROM [group_test] WHERE [group_id] IN (SELECT [group_id] FROM [group_student] WHERE [student_id] = %s) AND [start] >= %s AND [start] <= %s",
+                "SELECT * FROM [group_test] WHERE [group_id] IN (SELECT [group_id] FROM [group_student] WHERE [student_id] = %s) AND CAST([start] AS DATE) >= CAST(%s AS DATE) AND CAST([start] AS DATE) <= CAST(%s AS DATE)",
                 (student_id, start, end))
             return [GroupTest(row) for row in cursor.fetchall()]
-
 
     # INSERT
     def insert_group_test(self, data: GroupTest) -> str:
