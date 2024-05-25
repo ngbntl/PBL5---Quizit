@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pymssql
 
 from Backend.Model.DB_model import GroupTest
@@ -16,6 +18,13 @@ class DAO_group_test:
             cursor.execute("SELECT * FROM [group_test] WHERE [id] = %s", group_test_id)
             row = cursor.fetchone()
             return GroupTest(row) if row else None
+
+    def get_group_test_for_student(self, student_id: str, start: datetime, end: datetime) -> list[GroupTest]:
+        with get_MS_database(True) as cursor:
+            cursor.execute(
+                "SELECT * FROM [group_test] WHERE [group_id] IN (SELECT [group_id] FROM [group_student] WHERE [student_id] = %s) AND [start] >= %s AND [start] <= %s",
+                (student_id, start, end))
+            return [GroupTest(row) for row in cursor.fetchall()]
 
     # INSERT
     def insert_group_test(self, data: GroupTest) -> str:

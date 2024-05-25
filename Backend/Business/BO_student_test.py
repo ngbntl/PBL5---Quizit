@@ -49,6 +49,9 @@ class BO_student_test:
         # Student test does not exist. Now create.
         return self.insert_student_test(student_id, group_test_id)
 
+    def get_group_test_in_time(self, student_id: str, start: datetime, end: datetime):
+        return self.dao_group_test.get_group_test_for_student(student_id, start, end)
+
     # INSERT
     def insert_student_test(self, student_id: str, group_test_id: str) -> StudentTest:
         student_work = self.bo_group_test.generate_student_work(group_test_id)
@@ -83,3 +86,5 @@ class BO_student_test:
             score += len(set(sw_question.student_answer) & sw_question.answer.correct) / len(sw_question.answer.correct)
 
         return score / len(student_work)
+
+

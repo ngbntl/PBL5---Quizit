@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import APIRouter, HTTPException, Depends, Body, Query
 from typing import Annotated
 from starlette import status
@@ -58,7 +60,8 @@ async def get_studentpoint(teacher: Annotated[Teacher, Depends(get_current_user)
                            group_test_service: Annotated[BO_group_test, Depends()],
                            group_test_id: Annotated[str, Query(min_length=8, max_length=8)]):
     try:
-        return [Res_StudentPoint(student_id=sp[0].id, name=sp[0].name, avatar_path=sp[0].avatar_path, point=sp[1]) for sp in
+        return [Res_StudentPoint(student_id=sp[0].id, name=sp[0].name, avatar_path=sp[0].avatar_path, point=sp[1]) for
+                sp in
                 group_test_service.get_studentpoints(group_test_id)]
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
@@ -87,6 +90,18 @@ async def delete_group_test(teacher: Annotated[Teacher, Depends(get_current_user
 
 
 ### STUDENT ###
+@student_group_test_router.get('/calendar', status_code=status.HTTP_200_OK)
+async def get_group_test_in_time(student: Annotated[Teacher | Student, Depends(get_current_user)],
+                                 student_test_service: Annotated[BO_student_test, Depends()],
+                                 start: Annotated[datetime, Body()],
+                                 end: Annotated[datetime, Body()]):
+    try:
+        return [Res_GroupTest.from_DB_model(group_test) for group_test in
+                student_test_service.get_group_test_in_time(student.id, start, end)]
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
 @student_group_test_router.get('/studentwork/', status_code=status.HTTP_200_OK)
 async def get_student_test(student: Annotated[Student, Depends(get_current_user)],
                            group_test_service: Annotated[BO_student_test, Depends()],
