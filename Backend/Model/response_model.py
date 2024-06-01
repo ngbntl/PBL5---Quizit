@@ -78,8 +78,8 @@ class Res_QuestionBank(BaseModel):
 
 
 class Res_GroupTest(BaseModel):
-    id: str
-    group_id: str
+    id: str | None = None
+    group_id: str | None = None
     test_id: str | None = None
     name: str | None = None
     start: datetime | None = None
@@ -176,11 +176,12 @@ class Res_StudentTest(BaseModel):
     end: datetime | None = None
     student_work: list[Res_StudentWork_Question] | None = None
     score: float | None = None
+    group_test: Res_GroupTest | None = None
 
     @classmethod
     def from_DB_model(cls, student_test: StudentTest):
         return cls(student_id=student_test.student_id, group_test_id=student_test.group_test_id,
-                   start=student_test.start, end=student_test.end,
+                   group_test=Res_GroupTest.from_DB_model(student_test.group_test), start=student_test.start, end=student_test.end,
                    student_work=[Res_StudentWork_Question.from_DB_model(sw) for sw in
                                  student_test.student_work] if student_test.student_work else None,
                    score=student_test.score)

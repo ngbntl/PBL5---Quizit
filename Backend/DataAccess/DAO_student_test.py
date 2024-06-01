@@ -44,14 +44,12 @@ class DAO_student_test:
 
     def get_student_test_history(self, student_id: str, group_id: str) -> list[StudentTest]:
         sql = """
-            SELECT [group_test_id], [start], [end], [score] FROM [student_test] 
-            WHERE [group_test_id] IN (SELECT [id] FROM [group_test] WHERE [group_id] = %s)
-            AND [student_id] = %s
+            SELECT st.[group_test_id], gt.[name], st.[start], st.[end], st.[score] FROM 
+            (SELECT [group_test_id], [start], [end], [score] FROM [student_test] WHERE [student_id] = %s) st
+            JOIN (SELECT [id], [name] FROM [group_test] WHERE [group_id] = %s) gt on st.[group_test_id] = gt.[id]
         """
         with get_MS_database(True) as cursor:
-            cursor.execute(
-                sql,
-                (group_id, student_id))
+            cursor.execute(sql, (student_id, group_id))
             return [StudentTest(row) for row in cursor.fetchall()]
 
     # UPDATE
