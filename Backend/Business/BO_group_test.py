@@ -1,3 +1,4 @@
+from Backend.Business import bcrypt_context
 from Backend.DataAccess.DAO_group import DAO_group
 from Backend.DataAccess.DAO_group_test import DAO_group_test
 from Backend.DataAccess.DAO_question import DAO_question
@@ -6,7 +7,6 @@ from Backend.DataAccess.DAO_test import DAO_test
 from Backend.DataAccess.DAO_test_structure import DAO_test_structure
 from Backend.Model.DB_model import GroupTest, TestStructure, Question, StudentWork_Question, StudentTest, Student
 from Backend.Model.request_model import Req_GroupTest
-from Backend.Model.response_model import Res_StudentTest
 
 
 class BO_group_test:
@@ -68,6 +68,10 @@ class BO_group_test:
             raise Exception("End time is required")
         if data.duration is None:
             raise Exception("Duration is required")
+        if data.password is None:
+            raise Exception("Password is required")
+        if data.shuffle is None:
+            data.shuffle = False
 
         return self.dao_group_test.insert_group_test(data.to_DB_model())
 
@@ -121,17 +125,14 @@ class BO_group_test:
 
         if self.dao_group.check_owner(group_test.group_id, teacher_id) is False:
             raise Exception(f"Teacher {teacher_id} is not the owner of group {group_test.group_id}")
-        if self.dao_test.check_owner(group_test.test_id, teacher_id) is False:
-            raise Exception(f"Teacher {teacher_id} is not the owner of test {group_test.test_id}")
 
-        if data.start is not None:
-            group_test.start = data.start
-        if data.end is not None:
-            group_test.end = data.end
-        if data.duration is not None:
-            group_test.duration = data.duration
-        if data.shuffle is not None:
-            group_test.shuffle = data.shuffle
+        group_test.name = data.name if data.name is not None else None
+        group_test.start = data.start if data.start is not None else None
+        group_test.end = data.end if data.end is not None else None
+        group_test.duration = data.duration if data.duration is not None else None
+        group_test.shuffle = data.shuffle if data.shuffle is not None else None
+        group_test.tolerance = data.tolerance if data.tolerance is not None else None
+        group_test.hash_pswd = bcrypt_context.hash(data.password) if data.password is not None else None
 
         self.dao_group_test.update_group_test(group_test)
 

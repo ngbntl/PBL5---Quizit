@@ -170,6 +170,8 @@ create table [group_test]
     [created_timestamp] datetime default getdate(),
     [duration]          tinyint  default 60,
     [shuffle]           bit      default 0,
+    [hash_pswd]         varchar(255),
+    [tolerance]         tinyint  default 3,
     -- constraint
     constraint [pk_grtes] primary key ([id]),
     constraint [fk_grtes_grp] foreign key ([group_id]) references [group] (id),
@@ -179,8 +181,6 @@ create table [group_test]
     constraint [ck_grtes_dur2] check ((CAST([end] AS float) - CAST([start] AS float)) * 24 * 60 >= [duration]),
 )
 
-alter table [group_test]
-add [name] nvarchar(100);
 
 -- student_test
 create table [student_test]
@@ -191,6 +191,7 @@ create table [student_test]
     [end]           datetime,
     [student_work]  varbinary(max),
     [score]         float    default 0,
+    [violate]       tinyint  default 0,
     -- constraint
     constraint [pk_stutes] primary key ([student_id], [group_test_id]),
     constraint [fk_stutes_stu] foreign key ([student_id]) references [student] (id),

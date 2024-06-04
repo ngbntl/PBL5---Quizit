@@ -144,13 +144,18 @@ class Req_GroupTest(BaseModel):
     group_id: str = Field(None, min_length=8, max_length=8)
     test_id: str = Field(None, min_length=8, max_length=8)
     name: str = Field(None, max_length=100)
+    password: str = Field(None, max_length=64)
     start: datetime = None
     end: datetime = None
     duration: int = Field(None, ge=1, le=180)
-    shuffle: bool = False
+    shuffle: bool = None
+    tolerance: int = Field(None, ge=0, le=255)
 
     def to_DB_model(self) -> GroupTest:
-        return GroupTest(self.model_dump())
+        group_test = GroupTest(self.model_dump(exclude={'passsword'}))
+        if self.password is not None:
+            group_test.hash_pswd = bcrypt_context.hash(self.password)
+        return group_test
 
 
 class Req_StudentWork(BaseModel):

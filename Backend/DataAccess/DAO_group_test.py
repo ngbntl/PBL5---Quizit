@@ -34,8 +34,8 @@ class DAO_group_test:
             while True:
                 try:
                     cursor.execute(
-                        "INSERT INTO [group_test]([id], [group_id], [test_id], [name], [start], [end], [duration], [shuffle])  VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
-                        (id, data.group_id, data.test_id, data.name, data.start, data.end, data.duration, data.shuffle))
+                        "INSERT INTO [group_test]([id], [group_id], [test_id], [name], [start], [end], [duration], [shuffle], [hash_pswd], [tolerance])  VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                        (id, data.group_id, data.test_id, data.name, data.start, data.end, data.duration, data.shuffle, data.hash_pswd, data.tolerance))
                     return id
                 except pymssql.Error as e:
                     if failed_count == 0 and id not in str(e.args[1]):
@@ -48,9 +48,37 @@ class DAO_group_test:
     # UPDATE
     def update_group_test(self, data: GroupTest) -> None:
         with get_MS_database(False) as cursor:
-            cursor.execute(
-                "UPDATE [group_test] SET [start]=%s, [end]=%s, [duration]=%s, [shuffle]=%s WHERE [id]=%s",
-                (data.start, data.end, data.duration, data.shuffle, data.id))
+            sql = "UPDATE [group_test] SET "
+            placeholder = list()
+            values = tuple()
+            if data.name is not None:
+                placeholder.append("[name] = %s")
+                values += (data.name,)
+            if data.start is not None:
+                placeholder.append("[start] = %s")
+                values += (data.start,)
+            if data.end is not None:
+                placeholder.append("[end] = %s")
+                values += (data.end,)
+            if data.duration is not None:
+                placeholder.append("[duration] = %s")
+                values += (data.duration,)
+            if data.shuffle is not None:
+                placeholder.append("[shuffle] = %s")
+                values += (data.shuffle,)
+            if data.tolerance is not None:
+                placeholder.append("[tolerance] = %s")
+                values += (data.tolerance,)
+            if data.hash_pswd is not None:
+                placeholder.append("[hash_pswd] = %s")
+                values += (data.hash_pswd,)
+
+            if len(placeholder) == 0:
+                return
+
+            sql += ",".join(placeholder) + " WHERE [id] = %s"
+            values += (data.id,)
+            cursor.execute(sql, values)
 
     # DELETE
     def delete_group_test(self, group_test_id: str) -> None:

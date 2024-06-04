@@ -171,10 +171,12 @@ class GroupTest:
         self.group_id: str | None = data.get("group_id")
         self.test_id: str | None = data.get("test_id")
         self.name: str | None = data.get("name")
+        self.hash_pswd: str | None = data.get("hash_pswd")
         self.start: datetime | None = data.get("start")
         self.end: datetime | None = data.get("end")
         self.duration: int | None = data.get("duration")
         self.shuffle: bool | None = data.get("shuffle")
+        self.tolerance: int | None = data.get("tolerance")
         self.created_timestamp: datetime | None = data.get("created_timestamp")
 
     def jsonify(self):
