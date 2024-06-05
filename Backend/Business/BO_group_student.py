@@ -43,10 +43,13 @@ class BO_group_student:
         return self.dao_group_student.get_students_by_group(group_id=group_id, is_join=is_join)
 
     def get_other_students_by_group(self, student_id: str, group_id: str) -> list[Student]:
-        if self.dao_group_student.check_student_in_group(group_id, student_id) is False:
+        if self.check_student_in_group(group_id, student_id) is False:
             raise ValueError(f"student {student_id} is not in group {group_id}")
 
         return self.dao_group_student.get_students_by_group(group_id=group_id, is_join=True)
+
+    def check_student_in_group(self, group_id: str, student_id: str) -> bool:
+        return self.dao_group_student.check_student_in_group(group_id, student_id)
 
     # INSERT
     def request_join(self, group_id: str, student_id: str) -> None:

@@ -182,6 +182,12 @@ class GroupTest:
     def jsonify(self):
         return self.__dict__
 
+    def is_active(self) -> bool:
+        return self.start <= datetime.now() <= self.end
+
+    def is_end(self) -> bool:
+        return datetime.now() > self.end
+
 
 class StudentWork_Question:
     def __init__(self, json: dict = None, **kwargs):
