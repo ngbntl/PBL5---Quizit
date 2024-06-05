@@ -1,3 +1,7 @@
+import os
+import random
+
+from Backend.Business import STATIC_PATH
 from Backend.DataAccess.DAO_group import DAO_group
 from Backend.Model.DB_model import Group
 from Backend.Model.request_model import Req_Group
@@ -28,7 +32,7 @@ class BO_group:
         if data.teacher_id is None:
             raise Exception("teacher_id is required!")
         group = data.to_DB_model()
-        group.image_path = None
+        group.image_path = random.choice(os.listdir(os.path.join(STATIC_PATH, 'Group', 'Images')))
         return self.dao_group.insert_group(group)
 
     # UPDATE
