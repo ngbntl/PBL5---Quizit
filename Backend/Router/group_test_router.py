@@ -103,15 +103,14 @@ async def get_group_test_in_time(student: Annotated[Teacher | Student, Depends(g
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@student_group_test_router.get('/studentwork/', status_code=status.HTTP_200_OK)
-async def get_student_test(student: Annotated[Student, Depends(get_current_user)],
-                           group_test_service: Annotated[BO_student_test, Depends()],
-                           group_test_id: QUERY_LEN_8):
-    try:
-        return Res_StudentTest.from_DB_model(
-            group_test_service.get_student_test_by_group_test_id(student.id, group_test_id))
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+# @student_group_test_router.get('/studentwork/', status_code=status.HTTP_200_OK)
+# async def get_student_test(student: Annotated[Student, Depends(get_current_user)],
+#                            group_test_service: Annotated[BO_student_test, Depends()],
+#                            group_test_id: QUERY_LEN_8):
+#     try:
+#         return Res_StudentTest.from_DB_model(group_test_service.get_student_test_by_group_test_id(student.id, group_test_id))
+#     except Exception as e:
+#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
 @student_group_test_router.post('/studentwork/submit', status_code=status.HTTP_200_OK)

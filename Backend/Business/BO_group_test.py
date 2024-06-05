@@ -82,30 +82,31 @@ class BO_group_test:
     def get_group_test_by_id(self, group_test_id: str) -> GroupTest:
         return self.dao_group_test.get_group_test_by_id(group_test_id)
 
-    def generate_student_work(self, group_test_id: str) -> list[StudentWork_Question]:
-        # Get group test by id
-        group_test = self.get_group_test_by_id(group_test_id)
-        if group_test is None:
-            raise Exception(f"Group test {group_test_id} not found")
-        student_work_question = []
-        # Then get test by id
-        test = self.dao_test.get_test_by_id(group_test.test_id)
-        # Get test structure
-        test_structer: list[TestStructure] = self.dao_test_structure.get_structure(test.id)
-        # For each test structure, get the number of question then get the question
-        for ts in test_structer:
-            for n in ts.number_of_question:  # n: NumberOfQuestion
-                # get n.number_of_question questions from question bank ts.question_bank_id with difficulty n.difficulty
-                # random order if group_test.shuffle is True
-                questions: list[Question] = self.dao_question.get_questions_in_bank_by_difficulty(ts.question_bank_id,
-                                                                                                  n.difficulty,
-                                                                                                  n.number_of_question,
-                                                                                                  group_test.shuffle)
-                for q in questions:
-                    student_work_question.append(
-                        StudentWork_Question(content=q.content, answer=q.answer,
-                                             attachment=q.attachment, student_answer=None))
-        return student_work_question
+    # def generate_student_work(self, group_test_id: str) -> list[StudentWork_Question]:
+    #     # Get group test by id
+    #     group_test = self.get_group_test_by_id(group_test_id)
+    #     if group_test is None:
+    #         raise Exception(f"Group test {group_test_id} not found")
+    #     student_work_question = []
+    #     # Then get test by id
+    #     test = self.dao_test.get_test_by_id(group_test.test_id)
+    #     # Get test structure
+    #     test_structer: list[TestStructure] = self.bo_test.get_test_strucutre(test.id)
+    #     # For each test structure, get the number of question then get the question
+    #     for ts in test_structer:
+    #         for n in ts.number_of_question:  # n: NumberOfQuestion
+    #             # get n.number_of_question questions from question bank ts.question_bank_id with difficulty n.difficulty
+    #             # random order if group_test.shuffle is True
+    #             questions: list[Question] = self.dao_question.get_questions_in_bank_by_difficulty(ts.question_bank_id,
+    #                                                                                               n.difficulty,
+    #                                                                                               n.number_of_question,
+    #                                                                                               group_test.shuffle)
+    #             for q in questions:
+    #                 student_work_question.append(StudentWork_Question(content=q.content, answer=q.answer, attachment=q.attachment, student_answer=None))
+    #     return student_work_question
+
+    def get_all_questions_in_test(self, test_id: str) -> list[Question]:
+        return self.dao_test.get_all_questions_in_test(test_id)
 
     def get_studentworks(self, group_test_id: str) -> list[StudentTest]:
         return self.dao_student_test.get_student_tests(group_test_id)

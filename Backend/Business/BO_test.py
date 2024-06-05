@@ -1,6 +1,7 @@
 from Backend.DataAccess.DAO_collection import DAO_collection
 from Backend.DataAccess.DAO_test import DAO_test
 from Backend.DataAccess.DAO_test_structure import DAO_test_structure
+from Backend.Model.DB_model import TestStructure, Test
 from Backend.Model.request_model import Req_Test
 
 
@@ -36,6 +37,11 @@ class BO_test:
         for test in self.dao_test.get_test_by_collection(collection_id):
             test.structure = self.dao_test_structure.get_structure(test.id)
             yield test
+
+    def get_test_by_id(self, test_id: str) -> Test:
+        test = self.dao_test.get_test_by_id(test_id)
+        test.structure = self.dao_test_structure.get_structure(test_id)
+        return test
 
     # INSERT
     def insert_test(self, teacher_id: str, data: Req_Test) -> str:

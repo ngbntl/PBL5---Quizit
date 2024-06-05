@@ -3,7 +3,7 @@ import pickle
 import pymssql
 
 from Backend.DataAccess import get_MS_database, generate_id
-from Backend.Model.DB_model import Test
+from Backend.Model.DB_model import Test, Question
 
 
 class DAO_test:
@@ -23,6 +23,16 @@ class DAO_test:
         with get_MS_database(True) as cursor:
             cursor.execute("SELECT * FROM [test] WHERE [id]=%s", test_id)
             return Test(cursor.fetchone())
+
+    def get_all_questions_in_test(self, test_id: str) -> list[Question]:
+        with get_MS_database(True) as cursor:
+            SQL = """
+                SELECT * FROM [question] q
+                WHERE q.[question_bank_id] IN (SELECT [question_bank_id] FROM [test_structure] WHERE [test_id] = %s)
+            """
+
+            cursor.execute(SQL, test_id)
+            return [Question(q) for q in cursor.fetchall()]
 
     # INSERT
     def insert_test(self, data: Test) -> str:

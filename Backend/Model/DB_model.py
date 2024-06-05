@@ -106,6 +106,14 @@ class Answer:
     def jsonify(self):
         return self.__dict__
 
+    def serialize(self):
+        ser = dict()
+        if self.text is not None:
+            ser["text"] = self.text
+        if self.correct is not None:
+            ser["correct"] = list(self.correct)
+        return ser
+
 
 class Question:
     def __init__(self, json: dict = None, **kwargs):
@@ -203,6 +211,18 @@ class StudentWork_Question:
     def jsonify(self):
         return self.__dict__
 
+    def serialize(self):
+        ser = dict()
+        if self.content is not None:
+            ser["content"] = self.content
+        if self.answer is not None:
+            ser["answer"] = self.answer.serialize()
+        if self.attachment is not None:
+            ser["attachment"] = self.attachment
+        if self.student_answer is not None:
+            ser["student_answer"] = self.student_answer
+        return ser
+
 
 class StudentTest:
     def __init__(self, json: dict = None, **kwargs):
@@ -221,3 +241,19 @@ class StudentTest:
 
     def jsonify(self):
         return self.__dict__
+
+    def serialize(self):
+        ser = dict()
+        if self.student_id is not None:
+            ser["student_id"] = self.student_id
+        if self.group_test_id is not None:
+            ser["group_test_id"] = self.group_test_id
+        if self.start is not None:
+            ser["start"] = self.start.isoformat()
+        if self.end is not None:
+            ser["end"] = self.end.isoformat()
+        if self.student_work is not None:
+            ser["student_work"] = [sw.serialize() for sw in self.student_work]
+        if self.score is not None:
+            ser["score"] = self.score
+        return ser

@@ -186,6 +186,11 @@ class Res_StudentTest(BaseModel):
                                  student_test.student_work] if student_test.student_work else None,
                    score=student_test.score)
 
+    class Config:
+        json_encoders = {
+            datetime: lambda v: v.isoformat(),
+        }
+
 
 class Res_StudentPoint(BaseModel):
     student_id: str | None = None
