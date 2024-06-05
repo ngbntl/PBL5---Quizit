@@ -160,6 +160,7 @@ async def student_ws_endpoint(token: Annotated[str, Header()], websocket: WebSoc
                         await student_ws.send_text('You have not joined any group')
                         continue
 
+
             except WebSocketDisconnect:
                 if room is not None:
                     room.students.pop(student.id)

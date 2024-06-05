@@ -86,6 +86,7 @@ class Res_GroupTest(BaseModel):
     end: datetime | None = None
     duration: int | None = None
     shuffle: bool | None = None
+    tolerance: int | None = None
     created_timestamp: datetime | None = None
 
     @classmethod
