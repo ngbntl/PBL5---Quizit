@@ -54,6 +54,7 @@ class Req_Group(BaseModel):
     name: str = Field(None, max_length=100)
     teacher_id: str = Field(None, min_length=8, max_length=8)
     is_show: bool = True
+    image_path: str = None
 
     def to_DB_model(self) -> Group:
         return Group(self.model_dump())

@@ -27,7 +27,9 @@ class BO_group:
     def insert_group(self, data: Req_Group) -> str:
         if data.teacher_id is None:
             raise Exception("teacher_id is required!")
-        return self.dao_group.insert_group(data.to_DB_model())
+        group = data.to_DB_model()
+        group.image_path = None
+        return self.dao_group.insert_group(group)
 
     # UPDATE
     def update_group(self, data: Req_Group):

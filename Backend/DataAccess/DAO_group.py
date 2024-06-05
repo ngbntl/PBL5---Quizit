@@ -31,8 +31,7 @@ class DAO_group:
             while True:
                 id = generate_id(8)
                 try:
-                    cursor.execute("INSERT INTO [group]([id], [teacher_id], [name])  VALUES (%s, %s, %s)",
-                                   (id, data.teacher_id, data.name))
+                    cursor.execute("INSERT INTO [group]([id], [teacher_id], [name], [image_path])  VALUES (%s, %s, %s, %s)", (id, data.teacher_id, data.name, data.image_path))
                     return id
                 except pymssql.Error as e:
                     if failed_count == 0 and id not in str(e.args[1]):
@@ -53,6 +52,9 @@ class DAO_group:
             if data.is_show is not None:
                 placeholder.append("[is_show] = %s")
                 values += (data.is_show,)
+            if data.image_path is not None:
+                placeholder.append("[image_path] = %s")
+                values += (data.image_path,)
             if len(values) == 0:
                 raise Exception("No data to update!")
             sql += ",".join(placeholder) + " WHERE [id] = %s AND [teacher_id] = %s"

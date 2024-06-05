@@ -55,6 +55,7 @@ class Group:
         self.teacher_id: str | None = data.get("teacher_id")
         self.created_timestamp: datetime | None = data.get("created_timestamp")
         self.is_show: bool | None = data.get("is_show")
+        self.image_path: str | None = data.get("image_path")
 
     def jsonify(self):
         return self.__dict__

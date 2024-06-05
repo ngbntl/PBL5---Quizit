@@ -41,6 +41,7 @@ class Res_Group(BaseModel):
     teacher_id: str | None = None
     created_timestamp: datetime | None = None
     is_show: bool | None = None
+    image_path: str | None = None
 
     @classmethod
     def from_DB_model(cls, group: Group):

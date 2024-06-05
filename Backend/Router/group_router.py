@@ -1,7 +1,10 @@
+import os
+
 from fastapi import APIRouter, HTTPException, Depends, Body, Query
 from starlette import status
 from typing import Annotated
 
+from Backend.Business import STATIC_PATH
 from Backend.Model.request_model import Req_Group, Req_GroupStudent
 from Backend.Model.response_model import Res_Group, Res_Student
 from Backend.Model.DB_model import Teacher, Student
@@ -35,6 +38,11 @@ async def get_group(teacher: Annotated[Teacher, Depends(get_current_user)],
         return [Res_Group.from_DB_model(group) for group in group_service.get_groups_by_teacher(teacher.id, is_show)]
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@teacher_group_router.get('/static_images', status_code=status.HTTP_200_OK)
+async def get_static_images():
+    return [os.path.join('Group', 'Images', name) for name in os.listdir(os.path.join(STATIC_PATH, 'Group', 'Images'))]
 
 
 # UPDATE GROUP
