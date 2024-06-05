@@ -11,6 +11,7 @@ from Backend.Model.DB_model import Teacher, Student
 from Backend.Business.BO_group import BO_group
 from Backend.Business.BO_group_student import BO_group_student
 from Backend.Business.BO_authenticate import get_current_user
+from Backend.Router.annotate import QUERY_LEN_8, BODY_LEN_8
 
 student_group_router = APIRouter(prefix='/group', tags=['group'])
 teacher_group_router = APIRouter(prefix='/group', tags=['group'])
@@ -61,7 +62,7 @@ async def update_group(teacher: Annotated[Teacher, Depends(get_current_user)],
 @teacher_group_router.post('/student', status_code=status.HTTP_201_CREATED)
 async def insert_students(teacher: Annotated[Teacher, Depends(get_current_user)],
                           data: Annotated[Req_GroupStudent.Req_InsertedInformation, Body()],
-                          group_id: Annotated[str, Query(min_length=8, max_length=8)],
+                          group_id: QUERY_LEN_8,
                           group_student_service: Annotated[BO_group_student, Depends()]):
     try:
         group_student_service.insert_students(teacher_id=teacher.id, group_id=group_id, data=data)
@@ -73,7 +74,7 @@ async def insert_students(teacher: Annotated[Teacher, Depends(get_current_user)]
 @teacher_group_router.get('/student', status_code=status.HTTP_200_OK)
 async def get_students_in_group(teacher: Annotated[Teacher, Depends(get_current_user)],
                                 group_student_service: Annotated[BO_group_student, Depends()],
-                                group_id: Annotated[str, Query(min_length=8, max_length=8)],
+                                group_id: QUERY_LEN_8,
                                 is_join: Annotated[bool, Query()] = True):
     try:
         return [Res_Student.from_DB_model(student) for student in
@@ -85,8 +86,8 @@ async def get_students_in_group(teacher: Annotated[Teacher, Depends(get_current_
 # DELETE STUDENTS IN GROUP
 @teacher_group_router.delete('/student', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_students(teacher: Annotated[Teacher, Depends(get_current_user)],
-                          group_id: Annotated[str, Query(min_length=8, max_length=8)],
-                          list_id: Annotated[list[Annotated[str, Body(min_length=8, max_length=8)]], Body()],
+                          group_id: QUERY_LEN_8,
+                          list_id: Annotated[list[BODY_LEN_8], Body()],
                           group_student_service: Annotated[BO_group_student, Depends()]):
     try:
         group_student_service.delete_students(teacher_id=teacher.id, group_id=group_id, list_id=list_id)
@@ -108,7 +109,7 @@ async def get_groups(student: Annotated[Student, Depends(get_current_user)],
 
 @student_group_router.get('/students', status_code=status.HTTP_200_OK)
 async def get_other_students_in_group(student: Annotated[Student, Depends(get_current_user)],
-                                      group_id: Annotated[str, Query(min_length=8, max_length=8)],
+                                      group_id: QUERY_LEN_8,
                                       group_student_service: Annotated[BO_group_student, Depends()]):
     try:
         return [Res_Student.from_DB_model(student) for student in group_student_service.get_other_students_by_group(student.id, group_id)]
@@ -118,7 +119,7 @@ async def get_other_students_in_group(student: Annotated[Student, Depends(get_cu
 
 @student_group_router.post('/', status_code=status.HTTP_201_CREATED)
 async def request_join_group(student: Annotated[Student, Depends(get_current_user)],
-                             group_id: Annotated[str, Query(min_length=8, max_length=8)],
+                             group_id: QUERY_LEN_8,
                              group_student_service: Annotated[BO_group_student, Depends()]):
     try:
         group_student_service.request_join(group_id=group_id, student_id=student.id)
@@ -139,7 +140,7 @@ async def update_student_group(student: Annotated[Student, Depends(get_current_u
 
 @student_group_router.delete('/', status_code=status.HTTP_204_NO_CONTENT)
 async def leave_group(student: Annotated[Student, Depends(get_current_user)],
-                      group_id: Annotated[str, Query(min_length=8, max_length=8)],
+                      group_id: QUERY_LEN_8,
                       group_student_service: Annotated[BO_group_student, Depends()]):
     try:
         group_student_service.leave_group(student.id, group_id)

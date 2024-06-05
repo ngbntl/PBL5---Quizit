@@ -170,3 +170,8 @@ async def student_ws_endpoint(token: Annotated[str, Header()], websocket: WebSoc
 
     except WebSocketDisconnect:
         pass
+
+
+@app.websocket("/teacher")
+async def teacher_ws_endpoint(token: Annotated[str, Header()], websocket: WebSocket):
+    pass
