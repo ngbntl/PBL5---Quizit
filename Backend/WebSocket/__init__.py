@@ -113,7 +113,7 @@ async def student_ws_endpoint(websocket: WebSocket):
             try:
                 msg = ClientMessage(json.loads((await websocket.receive_text())))
                 if msg.command == ClientMessage.AUTHENTICATE:
-                    student = get_current_user(msg.detail['token'])
+                    student = await get_current_user(msg.detail['token'])
                     if student is None or not isinstance(student, Student):
                         await student_ws.send_text('Invalid token')
                         continue
