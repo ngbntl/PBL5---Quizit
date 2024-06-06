@@ -19,3 +19,6 @@ logging.getLogger('passlib').setLevel(logging.ERROR)
 # Accessing a WSL 2 distribution from your local area network (LAN)
 # netsh interface portproxy add v4tov4 listenport=<yourPortToForward> listenaddress=0.0.0.0 connectport=<yourPortToConnectToInWSL> connectaddress=(wsl hostname -I)
 # netsh interface portproxy add v4tov4 listenport=4444 listenaddress=0.0.0.0 connectport=4444 connectaddress=172.31.54.89
+
+# disable port forwarding
+# netsh interface portproxy delete v4tov4 listenport=4444 listenaddress=0.0.0.0

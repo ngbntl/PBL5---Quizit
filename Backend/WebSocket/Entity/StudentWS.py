@@ -12,3 +12,6 @@ class StudentWS:
 
     async def send_json(self, data: dict):
         await self.websocket.send_json(data)
+
+    async def receive_json(self):
+        return await self.websocket.receive_json()

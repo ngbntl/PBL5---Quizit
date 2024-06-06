@@ -178,6 +178,8 @@ class Res_StudentTest(BaseModel):
     end: datetime | None = None
     student_work: list[Res_StudentWork_Question] | None = None
     score: float | None = None
+    violate: int | None = None
+
     group_test: Res_GroupTest | None = None
 
     @classmethod
@@ -186,7 +188,7 @@ class Res_StudentTest(BaseModel):
                    group_test=Res_GroupTest.from_DB_model(student_test.group_test), start=student_test.start, end=student_test.end,
                    student_work=[Res_StudentWork_Question.from_DB_model(sw) for sw in
                                  student_test.student_work] if student_test.student_work else None,
-                   score=student_test.score)
+                   score=student_test.score, violate=student_test.violate)
 
     class Config:
         json_encoders = {

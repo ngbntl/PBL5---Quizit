@@ -234,6 +234,7 @@ class StudentTest:
         self.end: datetime | None = data.get("end")
         self.student_work: list[StudentWork_Question] | bytes | None = data.get("student_work")
         self.score: float | None = data.get("score")
+        self.violate: int | None = data.get("violate")
 
         self.group_test: GroupTest | None = GroupTest(data)
 
