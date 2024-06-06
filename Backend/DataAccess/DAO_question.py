@@ -157,7 +157,6 @@ class DAO_question:
             try:
                 cursor.execute("DELETE FROM [question] WHERE [question_bank_id] = %s AND [id] IN %s",
                                (question_bank_id, tuple(set(question_ids))))
-                return
             except Exception as e:
                 raise e
 

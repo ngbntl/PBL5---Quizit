@@ -21,13 +21,15 @@ dotenv_path = normpath(join(dirname(__file__), '..', '..', '.env'))
 load_dotenv(dotenv_path)
 MSSQL_SERVER = getenv("MSSQL_SERVER")
 MSSQL_DATABASE = getenv("MSSQL_DATABASE")
+MSSQL_USER = getenv("MSSQL_USER")
+MSSQL_PASSWORD = getenv("MSSQL_PASSWORD")
 MSSQL_PORT = getenv("MSSQL_PORT")
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=6))
 @contextmanager
 def get_MS_database(as_dict=True):
-    mssql_connection = pymssql.connect(server=MSSQL_SERVER, database=MSSQL_DATABASE, port=MSSQL_PORT, as_dict=as_dict)
+    mssql_connection = pymssql.connect(server=MSSQL_SERVER, database=MSSQL_DATABASE, user=MSSQL_USER, password=MSSQL_PASSWORD, port=MSSQL_PORT, as_dict=as_dict)
     cursor = mssql_connection.cursor()
 
     try:

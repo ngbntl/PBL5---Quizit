@@ -10,8 +10,7 @@ from Backend.Business import bcrypt_context
 from Backend.Business.BO_WebSocket import BO_WebSocket
 from Backend.Business.BO_authenticate import get_current_user
 
-from Backend.Model.DB_model import Student, Teacher, GroupTest, StudentTest, Test, Question, StudentWork_Question, NumberOfQuestion
-from Backend.Model.response_model import Res_StudentTest
+from Backend.Model.DB_model import Student, Teacher, GroupTest, StudentTest, Test, Question, StudentWork_Question
 from Backend.Router import app
 from Backend.WebSocket.StudentWS import StudentWS
 

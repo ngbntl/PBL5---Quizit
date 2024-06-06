@@ -1,24 +1,17 @@
-import pickle
+import pymssql
 
+MSSQL_SERVER = '172.31.48.1'
+MSSQL_DATABASE = "trac_nghiem"
+MSSQL_USER = "sa"
+MSSQL_PASSWORD = "pbl5"
+MSSQL_PORT = "1433"
 
-class A:
-    def __init__(self, a):
-        self.a = a
+mssql_connection = pymssql.connect(server=MSSQL_SERVER, user=MSSQL_USER, password=MSSQL_PASSWORD, database=MSSQL_DATABASE, port=MSSQL_PORT, as_dict=True)
 
-    def __repr__(self):
-        return f"A({self.a})"
-
-
-class B:
-    def __init__(self):
-        self.b = [A({1, 2, 3}), A([5, 6, 7]), A((True, False, None))]
-
-    def __repr__(self):
-        return f"B({self.b})"
-
-
-byte = pickle.dumps(B())
-object_ = pickle.loads(byte)
-print(isinstance(byte, bytes))
-print(isinstance(object_, B))
-print(object_)
+cursor = mssql_connection.cursor()
+cursor.execute("SELECT * FROM student")
+students = cursor.fetchall()
+cursor.close()
+mssql_connection.close()
+for student in students:
+    print(students)
