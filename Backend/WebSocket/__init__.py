@@ -18,6 +18,7 @@ bo_websocket = BO_WebSocket()
 
 
 class ClientMessage:
+    AUTHENTICATE = 'AUTHENTICATE'
     JOIN_GROUP_TEST = 'JOIN GROUP TEST'
     GET_TEST = 'GET TEST'
     SUBMIT_TEST = 'SUBMIT TEST'
@@ -99,10 +100,10 @@ room_group_test: dict[Room_GroupTest] = dict()
 
 
 @app.websocket("/student")
-async def student_ws_endpoint(token: Annotated[str, Header()], websocket: WebSocket):
-    student = await get_current_user(token=token)
-    if student is None or not isinstance(student, Student):
-        raise WebSocketDisconnect()
+async def student_ws_endpoint(websocket: WebSocket):
+    student = None
+    # if student is None or not isinstance(student, Student):
+    #     raise WebSocketDisconnect()
 
     student_ws = StudentWS(websocket, student)
     room = None
@@ -111,8 +112,18 @@ async def student_ws_endpoint(token: Annotated[str, Header()], websocket: WebSoc
         while True:
             try:
                 msg = ClientMessage(json.loads((await websocket.receive_text())))
+                if msg.command == ClientMessage.AUTHENTICATE:
+                    student = get_current_user(msg.detail['token'])
+                    if student is None or not isinstance(student, Student):
+                        await student_ws.send_text('Invalid token')
+                        continue
+                    student_ws.student = student
+                    await student_ws.send_text('Authenticated')
 
-                if msg.command == ClientMessage.JOIN_GROUP_TEST:
+                elif msg.command == ClientMessage.JOIN_GROUP_TEST:
+                    if student is None:
+                        await student_ws.send_text('You have not authenticated')
+                        continue
                     group_test_id = msg.detail['group_test_id']
                     password = msg.detail['password']
                     room = Room_GroupTest(group_test_id)  # get the room
@@ -144,6 +155,9 @@ async def student_ws_endpoint(token: Annotated[str, Header()], websocket: WebSoc
                         continue
 
                 elif msg.command == ClientMessage.GET_TEST:  # Add more command here
+                    if student is None:
+                        await student_ws.send_text('You have not authenticated')
+                        continue
                     if room is None:
                         await student_ws.send_text('You have not joined any group')
                         continue
@@ -155,6 +169,9 @@ async def student_ws_endpoint(token: Annotated[str, Header()], websocket: WebSoc
                     await student_ws.send_json(student_test.serialize())
 
                 elif msg.command == ClientMessage.SUBMIT_TEST:
+                    if student is None:
+                        await student_ws.send_text('You have not authenticated')
+                        continue
                     if room is None:
                         await student_ws.send_text('You have not joined any group')
                         continue
@@ -172,5 +189,5 @@ async def student_ws_endpoint(token: Annotated[str, Header()], websocket: WebSoc
 
 
 @app.websocket("/teacher")
-async def teacher_ws_endpoint(token: Annotated[str, Header()], websocket: WebSocket):
+async def teacher_ws_endpoint(websocket: WebSocket):
     pass
