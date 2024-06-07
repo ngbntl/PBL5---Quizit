@@ -64,7 +64,8 @@ class Room_GroupTest:
             grouptest_student = self.students[student_id]
             student_test = grouptest_student.get_student_test()
             if student_test is None:
-                grouptest_student.set_student_test(self.generate_student_test(student_id))
+                student_test = self.bo_room_grouptest.get_student_test(self.group_test_id, student_id)
+                grouptest_student.set_student_test(student_test if student_test is not None else self.generate_student_test(student_id))
                 return grouptest_student.get_student_test()
             return student_test
         return None
@@ -119,5 +120,5 @@ class Room_GroupTest:
     def get_student_state(self):
         ans = dict()
         for student_id, grouptest_student in self.students.items():
-            ans[student_id] = grouptest_student.serialize(include={'student', 'state', 'violate'})
+            ans[student_id] = grouptest_student.serialize(include={'student', 'state', 'violate', 'score'})
         return ans

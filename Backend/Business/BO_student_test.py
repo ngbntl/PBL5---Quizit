@@ -32,22 +32,8 @@ class BO_student_test:
             self._bo_group_test = BO_group_test()
         return self._bo_group_test
 
-    # def get_student_test_by_group_test_id(self, student_id: str, group_test_id: str) -> StudentTest:
-    #     group_test = self.dao_group_test.get_group_test_by_id(group_test_id)
-    #     if group_test is None:
-    #         raise Exception("Group test does not exist")
-    #     if datetime.now() < group_test.start:
-    #         raise Exception("Group test has not started yet")
-    #     if datetime.now() > group_test.end:
-    #         raise Exception("Group test has ended")
-    #     student_test = self.dao_student_test.get_student_test_by_group_test_id(student_id, group_test_id)
-    #     if student_test is not None:
-    #         if student_test.end is None:  # Student test exists but not submitted
-    #             return student_test
-    #         else:
-    #             raise Exception("Student has already been submitted the test")
-    #     # Student test does not exist. Now create.
-    #     return self.insert_student_test(student_id, group_test_id)
+    def get_student_test(self, group_test_id: str, student_id: str) -> StudentTest:
+        return self.dao_student_test.get_student_test(group_test_id, student_id)
 
     def get_group_test_in_time(self, student_id: str, start: datetime, end: datetime):
         return self.dao_group_test.get_group_test_for_student(student_id, start, end)

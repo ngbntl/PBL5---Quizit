@@ -57,4 +57,10 @@ class GroupTest_Student:
             ser['violate'] = self.violate
         if 'state' in include:
             ser['state'] = self.state
+        if 'score' in include:
+            if self.state == self.STATE_SUBMIT:
+                ser['score'] = self.student_test.score
+            else:
+                ser['score'] = None
+
         return ser

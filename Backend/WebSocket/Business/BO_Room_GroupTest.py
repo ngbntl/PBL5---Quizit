@@ -50,6 +50,9 @@ class BO_Room_GroupTest:
     def get_test_by_id(self, test_id: str):
         return self.bo_test.get_test_by_id(test_id)
 
+    def get_student_test(self, group_test_id: str, student_id: str):
+        return self.bo_student_test.get_student_test(group_test_id, student_id)
+
     def get_group_test_by_id(self, group_test_id: str) -> GroupTest:
         return self.bo_group_test.get_group_test_by_id(group_test_id)
 

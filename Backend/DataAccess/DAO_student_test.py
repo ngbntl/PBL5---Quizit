@@ -26,8 +26,7 @@ class DAO_student_test:
 
     def get_student_test(self, group_test_id: str, student_id: str) -> StudentTest:
         with get_MS_database(True) as cursor:
-            cursor.execute("SELECT * FROM [student_test] WHERE [group_test_id]=%s AND [student_id]=%s",
-                           (group_test_id, student_id))
+            cursor.execute("SELECT * FROM [student_test] WHERE [group_test_id]=%s AND [student_id]=%s", (group_test_id, student_id))
             row = cursor.fetchone()
             return StudentTest(row) if row else None
 
