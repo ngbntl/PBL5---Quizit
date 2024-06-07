@@ -23,6 +23,7 @@ class BO_Student_Message:
         self.message = None
         self.response = None
         self.grouptest_student = None
+        self.student_test = None
 
     async def handle(self):
         try:
@@ -83,15 +84,14 @@ class BO_Student_Message:
                             if self.room.check_student_join(self.student.id):
                                 await self.websocket.send_json(self.response.set_status(status.HTTP_200_OK).set_message('You have already joined this room').serialize())
                                 self.grouptest_student = self.room.get_grouptest_student(self.student.id)  # get before grouptest_student from room
-                                self.grouptest_student.set_state(GroupTest_Student.STATE_READY)
+                                await self.room.set_state(self.student.id, GroupTest_Student.STATE_READY)
                                 continue
                             if self.room.check_student_in_group(self.student.id) is False:  # student not in group
                                 await self.websocket.send_json(self.response.set_status(status.HTTP_403_FORBIDDEN).set_message('You are not in this group').serialize())
                                 continue
 
                         self.room.add_grouptest_student(self.grouptest_student)  # add student to room
-                        self.grouptest_student.set_room(self.room)  # set room to student
-                        self.grouptest_student.set_state(GroupTest_Student.STATE_READY)
+                        await self.room.set_state(self.student.id, GroupTest_Student.STATE_READY)
 
                         await self.websocket.send_json(self.response.set_status(status.HTTP_200_OK).set_message('Joined successfully').serialize())
                         continue
@@ -101,23 +101,43 @@ class BO_Student_Message:
                         continue
 
                     if msg.command == ClientMessage.GET_TEST:  # get test
-                        student_test = self.room.get_student_test(self.student.id)
-                        await self.websocket.send_json(self.response.set_status(status.HTTP_200_OK).set_message(student_test.serialize()).serialize())
-                        self.grouptest_student.set_state(GroupTest_Student.STATE_WORKING)
+                        self.student_test = self.room.get_student_test(self.student.id)
+                        if self.student_test is None:
+                            self.student_test = self.room.generate_student_test(self.student.id)
+
+                        if self.student_test.end is not None:
+                            await self.websocket.send_json(self.response.set_status(status.HTTP_400_BAD_REQUEST).set_message('You have submitted').serialize())
+                            await self.room.set_state(self.student.id, GroupTest_Student.STATE_SUBMIT)
+                            continue
+
+                        await self.websocket.send_json(self.response.set_status(status.HTTP_200_OK).set_message(self.student_test.serialize()).serialize())
+                        await self.room.set_state(self.student.id, GroupTest_Student.STATE_WORKING)
                         continue
 
                     if msg.command == ClientMessage.VIOLATE:
-                        self.grouptest_student.increase_violate()
+                        if self.student_test is None:
+                            await self.websocket.send_json(self.response.set_status(status.HTTP_400_BAD_REQUEST).set_message('You have not get test yet').serialize())
+                            continue
+                        self.room.increase_violate(self.student.id)
+                        await self.websocket.send_json(self.response.set_status(status.HTTP_200_OK).set_message({'violate': self.grouptest_student.get_violate()}).serialize())
                         continue
 
                     if msg.command == ClientMessage.SUBMIT_TEST:
+                        if self.student_test is None:
+                            await self.websocket.send_json(self.response.set_status(status.HTTP_400_BAD_REQUEST).set_message('You have not get test yet').serialize())
+                            continue
                         student_answer = msg.detail['student_answer']
-                        self.room.submit(self.student.id, student_answer)
-                        self.grouptest_student.set_state(GroupTest_Student.STATE_SUBMIT)
+                        try:
+                            self.room.submit(self.student.id, student_answer)
+                        except Exception as e:
+                            await self.websocket.send_json(self.response.set_status(status.HTTP_400_BAD_REQUEST).set_message(str(e)).serialize())
+                            break
+                        await self.websocket.send_json(self.response.set_status(status.HTTP_200_OK).set_message({'score': self.grouptest_student.get_score()}).serialize())
+                        await self.room.set_state(self.student.id, GroupTest_Student.STATE_SUBMIT)
                         break
 
                 except WebSocketDisconnect:
-                    self.grouptest_student.set_state(GroupTest_Student.STATE_DISCONNECTED)
+                    await self.room.set_state(self.student.id, GroupTest_Student.STATE_DISCONNECTED)
                     break
                 except Exception as e:
                     continue

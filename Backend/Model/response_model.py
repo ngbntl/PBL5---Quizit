@@ -196,7 +196,7 @@ class Res_StudentTest(BaseModel):
         }
 
 
-class Res_StudentPoint(BaseModel):
+class Res_StudentScore(BaseModel):
     student_id: str | None = None
     name: str | None = None
     avatar_path: str | None = None

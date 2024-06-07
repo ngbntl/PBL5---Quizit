@@ -95,13 +95,13 @@ class BO_Teacher_Message:
                         await self.websocket.send_json(self.response.set_status(status.HTTP_403_FORBIDDEN).set_message('You have not joined any group').serialize())
                         continue
 
-                    if msg.command == ClientMessage.GET_STUDENT_STATE:
-                        await self.websocket.send_json(self.response.set_status(status.HTTP_200_OK).set_message(self.room.get_student_state()).serialize())
-                        continue
+                    # if msg.command == ClientMessage.GET_STUDENT_STATE:
+                    #     await self.websocket.send_json(self.response.set_status(status.HTTP_200_OK).set_message(self.room.get_student_state()).serialize())
+                    #     continue
 
 
                 except WebSocketDisconnect:
-                    break
+                    self.room.teacher = None
                 except Exception as e:
                     continue
 

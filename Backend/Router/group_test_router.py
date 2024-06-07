@@ -9,7 +9,7 @@ from Backend.Business.BO_student_test import BO_student_test
 from Backend.Model.DB_model import Teacher, Student
 from Backend.Business.BO_authenticate import get_current_user
 from Backend.Model.request_model import Req_GroupTest, Req_StudentWork
-from Backend.Model.response_model import Res_GroupTest, Res_StudentTest, Res_StudentPoint
+from Backend.Model.response_model import Res_GroupTest, Res_StudentTest, Res_StudentScore
 from Backend.Router.annotate import QUERY_LEN_8
 
 teacher_group_test_router = APIRouter(prefix='/grouptest', tags=['grouptest'])
@@ -61,9 +61,9 @@ async def get_studentpoint(teacher: Annotated[Teacher, Depends(get_current_user)
                            group_test_service: Annotated[BO_group_test, Depends()],
                            group_test_id: Annotated[str, Query(min_length=8, max_length=8)]):
     try:
-        return [Res_StudentPoint(student_id=sp[0].id, name=sp[0].name, avatar_path=sp[0].avatar_path, point=sp[1]) for
+        return [Res_StudentScore(student_id=sp[0].id, name=sp[0].name, avatar_path=sp[0].avatar_path, point=sp[1]) for
                 sp in
-                group_test_service.get_studentpoints(group_test_id)]
+                group_test_service.get_students_scores(group_test_id)]
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
@@ -113,14 +113,14 @@ async def get_group_test_in_time(student: Annotated[Teacher | Student, Depends(g
 #         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@student_group_test_router.post('/studentwork/submit', status_code=status.HTTP_200_OK)
-async def update_student_work(student: Annotated[Student, Depends(get_current_user)],
-                              data: Annotated[Req_StudentWork, Body()],
-                              group_test_service: Annotated[BO_student_test, Depends()]) -> float:
-    try:
-        return group_test_service.submit(student.id, data)
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+# @student_group_test_router.post('/studentwork/submit', status_code=status.HTTP_200_OK)
+# async def update_student_work(student: Annotated[Student, Depends(get_current_user)],
+#                               data: Annotated[Req_StudentWork, Body()],
+#                               group_test_service: Annotated[BO_student_test, Depends()]) -> float:
+#     try:
+#         return group_test_service.submit(student.id, data)
+#     except Exception as e:
+#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
 @student_group_test_router.get('/history', status_code=status.HTTP_200_OK)

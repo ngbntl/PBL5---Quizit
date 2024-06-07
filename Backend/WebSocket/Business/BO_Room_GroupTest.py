@@ -67,3 +67,9 @@ class BO_Room_GroupTest:
 
     def get_all_questions_in_test(self, test_id: str) -> list[Question]:
         return self.bo_group_test.get_all_questions_in_test(test_id)
+
+    def submit(self, group_test_id, student_id: str, student_answer: list[list[int]], violate: int) -> StudentTest:
+        return self.bo_student_test.submit(group_test_id, student_id, student_answer, violate)
+
+    def update_violate(self, group_test_id: str, student_id: str, violate):
+        self.bo_student_test.update_violate(group_test_id, student_id, violate)

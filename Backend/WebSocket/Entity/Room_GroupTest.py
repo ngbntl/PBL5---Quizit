@@ -8,7 +8,7 @@ from Backend.WebSocket.Entity.GroupTest_Student import GroupTest_Student
 from Backend.WebSocket.Entity.GroupTest_Teacher import GroupTest_Teacher
 
 
-class Room_GroupTest:
+class Room_GroupTest:  # Room of group test. Contain all student and teacher in group test.
     def __init__(self, group_test_id: str):
         self.group_test_id = group_test_id
         self.teacher: GroupTest_Teacher = None
@@ -55,6 +55,7 @@ class Room_GroupTest:
 
     def add_grouptest_student(self, grouptest_student: GroupTest_Student):
         self.students[grouptest_student.get_student().id] = grouptest_student
+        grouptest_student.set_room(self)
 
     def get_grouptest_student(self, student_id: str) -> GroupTest_Student:
         return self.students[student_id]
@@ -65,8 +66,7 @@ class Room_GroupTest:
             student_test = grouptest_student.get_student_test()
             if student_test is None:
                 student_test = self.bo_room_grouptest.get_student_test(self.group_test_id, student_id)
-                grouptest_student.set_student_test(student_test if student_test is not None else self.generate_student_test(student_id))
-                return grouptest_student.get_student_test()
+                grouptest_student.set_student_test(student_test)
             return student_test
         return None
 
@@ -80,11 +80,15 @@ class Room_GroupTest:
         return ans
 
     def generate_student_test(self, student_id: str) -> StudentTest:
-        student_test = self.students[student_id].get_student_test()
+        student_test = self.bo_room_grouptest.get_student_test(self.group_test_id, student_id)  # get student test from db
         if student_test is not None:
+            self.students[student_id].set_student_test(student_test)
             return student_test
+        # student test not exist
+        # generate student work
         student_test = StudentTest(student_id=student_id, group_test_id=self.group_test_id, student_work=self.generate_student_work_question())
         self.bo_room_grouptest.insert_student_test(student_test)
+        self.students[student_id].set_student_test(student_test)
         return student_test
 
     def is_active(self):
@@ -105,9 +109,6 @@ class Room_GroupTest:
     def check_student_join(self, student_id: str):
         return self.students.get(student_id, None) is not None
 
-    def submit(self, id, student_answer):
-        pass
-
     def check_teacher_join(self):
         return self.teacher is not None
 
@@ -118,7 +119,22 @@ class Room_GroupTest:
         return self.teacher
 
     def get_student_state(self):
-        ans = dict()
-        for student_id, grouptest_student in self.students.items():
-            ans[student_id] = grouptest_student.serialize(include={'student', 'state', 'violate', 'score'})
+        ans = []
+        for grouptest_student in self.students.values():
+            ans.append(grouptest_student.serialize(include={'student', 'state', 'violate', 'score'}))
         return ans
+
+    def submit(self, student_id: str, student_answer: list[list[int]]):
+        self.students[student_id].set_student_test(self.bo_room_grouptest.submit(self.group_test_id, student_id, student_answer, self.students[student_id].get_violate()))
+
+    def increase_violate(self, student_id: str):
+        self.students[student_id].increase_violate()
+        self.bo_room_grouptest.update_violate(self.group_test_id, student_id, self.students[student_id].get_violate() + 1)
+
+    async def send_student_state_to_teacher(self):
+        if self.teacher is not None:
+            await self.teacher.websocket.send_json(self.get_student_state())
+
+    async def set_state(self, student_id, state):
+        self.students[student_id].set_state(state)
+        await self.send_student_state_to_teacher()

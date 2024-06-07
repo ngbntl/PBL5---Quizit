@@ -114,8 +114,8 @@ class BO_group_test:
     def get_studentwork(self, group_test_id: str, student_id: str) -> StudentTest:
         return self.dao_student_test.get_student_test(group_test_id, student_id)
 
-    def get_studentpoints(self, group_test_id: str) -> list[tuple[Student, float]]:
-        return self.dao_student_test.get_student_points(group_test_id)
+    def get_students_scores(self, group_test_id: str) -> list[tuple[Student, float]]:
+        return self.dao_student_test.get_students_score(group_test_id)
 
     # UPDATE
     def update_group_test(self, teacher_id: str, data: Req_GroupTest):

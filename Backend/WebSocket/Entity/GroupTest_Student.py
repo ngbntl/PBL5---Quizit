@@ -35,6 +35,9 @@ class GroupTest_Student:
         self.violate += 1
         return self
 
+    def get_violate(self):
+        return self.violate
+
     def set_student(self, student):
         self.student = student
         return self
@@ -58,9 +61,13 @@ class GroupTest_Student:
         if 'state' in include:
             ser['state'] = self.state
         if 'score' in include:
-            if self.state == self.STATE_SUBMIT:
-                ser['score'] = self.student_test.score
-            else:
-                ser['score'] = None
+            ser['score'] = self.student_test.score
 
         return ser
+
+    def get_score(self):
+        return self.student_test.score
+
+    # def submit(self, student_answer: list[list[int]]):
+    #     student_test = self.room.submit(self.student.id, student_answer)
+    #     self.set_student_test(student_test)
