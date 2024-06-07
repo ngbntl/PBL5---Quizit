@@ -58,7 +58,7 @@ class BO_student_test:
     def update_violate(self, group_test_id, student_id, violate):
         self.dao_student_test.update_violate(group_test_id, student_id, violate)
 
-    def submit(self, group_test_id: str, student_id: str, student_answer: list[list[int]], violate) -> StudentTest:
+    def submit(self, group_test_id: str, student_id: str, student_answer: list[list[int]]) -> StudentTest:
         student_test = self.dao_student_test.get_student_test(group_test_id, student_id)
 
         if student_test is None:
@@ -73,7 +73,6 @@ class BO_student_test:
 
         student_test.end = datetime.now()
         student_test.score = self.calculate_point(student_test.student_work)
-        student_test.violate = violate
         self.dao_student_test.submit(student_test)
         return student_test
 

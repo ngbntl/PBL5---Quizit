@@ -14,7 +14,6 @@ class GroupTest_Student:
         self.student: Student = None
         self.room = None
         self.state = self.STATE_READY
-        self.violate = 0
         self.student_test: StudentTest = None
 
     def set_room(self, room):  # room: Room_GroupTest
@@ -32,11 +31,11 @@ class GroupTest_Student:
         return self.state
 
     def increase_violate(self):
-        self.violate += 1
+        self.student_test.violate += 1
         return self
 
     def get_violate(self):
-        return self.violate
+        return self.student_test.violate
 
     def set_student(self, student):
         self.student = student
@@ -61,7 +60,10 @@ class GroupTest_Student:
         if 'state' in include:
             ser['state'] = self.state
         if 'score' in include:
-            ser['score'] = self.student_test.score
+            if self.student_test is not None:
+                ser['score'] = self.student_test.score
+            else:
+                ser['score'] = None
 
         return ser
 

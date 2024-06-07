@@ -270,4 +270,9 @@ class StudentTest:
             ser["student_work"] = [sw.serialize() for sw in self.student_work]
         if self.score is not None:
             ser["score"] = self.score
+        if self.violate is not None:
+            ser["violate"] = self.violate
         return ser
+
+    def is_submitted(self):
+        return self.end is not None
