@@ -35,8 +35,8 @@ class BO_student_test:
     def get_student_test(self, group_test_id: str, student_id: str) -> StudentTest:
         return self.dao_student_test.get_student_test(group_test_id, student_id)
 
-    def get_group_test_in_time(self, student_id: str, start: datetime, end: datetime):
-        return self.dao_group_test.get_group_test_for_student(student_id, start, end)
+    # def get_group_test_in_time(self, student_id: str, start: datetime, end: datetime):
+    #     return self.dao_group_test.get_group_test_for_student(student_id, start, end)
 
     def get_history(self, student_id: str, group_id: str) -> list[StudentTest]:
         return self.dao_student_test.get_student_test_history(student_id, group_id)

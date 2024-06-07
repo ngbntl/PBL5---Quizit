@@ -82,6 +82,9 @@ class BO_group_test:
     def get_group_test_by_id(self, group_test_id: str) -> GroupTest:
         return self.dao_group_test.get_group_test_by_id(group_test_id)
 
+    def get_group_test_calendar(self, role: str, user_id: str, start, end) -> list[GroupTest]:
+        return self.dao_group_test.get_group_test_calendar(role, user_id, start, end)
+
     # def generate_student_work(self, group_test_id: str) -> list[StudentWork_Question]:
     #     # Get group test by id
     #     group_test = self.get_group_test_by_id(group_test_id)

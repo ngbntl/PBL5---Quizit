@@ -8,7 +8,7 @@ from Backend.Business.BO_group_test import BO_group_test
 from Backend.Business.BO_student_test import BO_student_test
 from Backend.Model.DB_model import Teacher, Student
 from Backend.Business.BO_authenticate import get_current_user
-from Backend.Model.request_model import Req_GroupTest, Req_StudentWork
+from Backend.Model.request_model import Req_GroupTest
 from Backend.Model.response_model import Res_GroupTest, Res_StudentTest, Res_StudentScore
 from Backend.Router.annotate import QUERY_LEN_8
 
@@ -91,14 +91,15 @@ async def delete_group_test(teacher: Annotated[Teacher, Depends(get_current_user
 
 
 ### STUDENT ###
+@teacher_group_test_router.get('/calendar', status_code=status.HTTP_200_OK)
 @student_group_test_router.get('/calendar', status_code=status.HTTP_200_OK)
-async def get_group_test_in_time(student: Annotated[Teacher | Student, Depends(get_current_user)],
-                                 student_test_service: Annotated[BO_student_test, Depends()],
+async def get_group_test_in_time(user: Annotated[Student | Teacher, Depends(get_current_user)],
+                                 group_test_service: Annotated[BO_group_test, Depends()],
                                  start: Annotated[datetime, Query()],
                                  end: Annotated[datetime, Query()]):
     try:
         return [Res_GroupTest.from_DB_model(group_test) for group_test in
-                student_test_service.get_group_test_in_time(student.id, start, end)]
+                group_test_service.get_group_test_calendar('teacher' if isinstance(user, Teacher) else 'student', user.id, start, end)]
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
