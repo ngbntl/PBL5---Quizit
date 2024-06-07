@@ -30,6 +30,18 @@ class Student:
     def jsonify(self):
         return self.__dict__
 
+    def serialize(self, include: set):
+        ser = dict()
+        if 'id' in include:
+            ser['id'] = self.id
+        if 'email' in include:
+            ser['email'] = self.email
+        if 'name' in include:
+            ser['name'] = self.name
+        if 'avatar_path' in include:
+            ser['avatar_path'] = self.avatar_path
+        return ser
+
 
 class Teacher:
     def __init__(self, json: dict = None, **kwargs):

@@ -1,32 +1,33 @@
 import random
 from collections import defaultdict
-from datetime import datetime
 
+from Backend.Business import bcrypt_context
 from Backend.Model.DB_model import StudentTest, GroupTest, Test, Question, StudentWork_Question
-from Backend.WebSocket.Business.BO_WebSocket import BO_WebSocket
-from Backend.WebSocket.Entity.StudentWS import StudentWS
+from Backend.WebSocket.Business.BO_Room_GroupTest import BO_Room_GroupTest
+from Backend.WebSocket.Entity.GroupTest_Student import GroupTest_Student
+from Backend.WebSocket.Entity.GroupTest_Teacher import GroupTest_Teacher
 
 
 class Room_GroupTest:
     def __init__(self, group_test_id: str):
         self.group_test_id = group_test_id
-        self.teacher = None
-        self.students: dict[str, (StudentWS, StudentTest)] = dict()
+        self.teacher: GroupTest_Teacher = None
+        self.students: dict[str, GroupTest_Student] = dict()
         self._group_test: GroupTest = None
         self._test: Test = None
         self._questions: defaultdict[int, list[Question]] = None
-        self._bo_websocket = None
+        self._bo_room_grouptest = None
 
     @property
-    def bo_websocket(self):
-        if self._bo_websocket is None:
-            self._bo_websocket = BO_WebSocket()
-        return self._bo_websocket
+    def bo_room_grouptest(self):
+        if self._bo_room_grouptest is None:
+            self._bo_room_grouptest = BO_Room_GroupTest()
+        return self._bo_room_grouptest
 
     @property
     def group_test(self):
         if self._group_test is None:
-            self._group_test = self.bo_websocket.get_group_test_by_id(self.group_test_id)
+            self._group_test = self.bo_room_grouptest.get_group_test_by_id(self.group_test_id)
         return self._group_test
 
     @property
@@ -40,7 +41,7 @@ class Room_GroupTest:
     @property
     def questions(self):
         if self._questions is None:
-            questions = self.bo_websocket.get_all_questions_in_test(self.group_test.test_id)
+            questions = self.bo_room_grouptest.get_all_questions_in_test(self.group_test.test_id)
             self._questions = defaultdict(list)
             for q in questions:
                 self._questions[q.difficulty].append(q)
@@ -49,17 +50,22 @@ class Room_GroupTest:
     @property
     def test(self):
         if self._test is None:
-            self._test = self.bo_websocket.get_test_by_id(self.group_test.test_id)
+            self._test = self.bo_room_grouptest.get_test_by_id(self.group_test.test_id)
         return self._test
 
-    def add_student_ws(self, student_ws: StudentWS):
-        self.students[student_ws.student.id] = (student_ws, None)
+    def add_grouptest_student(self, grouptest_student: GroupTest_Student):
+        self.students[grouptest_student.get_student().id] = grouptest_student
+
+    def get_grouptest_student(self, student_id: str) -> GroupTest_Student:
+        return self.students[student_id]
 
     def get_student_test(self, student_id: str) -> StudentTest:
         if student_id in self.students.keys():  # check if student is in room
-            _, student_test = self.students[student_id]
+            grouptest_student = self.students[student_id]
+            student_test = grouptest_student.get_student_test()
             if student_test is None:
-                return self.generate_student_test(student_id)
+                grouptest_student.set_student_test(self.generate_student_test(student_id))
+                return grouptest_student.get_student_test()
             return student_test
         return None
 
@@ -73,12 +79,11 @@ class Room_GroupTest:
         return ans
 
     def generate_student_test(self, student_id: str) -> StudentTest:
-        student_ws, student_test = self.students[student_id]
+        student_test = self.students[student_id].get_student_test()
         if student_test is not None:
             return student_test
-        student_test = StudentTest(student_id=student_id, group_test_id=self.group_test_id, start=datetime.now(), student_work=self.generate_student_work_question(), score=0)
-        # bo_websocket.insert_student_test(student_test)
-        self.students[student_id] = (student_ws, student_test)
+        student_test = StudentTest(student_id=student_id, group_test_id=self.group_test_id, student_work=self.generate_student_work_question())
+        self.bo_room_grouptest.insert_student_test(student_test)
         return student_test
 
     def is_active(self):
@@ -86,3 +91,33 @@ class Room_GroupTest:
 
     def is_exist(self):
         return self.group_test is not None
+
+    def authenticate(self, password: str):
+        return bcrypt_context.verify(password, self.hash_pswd)
+
+    def check_student_in_group(self, student_id: str):
+        return self.bo_room_grouptest.check_student_in_group(self.group_test.group_id, student_id)
+
+    def check_owner(self, teacher_id: str):
+        return self.bo_room_grouptest.check_owner(self.group_test.group_id, teacher_id)
+
+    def check_student_join(self, student_id: str):
+        return self.students.get(student_id, None) is not None
+
+    def submit(self, id, student_answer):
+        pass
+
+    def check_teacher_join(self):
+        return self.teacher is not None
+
+    def add_grouptest_teacher(self, grouptest_teacher: GroupTest_Teacher):
+        self.teacher = grouptest_teacher
+
+    def get_grouptest_teacher(self):
+        return self.teacher
+
+    def get_student_state(self):
+        ans = dict()
+        for student_id, grouptest_student in self.students.items():
+            ans[student_id] = grouptest_student.serialize(include={'student', 'state', 'violate'})
+        return ans

@@ -3,6 +3,9 @@ from fastapi import Depends, HTTPException
 from typing import Annotated
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
+
+from Backend.Business.BO_student import BO_student
+from Backend.Business.BO_teacher import BO_teacher
 from Backend.Model.DB_model import Teacher, Student, Admin
 from Backend.Business import ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY, HASH_ALGORITHM, oauth2_scheme
 

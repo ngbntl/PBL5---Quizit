@@ -27,6 +27,9 @@ class BO_group:
             raise Exception(f"Group {group_id} is not belong to teacher {teacher_id}!")
         return group
 
+    def check_owner(self, group_id: str, teacher_id: str) -> bool:
+        return self.dao_group.check_owner(group_id, teacher_id)
+
     # INSERT
     def insert_group(self, data: Req_Group) -> str:
         if data.teacher_id is None:

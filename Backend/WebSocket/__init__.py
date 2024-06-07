@@ -1,18 +1,18 @@
 from fastapi import WebSocket
 
-from Backend.WebSocket.Business.BO_Room_GroupTest import BO_Room_GroupTest
-from Backend.WebSocket.Endpoint.student_ws_endpoint import student_ws_endpoint
-from Backend.WebSocket.Endpoint.teacher_ws_endpoint import teacher_ws_endpoint
+from Backend.WebSocket.Business.BO_Room_Manager import BO_Room_Manager
+from Backend.WebSocket.Business.BO_Student_Message import BO_Student_Message
+from Backend.WebSocket.Business.BO_Teacher_Message import BO_Teacher_Message
 from Backend.Router import app
-from Backend.WebSocket.Entity.StudentWS import StudentWS
+from Backend.WebSocket.Entity.GroupTest_Student import GroupTest_Student
 from Backend.WebSocket.Entity.TeacherWS import TeacherWS
 
 
 @app.websocket("/student")
 async def student_endpoint(websocket: WebSocket):
-    await student_ws_endpoint(websocket)
+    await BO_Student_Message(websocket).handle()
 
 
 @app.websocket("/teacher")
 async def teacher_endpoint(websocket: WebSocket):
-    await teacher_ws_endpoint(websocket)
+    await BO_Teacher_Message(websocket).handle()

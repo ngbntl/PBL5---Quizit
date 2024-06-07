@@ -2,27 +2,27 @@ from fastapi import WebSocket
 from starlette import status
 from starlette.websockets import WebSocketDisconnect
 
-from Backend.Business.BO_student import BO_student
+from Backend.Business.BO_authenticate import get_current_user
+from Backend.Business.BO_teacher import BO_teacher
+from Backend.Model.DB_model import Teacher
+from Backend.WebSocket import BO_Room_Manager
+from Backend.WebSocket.Business.BO_Room_GroupTest import BO_Room_GroupTest
 from Backend.WebSocket.Entity.ClientMessage import ClientMessage
+from Backend.WebSocket.Entity.GroupTest_Teacher import GroupTest_Teacher
 from Backend.WebSocket.Entity.ResponseMessage import ResponseMessage
 from Backend.WebSocket.Entity.Room_GroupTest import Room_GroupTest
-from Backend.WebSocket.Entity.GroupTest_Student import GroupTest_Student
-from Backend.WebSocket.Business.BO_Room_GroupTest import BO_Room_GroupTest
-from Backend.WebSocket.Business.BO_Room_Manager import BO_Room_Manager
-from Backend.Model.DB_model import Student
-from Backend.Business.BO_authenticate import get_current_user
 
 
-class BO_Student_Message:
+class BO_Teacher_Message:
     def __init__(self, websocket: WebSocket):
         self.websocket = websocket
-        self.student = None
+        self.teacher = None
         self.room = None
         self.bo_room_grouptest = None
         self.bo_room_manager = None
         self.message = None
         self.response = None
-        self.grouptest_student = None
+        self.grouptest_teacher = None
 
     async def handle(self):
         try:
@@ -31,24 +31,25 @@ class BO_Student_Message:
             self.bo_room_manager = BO_Room_Manager()
             self.message = ClientMessage()
             self.response = ResponseMessage()
-            self.grouptest_student = GroupTest_Student(self.websocket)
+            self.grouptest_teacher = GroupTest_Teacher(self.websocket)
+
 
             while True:
                 try:
                     msg = self.message.set_message(**await self.websocket.receive_json())
                     if msg.command == ClientMessage.AUTHENTICATE:
-                        self.student = await get_current_user(msg.detail['token'])
-                        self.student = BO_student().get_student_by_id(self.student.id)
-                        if self.student is None or not isinstance(self.student, Student):
-                            self.student = None
+                        self.teacher = await get_current_user(msg.detail['token'])
+                        self.teacher = BO_teacher().get_teacher_by_id(self.teacher.id)
+                        if self.teacher is None or not isinstance(self.teacher, Teacher):
+                            self.teacher = None
                             await self.websocket.send_json(self.response.set_status(status.HTTP_401_UNAUTHORIZED).set_message('Invalid token').serialize())
                             continue
 
-                        self.grouptest_student.set_student(self.student)
+                        self.grouptest_teacher.set_teacher(self.teacher)
                         await self.websocket.send_json(self.response.set_status(status.HTTP_200_OK).set_message('Authenticated').serialize())
                         continue
 
-                    if self.student is None:  # check if student is authenticated
+                    if self.teacher is None:  # check if teacher is authenticated
                         await self.websocket.send_json(self.response.set_status(status.HTTP_401_UNAUTHORIZED).set_message('You have not authenticated').serialize())
                         continue  # if not, continue to next loop
 
@@ -56,10 +57,6 @@ class BO_Student_Message:
                         group_test_id = msg.detail['group_test_id']
 
                         self.room = Room_GroupTest(group_test_id)  # create the room
-
-                        if self.room.authenticate(msg.detail['password']) is False:  # false password
-                            await self.websocket.send_json(self.response.set_status(status.HTTP_403_FORBIDDEN).set_message('Group test password is wrong').serialize())
-                            continue
 
                         if self.bo_room_manager.is_room_exist(group_test_id) is False:  # room not exist in room manager
                             if self.room.is_exist() is False:  # check if group test is exist
@@ -70,8 +67,8 @@ class BO_Student_Message:
                                 await self.websocket.send_json(self.response.set_status(status.HTTP_404_NOT_FOUND).set_message('Group test is not active').serialize())
                                 continue
 
-                            if self.room.check_student_in_group(self.student.id) is False:  # student not in group
-                                await self.websocket.send_json(self.response.set_status(status.HTTP_403_FORBIDDEN).set_message('You are not in this group').serialize())
+                            if self.room.check_owner(self.teacher.id) is False:  # teacher not own group
+                                await self.websocket.send_json(self.response.set_status(status.HTTP_403_FORBIDDEN).set_message(f'You not own this group').serialize())
                                 continue
 
                             self.bo_room_manager.add_room(group_test_id, self.room)  # add room to manager
@@ -79,45 +76,31 @@ class BO_Student_Message:
                         else:  # room exist in room manager
                             self.room = self.bo_room_manager.get_room(group_test_id)  # get room from manager
 
-                            # check if student has already joined this room
-                            if self.room.check_student_join(self.student.id):
+                            # check if teacher has already joined this room
+                            if self.room.check_teacher_join():
                                 await self.websocket.send_json(self.response.set_status(status.HTTP_200_OK).set_message('You have already joined this room').serialize())
-                                self.grouptest_student = self.room.get_grouptest_student(self.student.id)  # get before grouptest_student from room
-                                self.grouptest_student.set_state(GroupTest_Student.STATE_READY)
+                                self.grouptest_teacher = self.room.get_grouptest_teacher()  # get before grouptest_student from room
                                 continue
-                            if self.room.check_student_in_group(self.student.id) is False:  # student not in group
-                                await self.websocket.send_json(self.response.set_status(status.HTTP_403_FORBIDDEN).set_message('You are not in this group').serialize())
+                            if self.room.check_owner(self.teacher.id) is False:  # teacher not own group
+                                await self.websocket.send_json(self.response.set_status(status.HTTP_403_FORBIDDEN).set_message(f'You not own this group').serialize())
                                 continue
 
-                        self.room.add_grouptest_student(self.grouptest_student)  # add student to room
-                        self.grouptest_student.set_room(self.room)  # set room to student
-                        self.grouptest_student.set_state(GroupTest_Student.STATE_READY)
+                        self.room.add_grouptest_teacher(self.grouptest_teacher)  # add teacher to room
+                        self.grouptest_teacher.set_room(self.room)  # set room to teacher
 
                         await self.websocket.send_json(self.response.set_status(status.HTTP_200_OK).set_message('Joined successfully').serialize())
                         continue
 
-                    if self.grouptest_student.get_room() is None:  # check if student has joined any group
+                    if self.grouptest_teacher.get_room() is None:  # check if teacher has joined any group
                         await self.websocket.send_json(self.response.set_status(status.HTTP_403_FORBIDDEN).set_message('You have not joined any group').serialize())
                         continue
 
-                    if msg.command == ClientMessage.GET_TEST:  # get test
-                        student_test = self.room.get_student_test(self.student.id)
-                        await self.websocket.send_json(self.response.set_status(status.HTTP_200_OK).set_message(student_test.serialize()).serialize())
-                        self.grouptest_student.set_state(GroupTest_Student.STATE_WORKING)
+                    if msg.command == ClientMessage.GET_STUDENT_STATE:
+                        await self.websocket.send_json(self.response.set_status(status.HTTP_200_OK).set_message(self.room.get_student_state()).serialize())
                         continue
 
-                    if msg.command == ClientMessage.VIOLATE:
-                        self.grouptest_student.increase_violate()
-                        continue
-
-                    if msg.command == ClientMessage.SUBMIT_TEST:
-                        student_answer = msg.detail['student_answer']
-                        self.room.submit(self.student.id, student_answer)
-                        self.grouptest_student.set_state(GroupTest_Student.STATE_SUBMIT)
-                        break
 
                 except WebSocketDisconnect:
-                    self.grouptest_student.set_state(GroupTest_Student.STATE_DISCONNECTED)
                     break
                 except Exception as e:
                     continue

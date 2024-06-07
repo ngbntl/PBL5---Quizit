@@ -56,11 +56,14 @@ class BO_student_test:
         return self.dao_student_test.get_student_test_history(student_id, group_id)
 
     # INSERT
-    def insert_student_test(self, student_id: str, group_test_id: str) -> StudentTest:
-        student_work = self.bo_group_test.generate_student_work(group_test_id)
-        student_test = StudentTest(student_id=student_id, group_test_id=group_test_id, student_work=student_work)
-        self.dao_student_test.insert_student_test(student_test)
-        return Res_StudentTest.from_DB_model(student_test)
+    # def insert_student_test(self, student_id: str, group_test_id: str) -> StudentTest:
+    #     student_work = self.bo_group_test.generate_student_work(group_test_id)
+    #     student_test = StudentTest(student_id=student_id, group_test_id=group_test_id, student_work=student_work)
+    #     self.dao_student_test.insert_student_test(student_test)
+    #     return student_test
+
+    def insert_student_test(self, student_test):
+        return self.dao_student_test.insert_student_test(student_test)
 
     def get_student_work(self, student_id: str, group_test_id: str):
         return self.dao_student_test.get_student_work(student_id, group_test_id)

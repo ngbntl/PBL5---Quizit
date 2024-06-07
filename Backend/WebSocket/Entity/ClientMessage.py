@@ -1,8 +1,10 @@
 class ClientMessage:
+    GET_STUDENT_STATE = 'GET STUDENT STATE'
     AUTHENTICATE = 'AUTHENTICATE'
     JOIN_GROUP_TEST = 'JOIN GROUP TEST'
     GET_TEST = 'GET TEST'
     SUBMIT_TEST = 'SUBMIT TEST'
+    VIOLATE = 'VIOLATE'
 
     def __init__(self):
         self.command = None
