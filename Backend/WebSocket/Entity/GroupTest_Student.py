@@ -65,7 +65,7 @@ class GroupTest_Student:
             if self.student_test is not None:
                 ser['score'] = self.student_test.score
             else:
-                ser['score'] = None
+                ser['score'] = 0
 
         return ser
 

@@ -89,6 +89,7 @@ class BO_Teacher_Message:
                         self.grouptest_teacher.set_room(self.room)  # set room to teacher
 
                         await self.websocket.send_json(self.response.set_status(status.HTTP_200_OK).set_message('Joined successfully').serialize())
+                        await self.room.send_student_state_to_teacher()
                         continue
 
                     if self.grouptest_teacher.get_room() is None:  # check if teacher has joined any group
