@@ -21,3 +21,7 @@ app.include_router(auth_router)
 app.include_router(teacher_router)
 app.include_router(student_router)
 
+
+@app.get("/")
+def index():
+    return {"message": "Hello World"}
