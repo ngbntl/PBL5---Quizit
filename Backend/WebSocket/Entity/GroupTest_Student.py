@@ -35,6 +35,8 @@ class GroupTest_Student:
         return self
 
     def get_violate(self):
+        if self.student_test is None:
+            return 0
         return self.student_test.violate
 
     def set_student(self, student):
@@ -56,7 +58,7 @@ class GroupTest_Student:
         if 'student' in include:
             ser['student'] = self.student.serialize({'id', 'name', 'email', 'avatar_path'})
         if 'violate' in include:
-            ser['violate'] = self.violate
+            ser['violate'] = self.get_violate()
         if 'state' in include:
             ser['state'] = self.state
         if 'score' in include:
