@@ -139,7 +139,7 @@ class BO_Student_Message:
                             break
                         await self.websocket.send_json(self.response.set_status(status.HTTP_200_OK).set_message({'score': self.grouptest_student.get_score()}).serialize())
                         self.room.set_state(self.student.id, GroupTest_Student.STATE_SUBMIT)
-                        await self.room.send_student_state_to_teacher()
+                        await self.room.send_student_state_to_teacher(self.student.id)
                         break
 
                 except WebSocketDisconnect:

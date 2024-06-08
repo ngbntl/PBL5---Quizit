@@ -118,11 +118,10 @@ class Room_GroupTest:  # Room of group test. Contain all student and teacher in 
     def get_grouptest_teacher(self):
         return self.teacher
 
-    def get_student_state(self):
-        ans = []
-        for grouptest_student in self.students.values():
-            ans.append(grouptest_student.serialize(include={'student', 'state', 'violate', 'score'}))
-        return ans
+    def get_student_state(self, student_id: str):
+        if self.students[student_id]:
+            return self.students[student_id].serialize(include={'student', 'state', 'violate', 'score'})
+        return None
 
     def submit(self, student_id: str, student_answer: list[list[int]]):
         self.students[student_id].set_student_test(self.bo_room_grouptest.submit(self.group_test_id, student_id, student_answer))
@@ -131,9 +130,9 @@ class Room_GroupTest:  # Room of group test. Contain all student and teacher in 
         self.students[student_id].increase_violate()
         self.bo_room_grouptest.update_violate(self.group_test_id, student_id, self.students[student_id].get_violate())
 
-    async def send_student_state_to_teacher(self):
+    async def send_student_state_to_teacher(self, student_id: str):
         if self.teacher is not None:
-            await self.teacher.websocket.send_json(self.get_student_state())
+            await self.teacher.websocket.send_json(self.get_student_state(student_id))
 
     def set_state(self, student_id, state):
         self.students[student_id].set_state(state)
