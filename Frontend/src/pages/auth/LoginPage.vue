@@ -72,6 +72,7 @@
             </form>
         </div>
     </div>
+    <a-spin :spinning="loading"></a-spin>
     <router-view />
 </template>
 
@@ -79,17 +80,21 @@
 import { ref } from "vue";
 import Header from "../../components/header/Header.vue";
 import { useAuthStore } from "../../stores/modules/auth.js";
+import { Spin } from "ant-design-vue";
 export default {
-    components: { Header },
+    components: {
+        Header,
+        'a-spin': Spin
+    },
     setup() {
         const email = ref("");
         const password = ref("");
         const emailError = ref("");
         const passwordError = ref("");
-        const role = ref("Teacher");
+        const role = ref("teacher");
         const showPassword = ref(false);
 
-
+        const loading = ref(false);
         const roleError = ref("");
 
         const validateRole = () => {
@@ -133,7 +138,9 @@ export default {
             submitForm();
         };
 
-        const submitForm = () => {
+        const submitForm = async () => {
+            loading.value = true;
+
             const data = {
                 username: email.value,
                 password: password.value,
@@ -141,9 +148,10 @@ export default {
             };
             const authStore = useAuthStore();
 
-            authStore.login(data);
-        };
+            await authStore.login(data);
 
+            loading.value = false;
+        };
         return {
             role,
             email,

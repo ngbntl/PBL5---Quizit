@@ -3,11 +3,24 @@ const student = [
     path: "/student",
     name: "student",
     component: () => import("../layouts/studentLayout.vue"),
+    beforeEnter: (_to, _from, next) => {
+      if (localStorage.getItem("role") == "student") {
+        next();
+      } else {
+        next("/login");
+      }
+    },
+    meta: {
+      title: "StudentPage",
+    },
     children: [
       {
         path: "schedule",
         name: "student - schedule",
         component: () => import("../pages/student/schedule/index.vue"),
+        meta: {
+          title: "Student - Schedule",
+        },
       },
       {
         path: "group",
@@ -38,9 +51,20 @@ const student = [
     ],
   },
   {
+    path: "/auth",
+    name: "student-auth",
+    component: () => import("../pages/student/test/password.vue"),
+  },
+  {
     path: "/test",
     name: "student-test",
     component: () => import("../pages/student/test/Test.vue"),
   },
+  {
+    path: "/point",
+    name: "student-point",
+    component: () => import("../pages/student/test/Point.vue"),
+  },
 ];
+
 export default student;

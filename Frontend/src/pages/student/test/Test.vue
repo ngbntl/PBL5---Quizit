@@ -1,8 +1,5 @@
 <template>
     <div class="p-10 ">
-        <!-- <div v-if="cheatingDetected" class="bg-red-500 text-white p-4 rounded">
-            <p>Bố bắt được mày chuyển tab nha thằng l</p>
-        </div> -->
 
         <timer :minutes="duration" class="fixed" @time-up="submitTest" />
 
@@ -13,7 +10,7 @@
                     :id="`question-${index+1}`">
                     <question-box :question="question" :questionIndex="index" @answer-selected="addAnswer" />
                 </div>
-                <a-button @click="showConfirm">Nộp bài</a-button>
+                <a-button @click="showConfirm" class=" bg-blue-500 text-white rounded-md">Nộp bài</a-button>
             </div>
 
 
@@ -32,7 +29,14 @@ import { useStudentStore } from '../../../stores/modules/student';
 import QuestionBox from '../../../components/test/QuestionBox.vue';
 import Timer from '../../../components/test/Timer.vue';
 import Menu from '../../../components/test/Menu.vue';
+
 import { Modal } from 'ant-design-vue';
+import { h } from 'vue';
+import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
+import { useRouter } from 'vue-router';
+import { useWebSocketStore } from '../../../stores/modules/webSocket';
+import { eventType } from 'ant-design-vue/es/_util/type';
+import { useToast } from 'vue-toastification';
 export default {
     components: {
         QuestionBox,
@@ -47,17 +51,30 @@ export default {
         const userAnswers = reactive({});
         let student_answer = ref([]);
         const duration = ref(null);
+        const length = ref(null)
+
+
+        const tabSwitchCount = ref(0);
         duration.value = localStorage.getItem("duration");
         const selectedQuestion = ref(null);
 
+        onMounted(() => {
+            window.addEventListener('beforeunload', handleBeforeUnload);
+        });
+
+        onUnmounted(() => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        });
+
+        const handleBeforeUnload = (event) => {
+            event.preventDefault();
+            event.returnValue = '';
+        };
 
 
 
 
-        const data = computed(() => ({
-            group_test_id: group_test_id.value,
-            student_answer: student_answer.value
-        }));
+
         const answeredQuestions = ref([]); // Mảng để theo dõi các câu hỏi đã được trả lời
 
         const addAnswer = (payload) => {
@@ -67,25 +84,137 @@ export default {
             answeredQuestions.value.push(questionId); // Thêm câu hỏi vào mảng câu hỏi đã trả lời
         }
 
-        const handleVisibilityChange = () => {
-            if (document.hidden) {
-                cheatingDetected.value = true;
-            }
+
+        const contextMenuHandler = (event) => {
+            event.preventDefault();
+
         };
 
-        const submitTest = () => {
-            console.log(data.value);
+        onMounted(() => {
+            window.addEventListener('contextmenu', contextMenuHandler);
+        });
+
+        onUnmounted(() => {
+            window.removeEventListener('contextmenu', contextMenuHandler);
+        });
+
+
+        const WS = ref(new WebSocket(`ws://localhost:4444/student`));
+
+        WS.value.onopen = (event) => {
+            console.log("Connection opened", event);
         };
-        const length = ref(null)
+
+
+
+        const submitTest = async () => {
+            const submitData = computed(() => ({
+                command: "SUBMIT TEST",
+                detail: {
+                    student_answer: student_answer.value
+                }
+            }));
+
+            let token = localStorage.getItem("token");
+
+            let auth = {
+                command: "AUTHENTICATE",
+                detail: {
+                    token: token,
+                },
+            };
+            WS.value.send(JSON.stringify(auth));
+
+            WS.value.onmessage = (event) => {
+                let data = JSON.parse(event.data);
+                if (data.message == "Authenticated") {
+                    let join = {
+                        command: "JOIN GROUP TEST",
+                        detail: {
+                            group_test_id: localStorage.getItem("group_test_id"),
+                            password: localStorage.getItem("pass")
+                        }
+                    }
+
+                    WS.value.send(JSON.stringify(join));
+                    WS.value.onmessage = (event) => {
+                        let data = JSON.parse(event.data)
+                        if (data.status == 403) {
+                            useToast().error("Sai mật khẩu");
+                        } else if (data.status == 200) {
+
+                            let get_test = {
+                                command: "GET TEST"
+                            }
+                            WS.value.send(JSON.stringify(get_test));
+                            WS.value.onmessage = (event) => {
+                                let data = JSON.parse(event.data);
+                                if (data.status == 400) {
+                                    useToast().warning("Bạn đã làm bài kiểm tra này")
+                                } else if (data.status == 200) {
+                                    WS.value.send(JSON.stringify(submitData.value))
+                                    WS.value.onmessage = (event) => {
+                                        let data = JSON.parse(event.data);
+                                        console.log(data);
+                                        if (data.status == 200) {
+
+                                            localStorage.setItem("score", data.message.score);
+                                            localStorage.setItem("violations", tabSwitchCount.value);
+                                            router.push('/point');
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+
+                } else {
+                    console.error('Authentication failed:', data.message);
+                }
+            };
+
+
+            //console.log(submitData.value)
+
+            // let res = null;
+            // //res = await studentStore.testSubmit(data.value);
+            // localStorage.setItem("score", res);
+            // localStorage.setItem("violations", tabSwitchCount.value);
+        };
         onMounted(async () => {
-            group_test_id.value = localStorage.getItem("group_test_id")
-            questions.value = await studentStore.getTest(group_test_id.value);
-            length.value = questions.value.student_work.length;
-            student_answer = ref(Array(length).fill().map(() => []));
-            console.log(duration.value)
+            let test = await localStorage.getItem('test');
+            questions.value = JSON.parse(test);
+            console.log(questions.value)
+            group_test_id.value = localStorage.getItem("group_test_id");
+            duration.value = localStorage.getItem("duration");
+            if (questions.value && questions.value.student_work) {
+                length.value = questions.value.student_work.length;
+                student_answer = ref(Array(length).fill().map(() => []));
+            }
+            console.log(duration.value);
             document.addEventListener('visibilitychange', handleVisibilityChange);
         });
 
+
+        const handleVisibilityChange = () => {
+            let tabSwitchLim = localStorage.getItem('tolerance')
+            if (tabSwitchLim > 0) {
+                if (document.hidden) {
+                    tabSwitchCount.value++;
+                    if (tabSwitchCount.value > tabSwitchLim) {
+                        submitTest();
+                    } else {
+                        Modal.warning({
+                            title: 'phát hiện hành vi gian lận!',
+                            content: h('div', { style: 'color:red;' },
+                                `Bạn đã chuyển tab ${tabSwitchCount.value} lần. Nếu chuyển tab quá ${tabSwitchLim} lần, bài kiểm tra sẽ tự động nộp.`,),
+                        });
+                    }
+                }
+            }
+        };
         onUnmounted(() => {
             document.removeEventListener('visibilitychange', handleVisibilityChange);
         });
@@ -95,40 +224,45 @@ export default {
                 questionElement.scrollIntoView({ behavior: 'smooth' });
             }
         };
-
+        const router = useRouter();
         const showConfirm = () => {
-            modal.confirm({
-                title: 'Do you Want to delete these items?',
+            Modal.confirm({
+                title: 'Bạn chắc chắn nộp bài?',
                 icon: h(ExclamationCircleOutlined),
                 content: h(
                     'div',
                     {
                         style: 'color:red;',
                     },
-                    'Some descriptions',
+                    '',
                 ),
                 onOk() {
-                    console.log('OK');
+
+                    submitTest();
+                    //  router.push('/point');
                 },
                 onCancel() {
-                    console.log('Cancel');
+                    console.log('Hủy');
                 },
                 class: 'test',
             });
         };
-
+        window.addEventListener('keydown', function (e) {
+            if (e.key === 'F5' || e.key === 'Ctrl' || e.key === 'Tab') {
+                e.preventDefault();
+            }
+        });
         return {
             cheatingDetected,
             questions,
             userAnswers,
             student_answer,
             group_test_id,
-            data,
             duration,
             length,
             selectedQuestion,
             answeredQuestions,
-
+            WS,
             goToQuestion,
             showConfirm,
             addAnswer,
@@ -138,3 +272,8 @@ export default {
     },
 };
 </script>
+<style>
+body {
+  user-select: none;
+}
+</style>

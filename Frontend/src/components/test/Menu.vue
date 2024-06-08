@@ -4,7 +4,7 @@
     <div class="grid grid-cols-3 gap-2 shadow-md p-6 ">
         <div v-for="index in totalQuestions" :key="index" @click="goToQuestion(index)"
             class="cursor-pointer border rounded-full w-10 h-10 flex items-center justify-center hover:bg-gray-100"
-            :class="{ 'bg-green-200': answeredQuestions.includes(index-1) }">
+            :class="{ 'bg-blue-200': answeredQuestions.includes(index-1) }">
             {{ index }}
         </div>
     </div>

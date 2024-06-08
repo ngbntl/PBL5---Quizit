@@ -36,7 +36,7 @@ export default {
 
         const handleOk = async () => {
             loading.value = true;
-            addCollection(collection.value)
+            addGroup(group.value)
 
             setTimeout(() => {
                 loading.value = false;

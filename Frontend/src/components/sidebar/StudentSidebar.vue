@@ -16,12 +16,12 @@
                     Nhóm
                 </router-link>
             </a-menu-item>
-            <a-menu-item key="notif">
+            <!-- <a-menu-item key="notif">
                 <router-link :to="{name: 'student - notif'}" class="pl-8">
                     <fa icon="fa-solid fa-bell" />
                     Thông báo
                 </router-link>
-            </a-menu-item>
+            </a-menu-item> -->
 
             <a-menu-item key="logout" class="pl-8" @click="logout">
                 <router-link to="" class="pl-8">
@@ -43,7 +43,8 @@
     });
 
     const logout = () => {
-        localStorage.removeItem('token');
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
         router.push('/login');
     }
 </script>

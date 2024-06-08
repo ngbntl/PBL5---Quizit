@@ -88,6 +88,7 @@ export default {
   },
 
   //groups
+
   getStudents(groupId) {
     return Api().get(`teacher/group/student?group_id=${groupId}`, {
       headers: {
@@ -145,7 +146,20 @@ export default {
       }
     );
   },
-
+  getImageGroups() {
+    return Api().get(`teacher/group/static_images`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+  },
+  updateGroup(group) {
+    return Api().put(`teacher/group/update`, group, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+  },
   //test
   getGroupTests(group_id) {
     return Api().get(`teacher/grouptest/?group_id=${group_id}`, {
@@ -160,6 +174,34 @@ export default {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
+  },
+  getStudentPoints(group_test_id) {
+    return Api().get(
+      `teacher/grouptest/studentpoint?group_test_id=${group_test_id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+  },
+
+  updateGroupTest(group_tests) {
+    return Api().put(`teacher/grouptest/`, group_tests, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+  },
+  getHistory(group_tests) {
+    return Api().get(
+      `teacher/grouptest/studentpoint?group_test_id=${group_tests}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
   },
   //profile
   getInfor() {

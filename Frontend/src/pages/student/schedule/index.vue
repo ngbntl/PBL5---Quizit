@@ -16,49 +16,42 @@
     </a-calendar>
 </template>
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
+import { useStudentStore } from '../../../stores/modules/student';
 const value = ref();
-const getListData = value => {
-    let listData;
-    switch (value.date()) {
-        case 8:
-            listData = [
-                {
-                    type: 'warning',
-                    content: 'Quản lý dự án',
-                },
-                {
-                    type: 'success',
-                    content: 'Công nghệ web',
-                },
-            ];
-            break;
-        case 10:
-            listData = [
-
-                {
-                    type: 'error',
-                    content: 'Phân tích thiết kế HDt',
-                },
-            ];
-            break;
-        case 15:
-            listData = [
-
-                {
-                    type: 'error',
-                    content: 'Lập trình mạng',
-                },
-                {
-                    type: 'success',
-                    content: 'Công nghệ phần mồm',
-                },
-            ];
-            break;
-        default:
-    }
-    return listData || [];
+const events = ref([]);
+const getListData = (value) => {
+    const date = value.format('YYYY-MM-DD');
+    const listData = events.value.filter(event => {
+        const start = event.start.split('T')[0];
+        const end = event.end.split('T')[0];
+        return date >= start && date <= end;
+    }).map(event => {
+        const startTime = event.start.split('T')[1].substring(0, 5); // Extracts the time from the start date
+        const endTime = event.end.split('T')[1].substring(0, 5); // Extracts the time from the end date
+        return {
+            type: 'success',
+            content: `${event.name} (${startTime} - ${endTime})` // Displays only the time
+        };
+    });
+    return listData.length ? listData : null;
 };
+
+const studentStore = useStudentStore();
+onMounted(async () => {
+    const start = new Date(2024, 5, 20, 9, 0, 0); // replace with actual start date
+    const end = new Date(2024, 5, 25, 9, 0, 0); // replace with actual end date
+
+    const startFormatted = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-${String(start.getDate()).padStart(2, '0')}T${String(start.getHours()).padStart(2, '0')}:${String(start.getMinutes()).padStart(2, '0')}:${String(start.getSeconds()).padStart(2, '0')}`;
+    const endFormatted = `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}-${String(end.getDate()).padStart(2, '0')}T${String(end.getHours()).padStart(2, '0')}:${String(end.getMinutes()).padStart(2, '0')}:${String(end.getSeconds()).padStart(2, '0')}`;
+
+    const res = await studentStore.getSchedule({ start: startFormatted, end: endFormatted });
+    events.value = res.map(item => ({
+        name: item.name,
+        start: item.start,
+        end: item.end,
+    }));
+});
 const getMonthData = value => {
     if (value.month() === 8) {
         return 1394;

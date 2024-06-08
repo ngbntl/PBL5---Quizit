@@ -1,14 +1,14 @@
 <template>
     <div class="ml-8 ">
-        <div class="flex items-center ">
-            <button @click="$router.go(-1)" class="ml-10 mt-5">
+        <div class="flex items-center mb-5">
+            <button @click="$router.go(-1)" class="ml-10 ">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
             </button>
-            <h1 class="text-2xl ml-10 mt-5"> vcc </h1>
+            <h1 class="text-2xl ml-5 my-5"> {{ teacherStore.groupName }}</h1>
         </div>
         <div class="mb-4">
             <div class="flex items-center hover:cursor-pointer hover:text-blue-500">
@@ -43,7 +43,7 @@
                 <h1 class="text-xl ml-8 my-0" @click="toggleTests">Bài kiểm tra</h1>
                 <group-test class="ml-auto" v-show="showTests" />
             </div>
-            <div class="flex flex-wrap justify-start" v-show="showTests">
+            <div class="flex flex-wrap justify-start hover:cursor-pointer" v-show="showTests">
                 <TestCard class="m-2" v-for="groupTest in groupTests" :key="groupTest.id" :test="groupTest" />
             </div>
         </div>
@@ -62,6 +62,7 @@ import TestCard from '../../../components/questionBank/TestCard.vue';
 import AddTest from '../../../components/modal/AddTest.vue';
 import Request from '../../../components/profile/Request.vue';
 import GroupTest from '../../../components/modal/GroupTest.vue';
+import router from '../../../router';
 
 export default {
     components: { Card, DownOutlined, RightOutlined, TestCard, AddStudent, AddTest, Request, GroupTest },
@@ -81,6 +82,8 @@ export default {
         const toggleTests = async () => {
 
             showTests.value = !showTests.value;
+            groupTests.value = await teacherStore.getGroupTests(groupId);
+
         }
         const toggleRequests = () => {
             showRequests.value = !showRequests.value;
@@ -88,14 +91,14 @@ export default {
         const toggleStudents = async () => {
 
             showStudents.value = !showStudents.value;
+            students.value = await teacherStore.getStudents(groupId);
+
 
         }
 
         onMounted(async () => {
-            students.value = await teacherStore.getStudents(groupId);
             //  tests.value = await teacherStore.getTests(groupId);
             requests.value = await teacherStore.getRequests(groupId);
-            groupTests.value = await teacherStore.getGroupTests(groupId);
             console.log(groupTests.value)
 
         });

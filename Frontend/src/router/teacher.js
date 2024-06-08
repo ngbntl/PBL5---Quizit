@@ -3,6 +3,16 @@ const teacher = [
     path: "/teacher",
     name: "teacher",
     component: () => import("../layouts/teacherLayout.vue"),
+    beforeEnter: (to, from, next) => {
+      if (localStorage.getItem("role") == "teacher") {
+        next();
+      } else {
+        next("/login");
+      }
+    },
+    meta: {
+      title: "WeightNPay-Admin",
+    },
     children: [
       {
         path: "schedule",
@@ -18,6 +28,11 @@ const teacher = [
         path: "group/:id",
         name: "teacher-group-detail",
         component: () => import("../pages/teacher/group/GroupDetail.vue"),
+      },
+      {
+        path: "group/:groupId/groupTestId/:testId",
+        name: "teacher-group-test",
+        component: () => import("../pages/teacher/group/GroupTest.vue"),
       },
       {
         path: "quizes",

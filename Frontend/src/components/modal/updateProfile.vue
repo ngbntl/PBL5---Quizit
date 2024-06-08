@@ -17,15 +17,8 @@
                     placeholder="Nhập mật khẩu..." required="" type="password" />
 
 
-                <p class="text-red-500" v-if="emailError">{{ emailError }}</p>
-                <p class="font-bold">Cập nhật ảnh đại diện</p>
-                <label for="file-upload"
-                    class="rounded-md px-8 py-2 border-2 border-transparent focus:outline-none focus:border-blue-500 placeholder-gray-400 transition-all duration-300 shadow-md">
-                    Chọn file...
-                </label>
-                <input id="file-upload" type="file" @change="handleFileChange" class="hidden mb-4" multiple />
 
-                <img :src="imagePreview" alt="Uploaded Image" v-if="imagePreview" class="mt-4 w-32 h-32" />
+
             </div>
         </a-modal>
     </div>

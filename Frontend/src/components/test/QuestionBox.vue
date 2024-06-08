@@ -18,7 +18,7 @@
                 class="p-2 cursor-pointer my-3 border rounded-lg  hover:bg-gray-100"
                 @click="selectAnswer(index, $event)">
                 <input v-if="question.answer.correct.length > 1" type="checkbox" :value="choice"
-                    v-model="userAnswers[question.id]" @click.stop>
+                    v-model="userAnswers[question.id][index]" @click.stop>
                 <input v-else type="radio" :value="choice" v-model="userAnswers[question.id]" @click.stop>
                 {{ choice }}
             </li>
@@ -36,6 +36,7 @@ export default {
     },
     setup(props, { emit }) {
         const userAnswers = ref({});
+        userAnswers.value[props.question.id] = [];
         const studentAnswers = ref([]);
         const selectAnswer = (index, event) => {
             const inputElement = event.target.querySelector('input');
@@ -54,6 +55,9 @@ export default {
                 }
             } else {
                 studentAnswers.value[props.questionIndex] = [index];
+            }
+            if (studentAnswers.value[props.questionIndex].length === 0) {
+                studentAnswers.value[props.questionIndex] = [];
             }
             emit('answer-selected', { questionId: props.questionIndex, answer: studentAnswers.value[props.questionIndex] });
         }

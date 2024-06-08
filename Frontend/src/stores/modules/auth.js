@@ -21,6 +21,8 @@ export const useAuthStore = defineStore("auth", {
           if (response && response.data.access_token) {
             this.token = response.data.access_token;
             localStorage.setItem("token", this.token);
+            localStorage.setItem("role", data.role);
+
             this.isLoggedIn = true;
             useToast().success("Đăng nhập thành công");
             router.push({ name: "teacher-schedule" });
@@ -35,6 +37,8 @@ export const useAuthStore = defineStore("auth", {
           if (response && response.data.access_token) {
             this.token = response.data.access_token;
             localStorage.setItem("token", this.token);
+            localStorage.setItem("role", data.role);
+            console.log(localStorage.getItem("role"));
             this.isLoggedIn = true;
             useToast().success("Đăng nhập thành công");
             router.push({ name: "student - schedule" });
@@ -50,6 +54,7 @@ export const useAuthStore = defineStore("auth", {
       this.isLoggedIn = false;
       this.token = null;
       localStorage.removeItem("token");
+      localStorage.removeItem("role");
       //router.push({ name: "login" });
     },
     async signUp(data) {

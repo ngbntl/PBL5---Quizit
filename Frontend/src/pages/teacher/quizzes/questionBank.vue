@@ -30,14 +30,14 @@
         <DownOutlined v-if="showTests" class="ml-4  transform transition-transform duration-200" @click="toggleTests" />
         <RightOutlined v-else class="ml-4  transform transition-transform duration-200" @click="toggleTests" />
         <h1 class="text-xl p-4 transition-colors duration-200" @click="toggleTests">Đề thi</h1>
-        <add-test v-show="showTests" class="ml-auto transition-opacity duration-200" />
+        <add-test v-show="showTests" class="ml-auto mr-12 transition-opacity duration-200" />
     </div>
 
     <div class="flex flex-wrap" v-show="showTests">
         <Test v-for="(item, index) in tests" :key="index" :test="item" />
     </div>
 
-    <router-view />
+
 </template>
 
 <script>
@@ -65,7 +65,7 @@ export default defineComponent({
         const banks = ref([]);
         const teacherStore = useTeacherStore();
         const route = useRoute();
-        const collectionName = teacherStore.collectionName;
+        const collectionName = ref('');
         const showQuestionBanks = ref(true);
         const tests = ref([]);
 
@@ -83,12 +83,14 @@ export default defineComponent({
 
         onMounted(async () => {
             const id = route.params.id;
+
+            collectionName.value = await teacherStore.collectionName;
             banks.value = await teacherStore.getQuestionBank(id);
             tests.value = await teacherStore.getTests(id);
 
         });
         const getName = (name) => {
-            teacherStore.questionsName = name;
+            teacherStore.questionName = name;
         };
         watch(() => teacherStore.questionBank, (newQuestionBank) => {
             banks.value = newQuestionBank;

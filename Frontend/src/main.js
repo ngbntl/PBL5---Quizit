@@ -25,6 +25,8 @@ import {
   Modal,
   Button,
   Input,
+  Table,
+  Spin,
 } from "ant-design-vue";
 
 const app = createApp(App);
@@ -37,6 +39,8 @@ app.use(Button);
 app.use(Input);
 app.use(Calendar);
 app.use(Menu);
+app.use(Table);
+app.use(Spin);
 app.use(Toast);
 
 app.use(createPinia());

@@ -45,7 +45,15 @@ export const useStudentStore = defineStore("student", {
         console.error(error);
       }
     },
-
+    async getHistory(group_id) {
+      try {
+        const response = await studentService.getHistory(group_id);
+        console.log(response.data);
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
     //profile
     async getInfor() {
       try {
@@ -62,6 +70,27 @@ export const useStudentStore = defineStore("student", {
       try {
         const response = await studentService.getTest(group_test_id);
         // console.log(response.data);
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async testSubmit(data) {
+      try {
+        const response = await studentService.testSubmit(data);
+        console.log(response.data);
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    //Schedule
+
+    async getSchedule() {
+      try {
+        const response = await studentService.getSchedule();
+        console.log(response.data);
         return response.data;
       } catch (error) {
         console.error(error);

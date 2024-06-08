@@ -36,6 +36,13 @@ export default {
       },
     });
   },
+  getHistory(group_id) {
+    return Api().get(`/student/grouptest/history?group_id=${group_id}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+  },
   //profile
   getInfor() {
     return Api().get("student/", {
@@ -49,6 +56,26 @@ export default {
   getTest(group_test_id) {
     return Api().get(
       `student/grouptest/studentwork?group_test_id=${group_test_id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+  },
+  testSubmit(data) {
+    return Api().post("student/grouptest/studentwork/submit", data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+  },
+
+  //Schedule
+
+  getSchedule() {
+    return Api().get(
+      "student/grouptest/calendar?start=2024-05-20T09:00:00&end=2024-06-25T09:00:00",
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,

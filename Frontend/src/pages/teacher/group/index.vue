@@ -2,9 +2,9 @@
     <div class="flex flex-wrap group hover:cursor-pointer hover:text-blue-500" @click="toggleGroup1">
         <DownOutlined v-if="showGroup1" class="ml-4 mt-6" />
         <RightOutlined v-else class="ml-4 mt-6" />
-        <h1 class="text-xl p-4">Nhóm</h1>
+        <h1 class="text-xl p-4 ">Nhóm</h1>
 
-        <add-group-vue class="absolute right-16 mt-4" />
+        <add-group-vue class="absolute right-16 mt-8" />
 
     </div>
 
@@ -15,7 +15,7 @@
     <div class="flex flex-wrap group hover:cursor-pointer hover:text-blue-500" @click="toggleGroup2">
         <DownOutlined v-if="showGroup2" class="ml-4 mt-6" />
         <RightOutlined v-else class="ml-4 mt-6" />
-        <h1 class="text-xl p-4">Nhóm đã ẩn</h1>
+        <h1 class="text-xl p-4 ">Nhóm đã ẩn</h1>
     </div>
     <div v-show="showGroup2" class="scroll-container">
         <Group :cards="groupHiddens" />
