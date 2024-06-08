@@ -151,6 +151,8 @@ class Req_GroupTest(BaseModel):
     duration: int = Field(None, ge=1, le=180)
     shuffle: bool = None
     tolerance: int = Field(None, ge=0, le=255)
+    n_page: int = Field(1, ge=1, le=255)
+    allow_move: bool = True
 
     def to_DB_model(self) -> GroupTest:
         group_test = GroupTest(self.model_dump(exclude={'passsword'}))

@@ -199,6 +199,8 @@ class GroupTest:
         self.shuffle: bool | None = data.get("shuffle")
         self.tolerance: int | None = data.get("tolerance")
         self.created_timestamp: datetime | None = data.get("created_timestamp")
+        self.n_page: int | None = data.get("n_page")
+        self.allow_move: bool | None = data.get("allow_move")
 
     def jsonify(self):
         return self.__dict__
@@ -248,10 +250,15 @@ class StudentTest:
         self.score: float | None = data.get("score")
         self.violate: int | None = data.get("violate")
 
-        self.group_test: GroupTest | None = GroupTest(data)
+        self.group_test: GroupTest | None = None
+        self.student: Student | None = None
 
         if isinstance(self.student_work, bytes):
             self.student_work = pickle.loads(self.student_work)
+
+    def set_student(self, student: Student):
+        self.student = student
+        return self
 
     def jsonify(self):
         return self.__dict__

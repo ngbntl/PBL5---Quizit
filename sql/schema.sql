@@ -172,6 +172,8 @@ create table [group_test]
     [shuffle]           bit      default 0,
     [hash_pswd]         varchar(255),
     [tolerance]         tinyint  default 3,
+    [n_page]            tinyint  default 1,
+    [allow_move]        bit      default 1,
     -- constraint
     constraint [pk_grtes] primary key ([id]),
     constraint [fk_grtes_grp] foreign key ([group_id]) references [group] (id),
@@ -180,7 +182,6 @@ create table [group_test]
     constraint [ck_grtes_dur] check ([duration] > 0),
     constraint [ck_grtes_dur2] check ((CAST([end] AS float) - CAST([start] AS float)) * 24 * 60 >= [duration]),
 )
-
 
 -- student_test
 create table [student_test]

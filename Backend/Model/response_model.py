@@ -89,6 +89,8 @@ class Res_GroupTest(BaseModel):
     shuffle: bool | None = None
     tolerance: int | None = None
     created_timestamp: datetime | None = None
+    n_page: int | None = None
+    allow_move: bool | None = None
 
     @classmethod
     def from_DB_model(cls, group_test: GroupTest):
@@ -179,16 +181,18 @@ class Res_StudentTest(BaseModel):
     student_work: list[Res_StudentWork_Question] | None = None
     score: float | None = None
     violate: int | None = None
-
-    group_test: Res_GroupTest | None = None
+    student: Res_Student | None = None
 
     @classmethod
     def from_DB_model(cls, student_test: StudentTest):
-        return cls(student_id=student_test.student_id, group_test_id=student_test.group_test_id,
-                   group_test=Res_GroupTest.from_DB_model(student_test.group_test), start=student_test.start, end=student_test.end,
-                   student_work=[Res_StudentWork_Question.from_DB_model(sw) for sw in
-                                 student_test.student_work] if student_test.student_work else None,
-                   score=student_test.score, violate=student_test.violate)
+        return cls(student_id=student_test.student_id
+                   , group_test_id=student_test.group_test_id
+                   , start=student_test.start
+                   , end=student_test.end
+                   , student_work=[Res_StudentWork_Question.from_DB_model(sw) for sw in student_test.student_work] if student_test.student_work else None
+                   , score=student_test.score
+                   , violate=student_test.violate
+                   , student=Res_Student.from_DB_model(student_test.student))
 
     class Config:
         json_encoders = {

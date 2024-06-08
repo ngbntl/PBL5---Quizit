@@ -45,8 +45,8 @@ class DAO_group_test:
             while True:
                 try:
                     cursor.execute(
-                        "INSERT INTO [group_test]([id], [group_id], [test_id], [name], [start], [end], [duration], [shuffle], [hash_pswd], [tolerance])  VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                        (id, data.group_id, data.test_id, data.name, data.start, data.end, data.duration, data.shuffle, data.hash_pswd, data.tolerance))
+                        "INSERT INTO [group_test]([id], [group_id], [test_id], [name], [start], [end], [duration], [shuffle], [hash_pswd], [tolerance], [n_page], [allow_move])  VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                        (id, data.group_id, data.test_id, data.name, data.start, data.end, data.duration, data.shuffle, data.hash_pswd, data.tolerance, data.n_page, data.allow_move))
                     return id
                 except pymssql.Error as e:
                     if failed_count == 0 and id not in str(e.args[1]):

@@ -15,8 +15,15 @@ class DAO_student_test:
     # SELECT:
     def get_student_tests(self, group_test_id: str) -> list[StudentTest]:
         with get_MS_database(True) as cursor:
-            cursor.execute("SELECT * FROM [student_test] WHERE [group_test_id]=%s", (group_test_id,))
-            return [StudentTest(row) for row in cursor.fetchall()]
+            SQL = """
+                SELECT s.[id], s.[name], s.[avatar_path], 
+                       st.[start], st.[end], st.[student_work], st.[score], st.[violate] 
+                FROM [student] s
+                LEFT JOIN [student_test] st ON s.[id] = st.[student_id]
+                WHERE s.[id] IN (SELECT [student_id] FROM [group_student] WHERE [group_id] = (SELECT [group_id] FROM [group_test] WHERE [id]=%s))
+            """
+            cursor.execute(SQL, (group_test_id,))
+            return [StudentTest(row).set_student(Student(row)) for row in cursor.fetchall()]
 
     def get_student_test(self, group_test_id: str, student_id: str) -> StudentTest:
         with get_MS_database(True) as cursor:

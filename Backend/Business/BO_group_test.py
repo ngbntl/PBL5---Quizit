@@ -111,7 +111,7 @@ class BO_group_test:
     def get_all_questions_in_test(self, test_id: str) -> list[Question]:
         return self.dao_test.get_all_questions_in_test(test_id)
 
-    def get_studentworks(self, group_test_id: str) -> list[StudentTest]:
+    def get_student_tests(self, group_test_id: str) -> list[StudentTest]:
         return self.dao_student_test.get_student_tests(group_test_id)
 
     def get_studentwork(self, group_test_id: str, student_id: str) -> StudentTest:

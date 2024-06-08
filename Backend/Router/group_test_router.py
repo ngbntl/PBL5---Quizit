@@ -41,31 +41,30 @@ async def get_group_test(_: Annotated[Teacher | Student, Depends(get_current_use
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@teacher_group_test_router.get('/studentwork', status_code=status.HTTP_200_OK)
+@teacher_group_test_router.get('/student_test', status_code=status.HTTP_200_OK)
 async def get_studentworks(teacher: Annotated[Teacher, Depends(get_current_user)],
                            group_test_service: Annotated[BO_group_test, Depends()],
-                           group_test_id: Annotated[str, Query(min_length=8, max_length=8)],
-                           student_id: Annotated[str, Query(min_length=8, max_length=8)] = None):
+                           group_test_id: QUERY_LEN_8):
     try:
-        if student_id is not None:
-            return Res_StudentTest.from_DB_model(group_test_service.get_studentwork(group_test_id, student_id))
+        # if student_id is not None:
+        #     return Res_StudentTest.from_DB_model(group_test_service.get_studentwork(group_test_id, student_id))
 
         return [Res_StudentTest.from_DB_model(student_test) for student_test in
-                group_test_service.get_studentworks(group_test_id)]
+                group_test_service.get_student_tests(group_test_id)]
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@teacher_group_test_router.get('/studentpoint', status_code=status.HTTP_200_OK)
-async def get_studentpoint(teacher: Annotated[Teacher, Depends(get_current_user)],
-                           group_test_service: Annotated[BO_group_test, Depends()],
-                           group_test_id: Annotated[str, Query(min_length=8, max_length=8)]):
-    try:
-        return [Res_StudentScore(student_id=sp[0].id, name=sp[0].name, avatar_path=sp[0].avatar_path, point=sp[1]) for
-                sp in
-                group_test_service.get_students_scores(group_test_id)]
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+# @teacher_group_test_router.get('/studentpoint', status_code=status.HTTP_200_OK)
+# async def get_studentpoint(teacher: Annotated[Teacher, Depends(get_current_user)],
+#                            group_test_service: Annotated[BO_group_test, Depends()],
+#                            group_test_id: Annotated[str, Query(min_length=8, max_length=8)]):
+#     try:
+#         return [Res_StudentScore(student_id=sp[0].id, name=sp[0].name, avatar_path=sp[0].avatar_path, point=sp[1]) for
+#                 sp in
+#                 group_test_service.get_students_scores(group_test_id)]
+#     except Exception as e:
+#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
 # UPDATE
