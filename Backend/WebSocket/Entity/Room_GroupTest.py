@@ -79,7 +79,7 @@ class Room_GroupTest:  # Room of group test. Contain all student and teacher in 
         stw = list()
         for ts in self.test.structure:
             for noq in ts.number_of_question:
-                num_question = max(noq.number_of_question, len(self.questions[noq.difficulty]))
+                num_question = min(noq.number_of_question, len(self.questions[noq.difficulty]))
                 if self.group_test.shuffle:
                     for q in random.sample(self.questions[noq.difficulty], num_question):
                         stw.append(StudentWork_Question(content=q.content, answer=q.answer, attachment=q.attachment, student_answer=[]))

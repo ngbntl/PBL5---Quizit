@@ -48,7 +48,13 @@ class BO_test:
         if self.dao_collection.check_owner(data.collection_id, teacher_id) is False:
             raise ValueError(f"The teacher {teacher_id} is not the owner of the collection {data.collection_id}!")
 
-        test = data.to_DB_model()
-        test_id = self.dao_test.insert_test(test)
+        test_id = self.dao_test.insert_test(data.to_DB_model())
 
         return test_id
+
+    # UPDATE
+    def update_test(self, teacher_id, data: Req_Test):
+        if self.dao_test.check_owner(data.id, teacher_id) is False:
+            raise ValueError(f"The teacher {teacher_id} is not the owner of the test {data.id}!")
+
+        self.dao_test.update_test(data.to_DB_model())

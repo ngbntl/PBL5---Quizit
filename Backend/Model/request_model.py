@@ -106,8 +106,7 @@ class Req_TestStructure(BaseModel):
     number_of_question: list[Req_NumberOfQuestion]
 
     def to_DB_model(self) -> TestStructure:
-        return TestStructure(self.model_dump(exclude={'number_of_question'}),
-                             number_of_question=[noq.to_DB_model() for noq in self.number_of_question])
+        return TestStructure(self.model_dump(exclude={'number_of_question'}), number_of_question=[noq.to_DB_model() for noq in self.number_of_question])
 
 
 class Req_Test(BaseModel):
@@ -117,8 +116,7 @@ class Req_Test(BaseModel):
     structure: list[Req_TestStructure]
 
     def to_DB_model(self) -> Test:
-        return Test(self.model_dump(exclude={'structure'}),
-                    structure=[structure.to_DB_model() for structure in self.structure])
+        return Test(self.model_dump(exclude={'structure'}), structure=[structure.to_DB_model() for structure in self.structure])
 
 
 class Req_Answer(BaseModel):

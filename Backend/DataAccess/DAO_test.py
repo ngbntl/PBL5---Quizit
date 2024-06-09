@@ -14,7 +14,7 @@ class DAO_test:
             return [Test(t) for t in cursor.fetchall()]
 
     def check_owner(self, test_id: str, teacher_id: str) -> bool:
-        SQL = "SELECT * FROM [test] JOIN [collection] ON [test].[collection_id]=[collection].[id] WHERE [test].[id]=%s AND [collection].[teacher_id]=%s"
+        SQL = "SELECT [test].[id] FROM [test] JOIN [collection] ON [test].[collection_id]=[collection].[id] WHERE [test].[id]=%s AND [collection].[teacher_id]=%s"
         with get_MS_database(False) as cursor:
             cursor.execute(SQL, (test_id, teacher_id))
             return cursor.fetchone() is not None
@@ -48,8 +48,7 @@ class DAO_test:
             while True:
                 id = generate_id(8)
                 try:
-                    cursor.execute("INSERT INTO [test] ([id], [collection_id], [name]) VALUES (%s, %s, %s)",
-                                   (id, data.collection_id, data.name))
+                    cursor.execute("INSERT INTO [test] ([id], [collection_id], [name]) VALUES (%s, %s, %s)", (id, data.collection_id, data.name))
                     cursor.executemany(
                         "INSERT INTO [test_structure] ([test_id], [question_bank_id], [number_of_question]) VALUES (%s, %s, %s)",
                         [(id, ts.question_bank_id, pickle.dumps(ts.number_of_question)) for ts in data.structure])
@@ -62,6 +61,20 @@ class DAO_test:
                         raise e
 
     # UPDATE
-    def update_test_name(self, data: Test) -> None:
+    def update_test(self, test: Test):
         with get_MS_database(False) as cursor:
-            cursor.execute("UPDATE [test] SET [name]=%s WHERE [id]=%s", (data.name, data.id))
+            sql = "UPDATE [test] SET "
+            placeholders = []
+            values = []
+            if test.name is not None:
+                placeholders.append("[name]=%s")
+                values.append(test.name)
+            if len(placeholders) != 0:
+                sql += ",".join(placeholders) + " WHERE [id]=%s"
+                values.append(test.id)
+                cursor.execute(sql, tuple(values))
+            if test.structure is not None:
+                cursor.execute("DELETE FROM [test_structure] WHERE [test_id]=%s", test.id)
+                cursor.executemany(
+                    "INSERT INTO [test_structure] ([test_id], [question_bank_id], [number_of_question]) VALUES (%s, %s, %s)",
+                    [(test.id, ts.question_bank_id, pickle.dumps(ts.number_of_question)) for ts in test.structure])

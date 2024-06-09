@@ -158,6 +158,22 @@ class NumberOfQuestion:
         return self.__dict__
 
 
+class TestStructure:
+    def __init__(self, json: dict = None, **kwargs):
+        data = {**json, **kwargs} if json else kwargs
+        self.test_id: str | None = data.get("test_id")
+        self.question_bank_id: str | None = data.get("question_bank_id")
+        self.number_of_question: list[NumberOfQuestion] | bytes = data.get("number_of_question")
+
+        if isinstance(self.number_of_question, bytes):
+            self.number_of_question = pickle.loads(self.number_of_question)
+
+    def jsonify(self):
+        return self.__dict__
+
+    def jsonify_number_of_question(self):
+        return [noq.jsonify() for noq in self.number_of_question] if isinstance(self.number_of_question, list) else []
+
 class Test:
     def __init__(self, json: dict = None, **kwargs):
         data = {**json, **kwargs} if json else kwargs
@@ -166,20 +182,6 @@ class Test:
         self.name: str | None = data.get("name")
         self.created_timestamp: datetime | None = data.get("created_timestamp")
         self.structure: list[TestStructure] | None = data.get("structure")
-
-    def jsonify(self):
-        return self.__dict__
-
-
-class TestStructure:
-    def __init__(self, json: dict = None, **kwargs):
-        data = {**json, **kwargs} if json else kwargs
-        self.test_id: str | None = data.get("test_id")
-        self.question_bank_id: str | None = data.get("question_bank_id")
-        self.number_of_question: list[NumberOfQuestion] | bytes | None = data.get("number_of_question")
-
-        if isinstance(self.number_of_question, bytes):
-            self.number_of_question = pickle.loads(self.number_of_question)
 
     def jsonify(self):
         return self.__dict__

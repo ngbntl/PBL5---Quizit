@@ -153,10 +153,11 @@ class Res_Test(BaseModel):
 
     @classmethod
     def from_DB_model(cls, test: Test):
-        return cls(id=test.id, collection_id=test.collection_id, name=test.name,
+        return cls(id=test.id,
+                   collection_id=test.collection_id,
+                   name=test.name,
                    created_timestamp=test.created_timestamp,
-                   structure=[Res_TestStructure.from_DB_model(structure) for structure in
-                              test.structure]) if test else None
+                   structure=[Res_TestStructure.from_DB_model(structure) for structure in test.structure] if test.structure else None) if test else None
 
 
 class Res_StudentWork_Question(BaseModel):
