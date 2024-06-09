@@ -55,8 +55,8 @@ class DAO_student_test:
     def submit(self, data: StudentTest):
         with get_MS_database(False) as cursor:
             cursor.execute(
-                "UPDATE [student_test] SET [student_work]=%s, [end]=%s, [score]=%s WHERE [student_id]=%s AND [group_test_id]=%s",
-                (pickle.dumps(data.student_work), data.end, data.score, data.student_id, data.group_test_id))
+                "UPDATE [student_test] SET [student_work]=%s, [end]=%s, [score]=%s, [violate]=%s WHERE [student_id]=%s AND [group_test_id]=%s",
+                (pickle.dumps(data.student_work), data.end, data.score, data.violate, data.student_id, data.group_test_id))
 
     def update_student_work(self, data: StudentTest):
         with get_MS_database(False) as cursor:
