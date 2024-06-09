@@ -282,22 +282,16 @@ class StudentTest:
         return self.__dict__
 
     def serialize(self):
-        ser = dict()
-        if self.student_id is not None:
-            ser["student_id"] = self.student_id
-        if self.group_test_id is not None:
-            ser["group_test_id"] = self.group_test_id
-        if self.start is not None:
-            ser["start"] = self.start.isoformat()
-        if self.end is not None:
-            ser["end"] = self.end.isoformat()
-        if self.student_work is not None:
-            ser["student_work"] = [sw.serialize() for sw in self.student_work]
-        if self.score is not None:
-            ser["score"] = self.score
-        if self.violate is not None:
-            ser["violate"] = self.violate
-        return ser
+        ser = {
+            "student_id": self.student_id,
+            "group_test_id": self.group_test_id,
+            "start": self.start.isoformat() if self.start else None,
+            "end": self.end.isoformat() if self.end else None,
+            "student_work": [sw.serialize() for sw in self.student_work] if self.student_work else None,
+            "score": self.score,
+            "violate": self.violate
+        }
+        return {k: v for k, v in ser.items() if v is not None}
 
     def is_submitted(self):
         return self.end is not None

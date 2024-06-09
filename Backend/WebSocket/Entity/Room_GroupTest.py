@@ -1,5 +1,6 @@
 import random
 from collections import defaultdict
+from datetime import datetime
 
 from Backend.Business import bcrypt_context
 from Backend.Model.DB_model import StudentTest, GroupTest, Test, Question, StudentWork_Question
@@ -13,6 +14,7 @@ class Room_GroupTest:  # Room of group test. Contain all student and teacher in 
         self.group_test_id = group_test_id
         self.teacher: GroupTest_Teacher = None
         self.students: dict[str, GroupTest_Student] = dict()
+        self.submit_count = 0
         self._group_test: GroupTest = None
         self._test: Test = None
         self._questions: defaultdict[int, list[Question]] = None
@@ -55,7 +57,6 @@ class Room_GroupTest:  # Room of group test. Contain all student and teacher in 
 
     def add_grouptest_student(self, grouptest_student: GroupTest_Student):
         self.students[grouptest_student.get_student().id] = grouptest_student
-        grouptest_student.set_room(self)
 
     def get_grouptest_student(self, student_id: str) -> GroupTest_Student:
         return self.students[student_id]
@@ -66,7 +67,11 @@ class Room_GroupTest:  # Room of group test. Contain all student and teacher in 
             student_test = grouptest_student.get_student_test()
             if student_test is None:
                 student_test = self.bo_room_grouptest.get_student_test(self.group_test_id, student_id)  # get student test from db
-                grouptest_student.set_student_test(student_test)
+                if student_test is not None:
+                    grouptest_student.set_student_test(student_test)
+                    grouptest_student.get_test_timestamp = datetime.now()
+                    grouptest_student.time_remaining = self.group_test.duration * 60  # convert minute to second. because just get from db so time remaining is full
+
             return student_test
         return None
 
@@ -92,7 +97,10 @@ class Room_GroupTest:  # Room of group test. Contain all student and teacher in 
         # generate student work
         student_test = StudentTest(student_id=student_id, group_test_id=self.group_test_id, student_work=self.generate_student_work_question(), score=0, violate=0)
         self.bo_room_grouptest.insert_student_test(student_test)
-        self.students[student_id].set_student_test(student_test)
+        grouptest_student = self.students[student_id]
+        grouptest_student.set_student_test(student_test)
+        grouptest_student.get_test_timestamp = datetime.now()
+        grouptest_student.time_remaining = self.group_test.duration * 60
         return student_test
 
     def is_active(self):
@@ -122,18 +130,20 @@ class Room_GroupTest:  # Room of group test. Contain all student and teacher in 
     def get_grouptest_teacher(self):
         return self.teacher
 
+    def get_max_violate(self):
+        return self.group_test.tolerance
+
     def get_student_information(self, student_id: str):
         if self.students[student_id]:
             return self.students[student_id].serialize(include={'student', 'state', 'violate', 'score'})
         return None
 
     def submit(self, student_id: str):
-        # self.students[student_id].set_student_test(self.bo_room_grouptest.submit(self.group_test_id, student_id, student_answer))
         self.bo_room_grouptest.submit(self.students[student_id].get_student_test())
+        self.submit_count += 1
 
     def increase_violate(self, student_id: str):
         self.students[student_id].increase_violate()
-        # self.bo_room_grouptest.update_violate(self.group_test_id, student_id, self.students[student_id].get_violate())
 
     async def notify_student_information(self, student_id: str):
         if self.teacher is not None:
@@ -141,3 +151,14 @@ class Room_GroupTest:  # Room of group test. Contain all student and teacher in 
 
     def set_state(self, student_id, state):
         self.students[student_id].set_state(state)
+
+    def able_to_be_destroyed(self):
+        if self.submit_count == len(self.students) and self.teacher is None:  # all student submitted and teacher left
+            return True
+        return False
+
+    def teacher_leave(self):
+        self.teacher = None
+
+    def student_leave(self, student_id: str):
+        self.students[student_id].update_time_remaining()

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import WebSocket
 from starlette import status
 from starlette.websockets import WebSocketDisconnect
@@ -61,7 +63,7 @@ class BO_Student_Message:
                             await self.websocket.send_json(self.response.set_status(status.HTTP_403_FORBIDDEN).set_message('Group test password is wrong').serialize())
                             continue
 
-                        if self.room_manager.is_room_exist(group_test_id) is False:  # room not exist in room manager
+                        if self.room_manager.get_room(group_test_id) is None:  # room not exist in room manager
                             if self.room.is_exist() is False:  # check if group test is exist
                                 await self.websocket.send_json(self.response.set_status(status.HTTP_404_NOT_FOUND).set_message('Group test not found').serialize())
                                 continue
@@ -74,6 +76,7 @@ class BO_Student_Message:
                                 await self.websocket.send_json(self.response.set_status(status.HTTP_403_FORBIDDEN).set_message('You are not in this group').serialize())
                                 continue
 
+                            print(f'Room {group_test_id} created by first student {self.student.id}')
                             self.room_manager.add_room(group_test_id, self.room)  # add room to manager
 
                         else:  # room exist in room manager
@@ -89,6 +92,7 @@ class BO_Student_Message:
                                 continue
 
                         self.room.add_grouptest_student(self.grouptest_student)  # add student to room
+                        self.grouptest_student.set_room(self.room)  # set room to student
 
                         await self.websocket.send_json(self.response.set_status(status.HTTP_200_OK).set_message('Joined successfully').serialize())
                         continue
@@ -108,7 +112,7 @@ class BO_Student_Message:
                             await self.websocket.send_json(self.response.set_status(status.HTTP_400_BAD_REQUEST).set_message('You have submitted').serialize())
                             break
 
-                        await self.websocket.send_json(self.response.set_status(status.HTTP_200_OK).set_message(self.student_test.serialize()).serialize())
+                        await self.websocket.send_json(self.response.set_status(status.HTTP_200_OK).set_message(self.grouptest_student.serialize(include={'violate', 'score', 'student_test', 'time_remaining'})).serialize())
                         self.room.set_state(self.student.id, GroupTest_Student.STATE_WORKING)
                         await self.room.notify_student_information(self.student.id)
                         continue
@@ -128,9 +132,13 @@ class BO_Student_Message:
                     # COMMAND: VIOLATE
                     if msg.command == ClientMessage.VIOLATE:
                         self.room.increase_violate(self.student.id)
-                        await self.websocket.send_json(self.response.set_status(status.HTTP_200_OK).set_message({'violate': self.grouptest_student.get_violate()}).serialize())
-                        await self.room.notify_student_information(self.student.id)
-                        continue
+                        if 0 < self.room.get_max_violate() <= self.student_test.violate:
+                            # await self.websocket.send_json(self.response.set_status(status.HTTP_200_OK).set_message('You have violated the limit more times than allowed. The system will automatically submit.').serialize())
+                            msg.command = ClientMessage.SUBMIT_TEST
+                        else:
+                            await self.websocket.send_json(self.response.set_status(status.HTTP_200_OK).set_message({'violate': self.grouptest_student.get_violate()}).serialize())
+                            await self.room.notify_student_information(self.student.id)
+                            continue
 
                     # COMMAND: SUBMIT TEST
                     if msg.command == ClientMessage.SUBMIT_TEST:
@@ -139,19 +147,18 @@ class BO_Student_Message:
                             await self.websocket.send_json(self.response.set_status(status.HTTP_200_OK).set_message({'score': self.grouptest_student.get_score()}).serialize())
                             self.room.set_state(self.student.id, GroupTest_Student.STATE_SUBMIT)
                             await self.room.notify_student_information(self.student.id)
-                            break
                         except Exception as e:
-                            await self.websocket.send_json(self.response.set_status(status.HTTP_400_BAD_REQUEST).set_message(str(e)).serialize())
-                            break
+                            pass
+                        await self.websocket.close()
+                        raise WebSocketDisconnect()
 
                 except WebSocketDisconnect:
-                    # self.room.set_state(self.student.id, GroupTest_Student.STATE_DISCONNECTED)
-                    # await self.room.notify_student_information(self.student.id)
-                    break
+                    if self.grouptest_student.get_room() is not None:
+                        self.grouptest_student.get_room().student_leave(self.student.id)
+                    self.room_manager.remove_room(self.grouptest_student.get_room())
+                    raise
                 except Exception as e:
                     continue
-
-            raise WebSocketDisconnect()
 
         except WebSocketDisconnect:
             pass

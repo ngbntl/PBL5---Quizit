@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi import WebSocket
 from Backend.Model.DB_model import StudentTest, Student
 
@@ -12,9 +13,11 @@ class GroupTest_Student:
     def __init__(self, websocket: WebSocket):
         self.websocket = websocket
         self.student: Student = None
+        self.student_test: StudentTest = None
         self.room = None
         self.state = self.STATE_READY
-        self.student_test: StudentTest = None
+        self.get_test_timestamp = None
+        self.time_remaining = 0
 
     def set_room(self, room):  # room: Room_GroupTest
         self.room = room
@@ -54,25 +57,16 @@ class GroupTest_Student:
         return self
 
     def serialize(self, include: set):
-        ser = dict()
-        if 'student' in include:
-            ser['student'] = self.student.serialize({'id', 'name', 'avatar_path'})
-        if 'violate' in include:
-            ser['violate'] = self.get_violate()
-        if 'state' in include:
-            ser['state'] = self.state
-        if 'score' in include:
-            if self.student_test is not None:
-                ser['score'] = self.student_test.score
-            else:
-                ser['score'] = 0
-        if 'student_test' in include:
-            if self.student_test is not None:
-                ser['student_test'] = self.student_test.serialize()
-            else:
-                ser['student_test'] = None
+        ser = {
+            'student': self.student.serialize({'id', 'name', 'avatar_path'}) if 'student' in include else None,
+            'violate': self.get_violate() if 'violate' in include else None,
+            'state': self.state if 'state' in include else None,
+            'score': self.student_test.score if 'score' in include and self.student_test is not None else 0,
+            'student_test': self.student_test.serialize() if 'student_test' in include and self.student_test is not None else None,
+            'time_remaining': self.time_remaining if 'time_remaining' in include else None
+        }
 
-        return ser
+        return {k: v for k, v in ser.items() if v is not None}
 
     def get_score(self):
         return self.student_test.score
@@ -80,3 +74,5 @@ class GroupTest_Student:
     # def submit(self, student_answer: list[list[int]]):
     #     student_test = self.room.submit(self.student.id, student_answer)
     #     self.set_student_test(student_test)
+    def update_time_remaining(self):
+        self.time_remaining -= (datetime.now() - self.get_test_timestamp).total_seconds()
