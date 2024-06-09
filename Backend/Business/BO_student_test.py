@@ -58,23 +58,22 @@ class BO_student_test:
     def update_violate(self, group_test_id, student_id, violate):
         self.dao_student_test.update_violate(group_test_id, student_id, violate)
 
-    def submit(self, group_test_id: str, student_id: str, student_answer: list[list[int]]) -> StudentTest:
-        student_test = self.dao_student_test.get_student_test(group_test_id, student_id)
-
-        if student_test is None:
-            raise Exception("Student test does not exist")
-        if student_test.end is not None:
-            raise Exception("Student test has already been submitted")
-
-        assert len(student_test.student_work) == len(student_answer)
-
-        for index, answer in enumerate(student_answer):  # assign student answer to student work
-            student_test.student_work[index].student_answer = answer
+    def submit(self, student_test: StudentTest):
+        # student_test = self.dao_student_test.get_student_test(group_test_id, student_id)
+        #
+        # if student_test is None:
+        #     raise Exception("Student test does not exist")
+        # if student_test.end is not None:
+        #     raise Exception("Student test has already been submitted")
+        #
+        # assert len(student_test.student_work) == len(student_answer)
+        #
+        # for index, answer in enumerate(student_answer):  # assign student answer to student work
+        #     student_test.student_work[index].student_answer = answer
 
         student_test.end = datetime.now()
         student_test.score = self.calculate_point(student_test.student_work)
         self.dao_student_test.submit(student_test)
-        return student_test
 
     def calculate_point(self, student_work: list[StudentWork_Question]) -> float:
         total_score = .0

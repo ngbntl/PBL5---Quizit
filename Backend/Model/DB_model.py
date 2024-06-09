@@ -211,6 +211,24 @@ class GroupTest:
     def is_end(self) -> bool:
         return datetime.now() > self.end
 
+    def serialize(self, include: dict):
+        attributes = {
+            'id': self.id,
+            'group_id': self.group_id,
+            'test_id': self.test_id,
+            'name': self.name,
+            'hash_pswd': self.hash_pswd,
+            'start': self.start.isoformat() if self.start else None,
+            'end': self.end.isoformat() if self.end else None,
+            'duration': self.duration,
+            'shuffle': self.shuffle,
+            'tolerance': self.tolerance,
+            'created_timestamp': self.created_timestamp.isoformat() if self.created_timestamp else None,
+            'n_page': self.n_page,
+            'allow_move': self.allow_move
+        }
+        return {key: value for key, value in attributes.items() if key in include and value is not None}
+
 
 class StudentWork_Question:
     def __init__(self, json: dict = None, **kwargs):

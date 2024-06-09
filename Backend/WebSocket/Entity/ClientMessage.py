@@ -5,6 +5,7 @@ class ClientMessage:
     GET_TEST = 'GET TEST'
     SUBMIT_TEST = 'SUBMIT TEST'
     VIOLATE = 'VIOLATE'
+    ANSWER = 'ANSWER'
 
     def __init__(self):
         self.command = None

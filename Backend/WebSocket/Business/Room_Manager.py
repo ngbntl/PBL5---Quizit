@@ -3,7 +3,7 @@ from Backend.WebSocket.Entity.Room_GroupTest import Room_GroupTest
 
 
 @singleton
-class BO_Room_Manager:
+class Room_Manager:
     def __init__(self):
         self.room_group_test: dict[Room_GroupTest] = dict()
 

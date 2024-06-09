@@ -25,7 +25,7 @@ class Room_GroupTest:  # Room of group test. Contain all student and teacher in 
         return self._bo_room_grouptest
 
     @property
-    def group_test(self):
+    def group_test(self) -> GroupTest:
         if self._group_test is None:
             self._group_test = self.bo_room_grouptest.get_group_test_by_id(self.group_test_id)
         return self._group_test
@@ -65,19 +65,23 @@ class Room_GroupTest:  # Room of group test. Contain all student and teacher in 
             grouptest_student = self.students[student_id]
             student_test = grouptest_student.get_student_test()
             if student_test is None:
-                student_test = self.bo_room_grouptest.get_student_test(self.group_test_id, student_id)
+                student_test = self.bo_room_grouptest.get_student_test(self.group_test_id, student_id)  # get student test from db
                 grouptest_student.set_student_test(student_test)
             return student_test
         return None
 
     def generate_student_work_question(self) -> list[StudentWork_Question]:
-        ans = list()
+        stw = list()
         for ts in self.test.structure:
             for noq in ts.number_of_question:
                 num_question = max(noq.number_of_question, len(self.questions[noq.difficulty]))
-                for q in random.sample(self.questions[noq.difficulty], num_question):
-                    ans.append(StudentWork_Question(content=q.content, answer=q.answer, attachment=q.attachment, student_answer=[]))
-        return ans
+                if self.group_test.shuffle:
+                    for q in random.sample(self.questions[noq.difficulty], num_question):
+                        stw.append(StudentWork_Question(content=q.content, answer=q.answer, attachment=q.attachment, student_answer=[]))
+                else:
+                    for q in self.questions[noq.difficulty][:num_question]:
+                        stw.append(StudentWork_Question(content=q.content, answer=q.answer, attachment=q.attachment, student_answer=[]))
+        return stw
 
     def generate_student_test(self, student_id: str) -> StudentTest:
         student_test = self.bo_room_grouptest.get_student_test(self.group_test_id, student_id)  # get student test from db
@@ -86,7 +90,7 @@ class Room_GroupTest:  # Room of group test. Contain all student and teacher in 
             return student_test
         # student test not exist
         # generate student work
-        student_test = StudentTest(student_id=student_id, group_test_id=self.group_test_id, student_work=self.generate_student_work_question())
+        student_test = StudentTest(student_id=student_id, group_test_id=self.group_test_id, student_work=self.generate_student_work_question(), score=0, violate=0)
         self.bo_room_grouptest.insert_student_test(student_test)
         self.students[student_id].set_student_test(student_test)
         return student_test
@@ -118,21 +122,22 @@ class Room_GroupTest:  # Room of group test. Contain all student and teacher in 
     def get_grouptest_teacher(self):
         return self.teacher
 
-    def get_student_state(self, student_id: str):
+    def get_student_information(self, student_id: str):
         if self.students[student_id]:
             return self.students[student_id].serialize(include={'student', 'state', 'violate', 'score'})
         return None
 
-    def submit(self, student_id: str, student_answer: list[list[int]]):
-        self.students[student_id].set_student_test(self.bo_room_grouptest.submit(self.group_test_id, student_id, student_answer))
+    def submit(self, student_id: str):
+        # self.students[student_id].set_student_test(self.bo_room_grouptest.submit(self.group_test_id, student_id, student_answer))
+        self.bo_room_grouptest.submit(self.students[student_id].get_student_test())
 
     def increase_violate(self, student_id: str):
         self.students[student_id].increase_violate()
-        self.bo_room_grouptest.update_violate(self.group_test_id, student_id, self.students[student_id].get_violate())
+        # self.bo_room_grouptest.update_violate(self.group_test_id, student_id, self.students[student_id].get_violate())
 
-    async def send_student_state_to_teacher(self, student_id: str):
+    async def notify_student_information(self, student_id: str):
         if self.teacher is not None:
-            await self.teacher.websocket.send_json(self.get_student_state(student_id))
+            await self.teacher.websocket.send_json(self.get_student_information(student_id))
 
     def set_state(self, student_id, state):
         self.students[student_id].set_state(state)

@@ -49,14 +49,14 @@ class GroupTest_Student:
     def get_student_test(self):
         return self.student_test
 
-    def set_student_test(self, student_test):
+    def set_student_test(self, student_test: StudentTest):
         self.student_test = student_test
         return self
 
     def serialize(self, include: set):
         ser = dict()
         if 'student' in include:
-            ser['student'] = self.student.serialize({'id', 'name', 'email', 'avatar_path'})
+            ser['student'] = self.student.serialize({'id', 'name', 'avatar_path'})
         if 'violate' in include:
             ser['violate'] = self.get_violate()
         if 'state' in include:
@@ -66,6 +66,11 @@ class GroupTest_Student:
                 ser['score'] = self.student_test.score
             else:
                 ser['score'] = 0
+        if 'student_test' in include:
+            if self.student_test is not None:
+                ser['student_test'] = self.student_test.serialize()
+            else:
+                ser['student_test'] = None
 
         return ser
 

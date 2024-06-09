@@ -5,8 +5,7 @@ from starlette.websockets import WebSocketDisconnect
 from Backend.Business.BO_authenticate import get_current_user
 from Backend.Business.BO_teacher import BO_teacher
 from Backend.Model.DB_model import Teacher
-from Backend.WebSocket import BO_Room_Manager
-from Backend.WebSocket.Business.BO_Room_GroupTest import BO_Room_GroupTest
+from Backend.WebSocket.Business.Room_Manager import Room_Manager
 from Backend.WebSocket.Entity.ClientMessage import ClientMessage
 from Backend.WebSocket.Entity.GroupTest_Teacher import GroupTest_Teacher
 from Backend.WebSocket.Entity.ResponseMessage import ResponseMessage
@@ -18,8 +17,7 @@ class BO_Teacher_Message:
         self.websocket = websocket
         self.teacher = None
         self.room = None
-        self.bo_room_grouptest = None
-        self.bo_room_manager = None
+        self.room_manager = None
         self.message = None
         self.response = None
         self.grouptest_teacher = None
@@ -27,8 +25,7 @@ class BO_Teacher_Message:
     async def handle(self):
         try:
             await self.websocket.accept()
-            self.bo_room_grouptest = BO_Room_GroupTest()
-            self.bo_room_manager = BO_Room_Manager()
+            self.room_manager = Room_Manager()
             self.message = ClientMessage()
             self.response = ResponseMessage()
             self.grouptest_teacher = GroupTest_Teacher(self.websocket)
@@ -58,7 +55,7 @@ class BO_Teacher_Message:
 
                         self.room = Room_GroupTest(group_test_id)  # create the room
 
-                        if self.bo_room_manager.is_room_exist(group_test_id) is False:  # room not exist in room manager
+                        if self.room_manager.is_room_exist(group_test_id) is False:  # room not exist in room manager
                             if self.room.is_exist() is False:  # check if group test is exist
                                 await self.websocket.send_json(self.response.set_status(status.HTTP_404_NOT_FOUND).set_message('Group test not found').serialize())
                                 continue
@@ -71,10 +68,10 @@ class BO_Teacher_Message:
                                 await self.websocket.send_json(self.response.set_status(status.HTTP_403_FORBIDDEN).set_message(f'You not own this group').serialize())
                                 continue
 
-                            self.bo_room_manager.add_room(group_test_id, self.room)  # add room to manager
+                            self.room_manager.add_room(group_test_id, self.room)  # add room to manager
 
                         else:  # room exist in room manager
-                            self.room = self.bo_room_manager.get_room(group_test_id)  # get room from manager
+                            self.room = self.room_manager.get_room(group_test_id)  # get room from manager
 
                             # check if teacher has already joined this room
                             if self.room.check_teacher_join():
@@ -89,7 +86,7 @@ class BO_Teacher_Message:
                         self.grouptest_teacher.set_room(self.room)  # set room to teacher
 
                         await self.websocket.send_json(self.response.set_status(status.HTTP_200_OK).set_message('Joined successfully').serialize())
-                        await self.room.send_student_state_to_teacher()
+                        await self.room.notify_student_information()
                         continue
 
                     if self.grouptest_teacher.get_room() is None:  # check if teacher has joined any group
