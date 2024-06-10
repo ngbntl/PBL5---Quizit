@@ -21,6 +21,10 @@ export default {
         answers: {
             type: Object,
             required: true
+        },
+        studentAnswer: {
+            type: Object,
+            required: true
         }
     },
     computed: {

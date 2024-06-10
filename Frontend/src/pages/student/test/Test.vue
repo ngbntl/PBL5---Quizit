@@ -101,7 +101,8 @@ export default {
 
 
 
-        const WS = ref(new WebSocket(`ws://localhost:4444/student`));
+        const WS = ref(new WebSocket(`${import.meta.env.WS}/student`));
+
 
         WS.value.onopen = (event) => {
             console.log("Connection opened", event);
@@ -216,7 +217,7 @@ export default {
             if (tabSwitchLim > 0) {
                 if (document.hidden) {
                     tabSwitchCount.value++;
-                    if (tabSwitchCount.value > tabSwitchLim) {
+                    if (tabSwitchCount.value >= tabSwitchLim) {
                         submitTest();
                     } else {
                         Modal.warning({

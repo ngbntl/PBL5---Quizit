@@ -55,6 +55,11 @@ const teacher = [
         name: "teacher-profile",
         component: () => import("../pages/teacher/profile/index.vue"),
       },
+      {
+        path: "testhistory",
+        name: "testHistory",
+        component: () => import("../pages/teacher/group/TestHistory.vue"),
+      },
     ],
   },
 ];

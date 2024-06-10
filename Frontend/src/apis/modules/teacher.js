@@ -204,6 +204,17 @@ export default {
     );
   },
 
+  getSumary(question_bank_id) {
+    return Api().get(
+      `teacher/collection/question_bank/question/summary?question_bank_id=${question_bank_id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+  },
+
   //profile
   getInfor() {
     return Api().get(`teacher/`, {

@@ -7,7 +7,7 @@
             </svg>
         </button>
         <h1 class="text-3xl flex justify-center items-center mt-10 font-semibold">
-            Trạng thái làm bài
+            Kết quả thi
         </h1>
         <div class="p-20 items-center justify-center w-full h-screen">
             <table class="min-w-full divide-y divide-gray-200">
@@ -31,7 +31,8 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-for="(item, index) in data" :key="item.student.id" @click="getTest(item)">
+                    <tr v-for="(item, index) in data" :key="item.student" @click="getTestHistory(item.student_work)"
+                        class=" cursor-pointer hover:text-blue-500">
                         <td class="px-6 py-4 whitespace-nowrap">{{ index + 1 }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ item.student.name }}</td>
                         <td class="px-6 py-4 whitespace-nowrap" :class="{
@@ -60,15 +61,18 @@ import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
 import { useTeacherStore } from "../../../stores/modules/teacher";
+import router from '../../../router';
 
 export default {
     setup() {
         const data = ref([]);
         const route = useRoute();
         const teacherStore = useTeacherStore();
+
+
         const webSocket = () => {
 
-            const WS = ref(new WebSocket(`ws://localhost:4444/teacher`));
+            const WS = ref(new WebSocket(`ws://192.168.1.11:4444/teacher`));
 
             WS.value.onopen = (event) => {
                 console.log("Connection opened", event);
@@ -97,22 +101,30 @@ export default {
                         WS.value.onmessage = (event) => {
                             let receivedData = JSON.parse(event.data);
                             console.log(receivedData);
-
-                            if (Array.isArray(receivedData)) {
-                                console.log(receivedData)
-                            }
+                            data.value = data.value.map(obj => obj.student_id === receivedData.student_id ? receivedData : obj);
                         };
                     }
                 };
             };
         };
+
         onMounted(async () => {
             data.value = await teacherStore.getStudentTest(route.params.testId);
             webSocket();
         });
+
+
+        const getTestHistory = async (item) => {
+            teacherStore.tmpTest = await item;
+            console.log(item)
+            router.push({
+                name: 'testHistory',
+            });
+        };
         return {
             data,
             webSocket,
+            getTestHistory
         };
     },
 };

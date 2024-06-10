@@ -4,22 +4,24 @@
 
         <div class="flex items-center justify-center min-h-screen">
             <div class="w-full max-w-4xl bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-                <div v-for="(question, index) in paginatedQuestions" :key="index" class="mb-6"
-                    :id="`question-${index+1}`">
-                    <question-box :question="question" :questionIndex="index"
+                <div v-for="(question, index) in paginatedQuestions"
+                    :key="(currentPage-1)*paginatedQuestions.length + index" class="mb-6" :id="`${currentPage}`">
+                    <question-box :question="question"
+                        :questionIndex="(currentPage-1)*paginatedQuestions.length + index "
                         @answer-selected="addAnswer($event, index)" />
                 </div>
                 <div class="text-right ">
                     <a-button @click="showConfirm" class="bg-blue-500 text-white rounded-md">Nộp bài</a-button>
                 </div>
                 <div class="pagination space-x-3">
-                    <a-button @click="prevPage" :disabled="currentPage === 1">Trước</a-button>
+                    <a-button @click="prevPage" :disabled="currentPage === 1 || allow_move">Trước</a-button>
                     <span class=" space-x-3">Trang {{ currentPage }} trên {{ totalPages }}</span>
                     <a-button @click="nextPage" :disabled="currentPage === totalPages">Tiếp theo</a-button>
                 </div>
             </div>
         </div>
     </div>
+
 </template>
 
 <script>
@@ -36,37 +38,49 @@ import { useRouter } from 'vue-router';
 import { useWebSocketStore } from '../../../stores/modules/webSocket';
 import { eventType } from 'ant-design-vue/es/_util/type';
 import { useToast } from 'vue-toastification';
+import { all } from 'axios';
+import Point from './Point.vue';
+import teacher from '../../../apis/modules/teacher';
 export default {
     components: {
         QuestionBox,
-        Timer
+        Timer,
+        Point
     },
     setup() {
-        const studentStore = useStudentStore();
+
         const questions = ref([]);
         const currentPage = ref(1);
-        const questionsPerPage = ref(5);
+        const questionsPerPage = ref(null);
         const duration = ref(null);
         const tabSwitchCount = ref(0);
-        const totalPages = computed(() => Math.ceil(questions.value.length / questionsPerPage.value));
-
+        const totalPages = computed(() => (questions.value.length / questionsPerPage.value));
+        const allow_move = ref(true);
 
 
         const paginatedQuestions = computed(() => {
-            const startIndex = (currentPage.value - 1) * questionsPerPage.value;
-            return questions.value.slice(startIndex, startIndex + questionsPerPage.value);
+            const startIndex = (currentPage.value - 1) * parseInt(questionsPerPage.value);
+            const endIndex = startIndex + parseInt(questionsPerPage.value);
+            // console.log(startIndex)
+            // console.log(endIndex)
+            // console.log(questions.value.slice(startIndex, endIndex))
+            console.log('currentPage.value', currentPage.value);
+
+            return questions.value.slice(startIndex, endIndex);
+
+
         });
 
-        onMounted(async () => {
-            let test = await localStorage.getItem('test');
-            duration.value = localStorage.getItem("duration");
-            const parsedTest = JSON.parse(test);
-            questions.value = parsedTest.student_work;
-        });
+
+
+        const WS = ref(new WebSocket(`ws://192.168.1.11:4444/student`));
+        //  const WS = ref(new WebSocket(`${import.meta.env.WS}/student`));
+
 
         const nextPage = () => {
             if (currentPage.value < totalPages.value) {
                 currentPage.value++;
+
             }
         };
 
@@ -75,6 +89,91 @@ export default {
                 currentPage.value--;
             }
         };
+
+
+        onMounted(async () => {
+            let test = await localStorage.getItem('test');
+            duration.value = localStorage.getItem("duration");
+            allow_move.value = localStorage.getItem("allow_move");
+            questionsPerPage.value = localStorage.getItem("n_page");
+            console.log(questionsPerPage.value)
+            const parsedTest = JSON.parse(test);
+            questions.value = parsedTest.student_work;
+
+            WS.value.onopen = (event) => {
+                console.log("Connection opened", event);
+
+                let token = localStorage.getItem("token");
+
+                let auth = {
+                    command: "AUTHENTICATE",
+                    detail: {
+                        token: token,
+                    },
+                };
+                WS.value.send(JSON.stringify(auth));
+
+                WS.value.onmessage = (event) => {
+                    let data = JSON.parse(event.data);
+                    if (data.message == "Authenticated") {
+                        let join = {
+                            command: "JOIN GROUP TEST",
+                            detail: {
+                                group_test_id: localStorage.getItem("group_test_id"),
+                                password: localStorage.getItem("pass")
+                            }
+                        }
+
+                        WS.value.send(JSON.stringify(join));
+                        WS.value.onmessage = (event) => {
+                            let data = JSON.parse(event.data)
+                            if (data.status == 403) {
+                                useToast().error("Sai mật khẩu");
+                            } else if (data.status == 200) {
+
+                                let get_test = {
+                                    command: "GET TEST"
+                                }
+                                WS.value.send(JSON.stringify(get_test));
+                                WS.value.onmessage = (event) => {
+                                    let data = JSON.parse(event.data);
+                                    if (data.status == 400) {
+                                        useToast().warning("Bạn đã làm bài kiểm tra này")
+                                        // } else if (data.status == 200) {
+                                        //     WS.value.send(JSON.stringify(submitData.value))
+                                        //     WS.value.onmessage = (event) => {
+                                        //         let data = JSON.parse(event.data);
+                                        //         console.log(data);
+                                        //         if (data.status == 200) {
+
+                                        //             localStorage.setItem("score", data.message.score);
+                                        //             localStorage.setItem("violations", tabSwitchCount.value);
+                                        //             router.push('/point');
+
+                                        //         }
+                                        //     }
+                                        // }
+                                    }
+                                }
+                            }
+                        }
+
+
+                    } else {
+                        console.error('Authentication failed:', data.message);
+                    }
+                };
+            }
+
+
+
+        });
+
+
+
+
+
+
 
         //  không nhấn chuột phải
         const contextMenuHandler = (event) => {
@@ -117,7 +216,13 @@ export default {
             if (tabSwitchLim > 0) {
                 if (document.visibilityState === 'hidden') {
                     tabSwitchCount.value++;
-                    if (tabSwitchCount.value > tabSwitchLim) {
+
+                    WS.value.send(JSON.stringify({
+                        command: "VIOLATE",
+
+                    }));
+
+                    if (tabSwitchCount.value >= tabSwitchLim) {
                         submitTest();
 
                     } else {
@@ -126,6 +231,7 @@ export default {
                             content: h('div', { style: 'color:red;' },
                                 `Bạn đã chuyển tab ${tabSwitchCount.value} lần. Nếu chuyển tab quá ${tabSwitchLim} lần, bài kiểm tra sẽ tự động nộp.`,),
                         });
+
                     }
                 }
             }
@@ -142,17 +248,47 @@ export default {
 
 
         const addAnswer = (answer, index) => {
-            console.log({
+            // console.log({
+            //     detail: {
+            //         index: index,
+            //         answer: [answer]
+            //     }
+            // });
+
+            WS.value.send(JSON.stringify({
+                command: "ANSWER",
                 detail: {
                     index: index,
-                    answer: [answer]
+                    answer: answer.answer
                 }
-            });
-        }
-        const submitTest = () => {
+            }));
+            // WS.value.onmessage = (event) => {
+            //     let data = JSON.parse(event.data);
+            //     console.log(data);
+
+            // }
+
+
 
 
         }
+        // const submitTest = () => {
+
+        //     WS.value.send(JSON.stringify({
+        //         command: "SUBMIT TEST",
+
+        //     })); 
+
+        //     WS.value.onmessage = (event) => {
+        //         let data = JSON.parse(event.data);
+        //         console.log(data);
+
+        //     }
+
+
+        // }
+        const router = useRouter();
+
 
         const showConfirm = () => {
             Modal.confirm({
@@ -167,8 +303,29 @@ export default {
                 ),
                 onOk() {
 
-                    submitTest();
-                    //  router.push('/point');
+
+                    WS.value.send(JSON.stringify({
+                        command: "SUBMIT TEST",
+
+                    }));
+
+                    const studentStore = useStudentStore();
+                    WS.value.onmessage = (event) => {
+                        let data = JSON.parse(event.data);
+                        console.log(data.message)
+                        if (data.status == 200) {
+                            studentStore.score = data.message.score;
+                            localStorage.setItem("score", data.message.score);
+                            studentStore.violations = tabSwitchCount.value;
+                            localStorage.setItem("violations", tabSwitchCount.value)
+                            router.push({
+                                name: 'student-point',
+                            });
+
+                        }
+
+                    }
+                    router.push('/point');
                 },
                 onCancel() {
                     console.log('Hủy');
@@ -185,6 +342,10 @@ export default {
             duration,
             tabSwitchCount,
             handleVisibilityChange,
+            showConfirm,
+            allow_move,
+            WS,
+            //submitTest,
             showConfirm,
 
 

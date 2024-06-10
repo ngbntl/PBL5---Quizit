@@ -51,6 +51,8 @@
                             <th class="px-4 py-2 text-center">Bài kiểm tra</th>
                             <th class="px-4 py-2 text-center">Ngày thi</th>
                             <th class="px-4 py-2 text-center">Điểm</th>
+                            <th class="px-4 py-2 text-center">Số lần vi phạm</th>
+
                         </tr>
                     </thead>
                     <tbody class="items-center">
@@ -58,6 +60,8 @@
                             <td class="border px-4 py-2 text-center">{{ record.group_test.name }}</td>
                             <td class="border px-4 py-2 text-center">{{ formatDate(record.start) }}</td>
                             <td class="border px-4 py-2 text-center">{{ record.score*10}}</td>
+                            <td class="border px-4 py-2 text-center">{{ record.violate}}</td>
+
                         </tr>
                     </tbody>
                 </table>

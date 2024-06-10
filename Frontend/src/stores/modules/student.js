@@ -5,6 +5,8 @@ export const useStudentStore = defineStore("student", {
   state: () => ({
     group_test_id: "",
     duration: 0,
+    score: 0,
+    violations: 0,
   }),
 
   actions: {

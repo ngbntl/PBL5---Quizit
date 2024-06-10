@@ -24,9 +24,9 @@
         </div>
 
 
-        <div class="flex justify-end items-center hover:cursor-pointer">
+        <div class="flex     justify-end items-center hover:cursor-pointer">
             <router-link :to="currentProfileRoute">
-                <img :src="'http://localhost:4444/static/'+ profile"
+                <img :src="'http://192.168.1.11:4444/static/'+ profile"
                     class="rounded-full w-12 h-12 text-center absolute transform -translate-x-2/3  top-2">
 
             </router-link>

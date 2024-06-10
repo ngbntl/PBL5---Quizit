@@ -15,6 +15,7 @@ export const useTeacherStore = defineStore("teacher", {
     groupName: "",
     questionId: "",
     testInCollection: [],
+    tmpTest: [],
   }),
 
   actions: {
@@ -261,6 +262,15 @@ export const useTeacherStore = defineStore("teacher", {
     async getStudentTest(group_test_id) {
       try {
         const response = await teacherService.getStudentTest(group_test_id);
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    async getSumary(question_bank_id) {
+      try {
+        const response = await teacherService.getSumary(question_bank_id);
         return response.data;
       } catch (error) {
         console.error(error);

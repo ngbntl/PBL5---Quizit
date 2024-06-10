@@ -41,7 +41,6 @@
 
                 </div>
 
-
                 <div v-for="(num, numindex) in struct.number_of_question" :key="numindex" class="p-4">
                     <div class="flex justify-between mb-2 items-center">
                         <div class="w-1/3  flex items-center">
@@ -105,6 +104,7 @@ export default {
         const questionBanks = ref([])
         const route = useRoute();
         const structure = ref([
+
             {
                 selected_collection: null,
                 questionBanks: [],
@@ -117,6 +117,7 @@ export default {
                 ]
             }
         ]);
+
         const test = computed(() => ({
             collection_id: collection_id.value,
             name: name.value,
@@ -133,11 +134,14 @@ export default {
             structure.value.forEach(async (struct, idx) => {
                 if (struct.selected_collection) {
                     struct.questionBanks = await teacherStore.getQuestionBank(struct.selected_collection);
+
+
                 } else {
                     struct.questionBanks = [];
                 }
             });
         });
+
 
 
         watch(name, (newName) => {
@@ -176,6 +180,8 @@ export default {
         const removeSNumberQuestion = (struct, numindex) => {
             struct.number_of_question.splice(numindex, 1);
         }
+
+
         const showModal = async () => {
             open.value = true;
             collections.value = await teacherStore.getCollections();

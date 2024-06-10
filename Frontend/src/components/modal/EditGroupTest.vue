@@ -119,7 +119,9 @@ export default {
             open.value = true;
         };
         const handleOk = async () => {
-            const updatedData = {};
+            const updatedData = {
+                id: props.test.id
+            };
             Object.keys(data).forEach((key) => {
                 if (key === 'password' && password.value === '') return; // skip empty password
                 if (data[key] !== props.test[key]) {

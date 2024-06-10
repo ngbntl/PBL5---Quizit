@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import Websocket from '../../../components/questionBank/websocket.vue';
 import { useWebSocketStore } from '../../../stores/modules/webSocket';
 import { useToast } from 'vue-toastification';
@@ -41,12 +41,16 @@ export default {
             showPassword.value = !showPassword.value;
         }
 
-        const WS = ref(new WebSocket(`ws://localhost:4444/student`));
+        const WS = ref(new WebSocket(`ws://192.168.1.11:4444/student`));
+
+
 
         WS.value.onopen = (event) => {
             console.log("Connection opened", event);
         };
-
+        onMounted(() => {
+            console.log(`${import.meta.env.WS}student`);
+        });
         const check = () => {
             let token = localStorage.getItem("token");
 
@@ -91,7 +95,7 @@ export default {
 
                                     localStorage.setItem("test", JSON.stringify(data.message.student_test));
                                     let npage = localStorage.getItem('n_page');
-                                    if (npage == 1) {
+                                    if (npage == data.message.student_test.length) {
                                         router.push('/test');
                                     }
                                     else {

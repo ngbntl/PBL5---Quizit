@@ -21,7 +21,7 @@
         <Group :cards="groupHiddens" />
     </div>
 
-    <router-view />
+
 </template>
 
 <script>

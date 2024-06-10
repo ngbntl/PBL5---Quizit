@@ -80,7 +80,7 @@ export default {
             localStorage.setItem('group_test_id', props.test.id);
             window.open('/auth', '_blank', `width=${width},height=${height}`);
             localStorage.setItem('tolerance', props.test.tolerance)
-
+            localStorage.setItem('n_page', props.test.n_page)
 
             loading.value = true;
             setTimeout(() => {
@@ -110,7 +110,7 @@ export default {
         if (isStudentRoute) {
             watchEffect(() => {
                 let testEnded = (new Date(props.test.end) < new Date());
-                let tested = props.history.some(his => props.test.id == his.group_test_id);
+                let tested = props.history.some(his => props.test.id == his.group_test.id);
 
                 console.log(tested)
                 isTestEnded.value = testEnded || tested;

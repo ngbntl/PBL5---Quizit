@@ -4,7 +4,7 @@
             class="m-4 w-60 h-72 bg-slate-100 rounded-3xl text-gray-500 p-4 flex flex-col items-start justify-center gap-3 hover:bg-gray-400 hover:shadow-2xl hover:shadow-sky-400 hover:text-white hover:cursor-pointer transition-shadow">
             <edit-group class="fixed text-end items-end hover:text-white" :group="card" />
             <div class="w-52 h-40 bg-slate-300 rounded-2xl" @click="getGroupId(card.id,card.name)">
-                <img :src="'http://localhost:4444/static/'+card.image_path"
+                <img :src="'http://192.168.1.11:4444/static/'+card.image_path"
                     class=" relative h-full w-full items-center justify-center rounded-md" alt="">
             </div>
             <div class="">
