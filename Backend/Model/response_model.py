@@ -183,6 +183,7 @@ class Res_StudentTest(BaseModel):
     score: float | None = None
     violate: int | None = None
     student: Res_Student | None = None
+    group_test: Res_GroupTest
 
     @classmethod
     def from_DB_model(cls, student_test: StudentTest):
@@ -193,7 +194,8 @@ class Res_StudentTest(BaseModel):
                    , student_work=[Res_StudentWork_Question.from_DB_model(sw) for sw in student_test.student_work] if student_test.student_work else None
                    , score=student_test.score
                    , violate=student_test.violate
-                   , student=Res_Student.from_DB_model(student_test.student))
+                   , student=Res_Student.from_DB_model(student_test.student) if student_test.student else None
+                   , group_test=Res_GroupTest.from_DB_model(student_test.group_test) if student_test.group_test else None) if student_test else None
 
     class Config:
         json_encoders = {

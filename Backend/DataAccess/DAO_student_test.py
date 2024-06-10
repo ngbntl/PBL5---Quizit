@@ -1,7 +1,7 @@
 import pickle
 
 from Backend.DataAccess import get_MS_database
-from Backend.Model.DB_model import StudentTest, Student
+from Backend.Model.DB_model import StudentTest, Student, GroupTest
 
 
 class DAO_student_test:
@@ -43,13 +43,20 @@ class DAO_student_test:
 
     def get_student_test_history(self, student_id: str, group_id: str) -> list[StudentTest]:
         sql = """
-            SELECT st.[group_test_id], gt.[name], st.[start], st.[end], st.[score] FROM
-            (SELECT [group_test_id], [start], [end], [score] FROM [student_test] WHERE [student_id] = %s) st
-            JOIN (SELECT [id], [name] FROM [group_test] WHERE [group_id] = %s) gt on st.[group_test_id] = gt.[id]
+            SELECT st.[start], st.[end], st.[score], st.[violate],
+                   gt.[id], gt.[test_id], gt.[name]
+            FROM student_test st
+            JOIN group_test gt ON st.group_test_id = gt.id
+            WHERE st.student_id = %s AND gt.group_id = %s
         """
         with get_MS_database(True) as cursor:
             cursor.execute(sql, (student_id, group_id))
-            return [StudentTest(row) for row in cursor.fetchall()]
+            arr = []
+            for row in cursor.fetchall():
+                st = StudentTest(start=row['start'], end=row['end'], score=row['score'], violate=row['violate'])
+                st.group_test = GroupTest(id=row['id'], test_id=row['test_id'], name=row['name'])
+                arr.append(st)
+            return arr
 
     # UPDATE
     def submit(self, data: StudentTest):
