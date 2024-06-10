@@ -1,1 +1,2 @@
-print("i am admin")
+print("i am admin and i can edit everything")
+
