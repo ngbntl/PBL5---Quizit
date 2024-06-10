@@ -183,7 +183,7 @@ class Res_StudentTest(BaseModel):
     score: float | None = None
     violate: int | None = None
     student: Res_Student | None = None
-    group_test: Res_GroupTest
+    group_test: Res_GroupTest | None = None
 
     @classmethod
     def from_DB_model(cls, student_test: StudentTest):
