@@ -55,9 +55,12 @@ export default {
 
 
         const tabSwitchCount = ref(0);
+
         duration.value = localStorage.getItem("duration");
         const selectedQuestion = ref(null);
 
+
+        // popup cảnh báo khi đóng cửa sổ
         onMounted(() => {
             window.addEventListener('beforeunload', handleBeforeUnload);
         });
@@ -73,18 +76,7 @@ export default {
 
 
 
-
-
-        const answeredQuestions = ref([]); // Mảng để theo dõi các câu hỏi đã được trả lời
-
-        const addAnswer = (payload) => {
-            const { questionId, answer } = payload;
-            student_answer.value[questionId] = answer;
-            selectedQuestion.value = questionId;
-            answeredQuestions.value.push(questionId); // Thêm câu hỏi vào mảng câu hỏi đã trả lời
-        }
-
-
+        //  chặn chuột phải
         const contextMenuHandler = (event) => {
             event.preventDefault();
 
@@ -99,11 +91,32 @@ export default {
         });
 
 
+        //chặn phím
+        window.addEventListener('keydown', function (e) {
+            if (e.key === 'F5' || e.key === 'Ctrl' || e.key === 'Tab') {
+                e.preventDefault();
+            }
+        });
+
+
+
+
         const WS = ref(new WebSocket(`ws://localhost:4444/student`));
 
         WS.value.onopen = (event) => {
             console.log("Connection opened", event);
         };
+
+
+        const answeredQuestions = ref([]); // Mảng để theo dõi các câu hỏi đã được trả lời
+
+        const addAnswer = (payload) => {
+            const { questionId, answer } = payload;
+            student_answer.value[questionId] = answer;
+            selectedQuestion.value = questionId;
+            answeredQuestions.value.push(questionId); // Thêm câu hỏi vào mảng câu hỏi đã trả lời
+        }
+
 
 
 
@@ -197,7 +210,7 @@ export default {
             document.addEventListener('visibilitychange', handleVisibilityChange);
         });
 
-
+        // đếm số lần chuyển tab
         const handleVisibilityChange = () => {
             let tabSwitchLim = localStorage.getItem('tolerance')
             if (tabSwitchLim > 0) {
@@ -215,15 +228,21 @@ export default {
                 }
             }
         };
+
+
+
         onUnmounted(() => {
             document.removeEventListener('visibilitychange', handleVisibilityChange);
         });
+
+
         const goToQuestion = (index) => {
             const questionElement = document.getElementById(`question-${index}`);
             if (questionElement) {
                 questionElement.scrollIntoView({ behavior: 'smooth' });
             }
         };
+
         const router = useRouter();
         const showConfirm = () => {
             Modal.confirm({
@@ -247,11 +266,7 @@ export default {
                 class: 'test',
             });
         };
-        window.addEventListener('keydown', function (e) {
-            if (e.key === 'F5' || e.key === 'Ctrl' || e.key === 'Tab') {
-                e.preventDefault();
-            }
-        });
+
         return {
             cheatingDetected,
             questions,

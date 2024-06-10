@@ -257,6 +257,16 @@ export const useTeacherStore = defineStore("teacher", {
         useToast().error("Cập nhật thất bại");
       }
     },
+
+    async getStudentTest(group_test_id) {
+      try {
+        const response = await teacherService.getStudentTest(group_test_id);
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
     //profile
     async getInfor() {
       try {

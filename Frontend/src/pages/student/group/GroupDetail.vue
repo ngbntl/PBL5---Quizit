@@ -31,7 +31,7 @@
             </div>
             <div class="flex flex-wrap justify-between" v-show="showTests">
                 <TestCard class="m-2 max-w-xs" :history="history" :test="test" v-for="test in tests" :key="test.id"
-                    @click="getGroupTestId(test.id, test.duration)" />
+                    @click="getGroupTestId(test.id, test.duration, test.n_page,test.allow_move)" />
             </div>
 
         </div>
@@ -101,10 +101,13 @@ export default {
         }
 
 
-        const getGroupTestId = (group_test_id, duration) => {
+        const getGroupTestId = (group_test_id, duration, n_page, allow_move) => {
             studentStore.group_test_id = group_test_id;
             localStorage.setItem("duration", duration);
             localStorage.setItem("group_test_id", group_test_id);
+            localStorage.setItem("n_page", n_page);
+            localStorage.setItem("allow_move", allow_move);
+
         }
         const toggleTests = () => {
             showTests.value = !showTests.value;

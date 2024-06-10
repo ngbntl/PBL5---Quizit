@@ -81,6 +81,19 @@
                         class="w-2/3 px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:shadow-outline" />
                 </div>
             </div>
+            <div class="grid grid-cols-2">
+
+                <div class="flex items-center p-4 ">
+                    <label class="w-1/3 ">Số câu trong 1 trang: </label>
+                    <input type="number" v-model="n_page" min="0"
+                        class="w-2/3 px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:shadow-outline" />
+                </div>
+                <div class="flex items-center p-4 ">
+                    <label class="w-1/3 ">Quay lại trang trước: </label>
+                    <input type="checkbox" v-model="allow_move"
+                        class="w-2/3 h-6 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
+                </div>
+            </div>
 
         </a-modal>
     </div>
@@ -121,6 +134,8 @@ export default {
         const testId = ref('')
         const collections = ref([])
         const showPassword = ref(false);
+        const n_page = ref(1);
+        const allow_move = ref(true);
 
         const duration = ref('')
         const shuffle = ref(false)
@@ -137,12 +152,15 @@ export default {
             duration: duration.value,
             shuffle: shuffle.value,
             password: password.value,
-            tolerance: tolerance.value
+            tolerance: tolerance.value,
+            n_page: n_page.value,
+            allow_move: allow_move.value
+
         });
         const togglePasswordVisibility = () => {
             showPassword.value = !showPassword.value;
         };
-        watch([name, testId, startTime, endTime, duration, shuffle, password, tolerance], () => {
+        watch([name, testId, startTime, endTime, duration, shuffle, password, tolerance, n_page, allow_move], () => {
             data.value = {
                 group_id: router.currentRoute.value.params.id,
                 test_id: testId.value,
@@ -152,7 +170,9 @@ export default {
                 duration: duration.value,
                 shuffle: shuffle.value,
                 password: password.value,
-                tolerance: tolerance.value
+                tolerance: tolerance.value,
+                n_page: n_page.value,
+                allow_move: allow_move.value
 
             };
         }, { immediate: true, deep: true });
@@ -207,6 +227,8 @@ export default {
             showPassword,
             password,
             tolerance,
+            n_page,
+            allow_move,
             togglePasswordVisibility,
             formatDate,
             showModal,

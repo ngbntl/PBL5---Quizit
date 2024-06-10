@@ -193,9 +193,9 @@ export default {
       },
     });
   },
-  getHistory(group_tests) {
+  getStudentTest(group_test_id) {
     return Api().get(
-      `teacher/grouptest/studentpoint?group_test_id=${group_tests}`,
+      `teacher/grouptest/student_test?group_test_id=${group_test_id}`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -203,6 +203,7 @@ export default {
       }
     );
   },
+
   //profile
   getInfor() {
     return Api().get(`teacher/`, {

@@ -61,6 +61,12 @@ const student = [
     component: () => import("../pages/student/test/Test.vue"),
   },
   {
+    path: "/nPagetest",
+    name: "student-nPagetest",
+    component: () => import("../pages/student/test/nPageTest.vue"),
+  },
+
+  {
     path: "/point",
     name: "student-point",
     component: () => import("../pages/student/test/Point.vue"),
