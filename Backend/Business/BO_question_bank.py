@@ -42,3 +42,8 @@ class BO_question_bank:
         if self.dao_collection.check_owner(self.dao_question_bank.get_collection_id(data.id), teacher_id) is False:
             raise Exception(f"teacher {teacher_id} is not the owner of question bank {data.id}")
         self.dao_question_bank.update_name(question_bank_id=data.id, name=data.name)
+
+    def delete_question_bank(self, teacher_id: str, data: Req_QuestionBank):
+        if self.dao_collection.check_owner(self.dao_question_bank.get_collection_id(data.id), teacher_id) is False:
+            raise Exception(f"teacher {teacher_id} is not the owner of question bank {data.id}")
+        self.dao_question_bank.delete_bank(id=data.id)

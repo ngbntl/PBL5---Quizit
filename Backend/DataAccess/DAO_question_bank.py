@@ -40,3 +40,8 @@ class DAO_question_bank:
     def update_name(self, question_bank_id: str, name: str):
         with get_MS_database(False) as cursor:
             cursor.execute("UPDATE [question_bank] SET [name] = %s WHERE [id] = %s", (name, question_bank_id))
+
+
+    def delete_bank(self, id: str):
+        with get_MS_database(False) as cursor:
+            cursor.execute("DELETE from [question_bank] WHERE [id] = %s", (id))
