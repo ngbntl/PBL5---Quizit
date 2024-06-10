@@ -37,3 +37,9 @@ class BO_group:
             self.dao_group.update_visibility(group_id=data.id, is_show=data.is_show)
         if data.name is not None:
             self.dao_group.update_group_name(group_id=data.id, name=data.name)
+
+    def delete_group(self, teacher_id: str, data: Req_Group):
+        if self.dao_group.check_owner(data.id, teacher_id) is False:
+            raise Exception(f"Group {data.id} is not belong to teacher {teacher_id}!")
+        if data.name is not None:
+            self.dao_collection.delete_group(id=data.id)

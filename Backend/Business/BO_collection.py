@@ -30,3 +30,9 @@ class BO_collection:
             raise Exception(f"Collection {data.id} is not belong to teacher {teacher_id}!")
         if data.name is not None:
             self.dao_collection.update_name(id=data.id, name=data.name)
+
+    def delete_collection(self, teacher_id: str, data: Req_Collection):
+        if self.dao_collection.check_owner(collection_id=data.id, teacher_id=teacher_id) is False:
+            raise Exception(f"Collection {data.id} is not belong to teacher {teacher_id}!")
+        if data.name is not None:
+            self.dao_collection.delete_collection(id=data.id)

@@ -39,3 +39,7 @@ class DAO_collection:
     def update_name(self, id: str, name: str) -> None:
         with get_MS_database(False) as cursor:
             cursor.execute("UPDATE [collection] SET [name]=%s WHERE [id]=%s", (name, id))
+
+    def delete_collection(self, id: str) -> None:
+        with get_MS_database(False) as cursor:
+            cursor.execute("DELETE FROM [collection] WHERE [id]=%s", (id))

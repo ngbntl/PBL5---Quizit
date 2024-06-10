@@ -42,3 +42,7 @@ class DAO_group:
     def update_group_name(self, group_id: str, name: str):
         with get_MS_database(False) as cursor:
             cursor.execute("UPDATE [group] SET [name] = %s WHERE [id] = %s", (name, group_id))
+
+    def delete_group(self, id:str):
+        with get_MS_database(False) as cursor:
+            cursor.execute("DELETE FROM [group] WHERE [id]=%s", (id))
