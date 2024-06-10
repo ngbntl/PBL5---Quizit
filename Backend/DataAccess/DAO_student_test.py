@@ -23,7 +23,7 @@ class DAO_student_test:
                 WHERE s.[id] IN (SELECT [student_id] FROM [group_student] WHERE [group_id] = (SELECT [group_id] FROM [group_test] WHERE [id]=%s))
             """
             cursor.execute(SQL, (group_test_id,))
-            return [StudentTest(row).set_student(Student(row)) for row in cursor.fetchall()]
+            return [StudentTest(student_id=row['id'], **row).set_student(Student(row)) for row in cursor.fetchall()]
 
     def get_student_test(self, group_test_id: str, student_id: str) -> StudentTest:
         with get_MS_database(True) as cursor:
