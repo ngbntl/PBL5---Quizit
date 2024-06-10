@@ -35,7 +35,7 @@ class BO_group:
         if data.teacher_id is None:
             raise Exception("teacher_id is required!")
         group = data.to_DB_model()
-        group.image_path = random.choice(os.listdir(os.path.join(STATIC_PATH, 'Group', 'Images')))
+        group.image_path = os.path.join('Group', 'Images', random.choice(os.listdir(os.path.join(STATIC_PATH, 'Group', 'Images'))))
         return self.dao_group.insert_group(group)
 
     # UPDATE
