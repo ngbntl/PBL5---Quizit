@@ -23,7 +23,7 @@ async def insert_group_test(teacher: Annotated[Teacher, Depends(get_current_user
                             data: Annotated[Req_GroupTest, Body()],
                             group_test_service: Annotated[BO_group_test, Depends()]):
     try:
-        return group_test_service.insert_group_test(teacher.id, data)
+        return group_test_service.inserpt_group_test(teacher.id, data)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 

@@ -83,6 +83,12 @@ class DAO_group_test:
             if data.hash_pswd is not None:
                 placeholder.append("[hash_pswd] = %s")
                 values += (data.hash_pswd,)
+            if data.n_page is not None:
+                placeholder.append("[n_page] = %s")
+                values += (data.n_page,)
+            if data.allow_move is not None:
+                placeholder.append("[allow_move] = %s")
+                values += (data.allow_move,)
 
             if len(placeholder) == 0:
                 return

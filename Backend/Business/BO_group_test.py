@@ -131,12 +131,14 @@ class BO_group_test:
             raise Exception(f"Teacher {teacher_id} is not the owner of group {group_test.group_id}")
 
         group_test.name = data.name if data.name is not None else None
+        group_test.hash_pswd = bcrypt_context.hash(data.password) if data.password is not None else None
         group_test.start = data.start if data.start is not None else None
         group_test.end = data.end if data.end is not None else None
         group_test.duration = data.duration if data.duration is not None else None
         group_test.shuffle = data.shuffle if data.shuffle is not None else None
         group_test.tolerance = data.tolerance if data.tolerance is not None else None
-        group_test.hash_pswd = bcrypt_context.hash(data.password) if data.password is not None else None
+        group_test.n_page = data.n_page if data.n_page is not None else None
+        group_test.allow_move = data.allow_move if data.allow_move is not None else None
 
         self.dao_group_test.update_group_test(group_test)
 
