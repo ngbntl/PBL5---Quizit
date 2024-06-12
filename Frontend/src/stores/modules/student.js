@@ -66,6 +66,14 @@ export const useStudentStore = defineStore("student", {
         console.error(error);
       }
     },
+    async updateAvatar(formData) {
+      try {
+        const response = await studentService.updateAvatar(formData);
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
 
     //Test
     async getTest(group_test_id) {

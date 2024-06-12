@@ -8,7 +8,7 @@
                     :key="(currentPage-1)*paginatedQuestions.length + index" class="mb-6" :id="`${currentPage}`">
                     <question-box :question="question"
                         :questionIndex="(currentPage-1)*paginatedQuestions.length + index "
-                        @answer-selected="addAnswer($event, index)" />
+                        @answer-selected="addAnswer($event, (currentPage-1)*paginatedQuestions.length + index)" />
                 </div>
                 <div class="text-right ">
                     <a-button @click="showConfirm" class="bg-blue-500 text-white rounded-md">Nộp bài</a-button>
@@ -41,6 +41,7 @@ import { useToast } from 'vue-toastification';
 import { all } from 'axios';
 import Point from './Point.vue';
 import teacher from '../../../apis/modules/teacher';
+import student from '../../../apis/modules/student';
 export default {
     components: {
         QuestionBox,
@@ -72,10 +73,8 @@ export default {
         });
 
 
-
-        const WS = ref(new WebSocket(`ws://192.168.1.11:4444/student`));
-        //  const WS = ref(new WebSocket(`${import.meta.env.WS}/student`));
-
+        let url = import.meta.env.VITE_APP_WS;
+        const WS = ref(new WebSocket(url + 'student'));
 
         const nextPage = () => {
             if (currentPage.value < totalPages.value) {
@@ -213,17 +212,36 @@ export default {
         // đếm số lần chuyển tab
         const handleVisibilityChange = () => {
             let tabSwitchLim = localStorage.getItem('tolerance')
-            if (tabSwitchLim > 0) {
+            if (tabSwitchLim > 1) {
                 if (document.visibilityState === 'hidden') {
                     tabSwitchCount.value++;
 
                     WS.value.send(JSON.stringify({
                         command: "VIOLATE",
-
                     }));
+                    WS.value.onmessage = (event) => {
+                        let data = JSON.parse(event.data);
+                        console.log(data);
+                        const studentStore = useStudentStore();
+                        if (data.message.score) {
+                            console.log(data.message.score)
+                            studentStore.score = data.message.score;
+                            studentStore.violations = tabSwitchLim;
+                            localStorage.setItem("score", data.message.score);
+                            localStorage.setItem("violations", tabSwitchLim)
+
+                        }
+                    }
 
                     if (tabSwitchCount.value >= tabSwitchLim) {
-                        submitTest();
+
+                        router.push({
+                            name: 'student-point',
+                            // params: {
+                            //     score: data.message.score,
+                            //     violations: tabSwitchCount.value
+                            // }
+                        });
 
                     } else {
                         Modal.warning({
@@ -288,7 +306,35 @@ export default {
 
         // }
         const router = useRouter();
+        const submitTest = () => {
+            WS.value.send(JSON.stringify({
+                command: "SUBMIT TEST",
 
+            }));
+
+            const studentStore = useStudentStore();
+            WS.value.onmessage = (event) => {
+                let data = JSON.parse(event.data);
+                console.log(data.message)
+
+                if (data.status == 200) {
+                    studentStore.score = data.message.score;
+                    localStorage.setItem("score", data.message.score);
+                    studentStore.violations = tabSwitchCount.value;
+                    localStorage.setItem("violations", tabSwitchCount.value)
+                    router.push({
+                        name: 'student-point',
+                        // params: {
+                        //     score: data.message.score,
+                        //     violations: tabSwitchCount.value
+                        // }
+                    });
+
+                }
+
+            }
+
+        }
 
         const showConfirm = () => {
             Modal.confirm({
@@ -303,29 +349,8 @@ export default {
                 ),
                 onOk() {
 
+                    submitTest();
 
-                    WS.value.send(JSON.stringify({
-                        command: "SUBMIT TEST",
-
-                    }));
-
-                    const studentStore = useStudentStore();
-                    WS.value.onmessage = (event) => {
-                        let data = JSON.parse(event.data);
-                        console.log(data.message)
-                        if (data.status == 200) {
-                            studentStore.score = data.message.score;
-                            localStorage.setItem("score", data.message.score);
-                            studentStore.violations = tabSwitchCount.value;
-                            localStorage.setItem("violations", tabSwitchCount.value)
-                            router.push({
-                                name: 'student-point',
-                            });
-
-                        }
-
-                    }
-                    router.push('/point');
                 },
                 onCancel() {
                     console.log('Hủy');
@@ -345,7 +370,7 @@ export default {
             showConfirm,
             allow_move,
             WS,
-            //submitTest,
+            submitTest,
             showConfirm,
 
 

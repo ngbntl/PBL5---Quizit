@@ -16,6 +16,7 @@ export const useTeacherStore = defineStore("teacher", {
     questionId: "",
     testInCollection: [],
     tmpTest: [],
+    state: null,
   }),
 
   actions: {
@@ -262,6 +263,7 @@ export const useTeacherStore = defineStore("teacher", {
     async getStudentTest(group_test_id) {
       try {
         const response = await teacherService.getStudentTest(group_test_id);
+        this.state = response.data;
         return response.data;
       } catch (error) {
         console.error(error);
@@ -285,6 +287,24 @@ export const useTeacherStore = defineStore("teacher", {
         return response.data;
       } catch (error) {
         console.error(error);
+      }
+    },
+    async updateAvatar(formData) {
+      try {
+        const response = await teacherService.updateAvatar(formData);
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async updateInfor(data) {
+      try {
+        const response = await teacherService.updateInfor(data);
+        useToast().success("Cập nhật thành công");
+        return response.data;
+      } catch (error) {
+        console.error(error);
+        useToast().error("Cập nhật thất bại");
       }
     },
   },

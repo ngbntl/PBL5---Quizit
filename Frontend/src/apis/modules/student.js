@@ -52,6 +52,15 @@ export default {
     });
   },
 
+  updateAvatar(formData) {
+    return Api().put(`student/avatar`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+  },
+
   //Test
   getTest(group_test_id) {
     return Api().get(

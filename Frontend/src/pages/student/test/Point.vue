@@ -8,7 +8,7 @@
     </div>
 </template>
 <script>
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref, watchEffect } from 'vue';
 import { useStudentStore } from '../../../stores/modules/student';
 
 export default {
@@ -24,9 +24,11 @@ export default {
         };
 
         onMounted(async () => {
-            score.value = await localStorage.getItem("score");
-            violations.value = await localStorage.getItem("violations");
-            window.addEventListener('beforeunload', clearLocalStorage);
+            score.value = localStorage.getItem("score");
+            violations.value = localStorage.getItem("violations");
+            // console.log(score.value)
+            location.reload();
+
         });
 
         onUnmounted(() => {

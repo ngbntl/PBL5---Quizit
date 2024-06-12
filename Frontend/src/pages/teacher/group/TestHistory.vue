@@ -18,19 +18,17 @@
                 </p>
                 <div v-if="question.attachment">
                     <div v-for="(file, index) in question.attachment" :key="index">
-                        <img v-if="file.endsWith('.jpg') || file.endsWith('.png')"
-                            :src="'http://192.168.1.11:4444/static/'+ file" class="p-10 w-1/2" />
-                        <audio class="ml-4" v-else-if="file.endsWith('.mp3')" controls
-                            :src="'http://192.168.1.11:4444/static/'+ file">
+                        <img v-if="file.endsWith('.jpg') || file.endsWith('.png')" :src="imgUrl+'static/'+ file"
+                            class="p-10 w-1/2" />
+                        <audio class="ml-4" v-else-if="file.endsWith('.mp3')" controls :src="imgUrl+'static/'+ file">
                             Your browser does not support the audio element.
                         </audio>
                     </div>
                 </div>
                 <p class="ml-4 font-bold">
                     Đáp án: </p>
-                <answer :answers="question.answer" class="p-4" />
-                <p class="ml-4 mb-4 font-bold">
-                    độ khó: {{ question.difficulty }}</p>
+                <student-answer :answers="question.answer" :studentAnswer="question.student_answer" class="p-4" />
+
 
 
             </div>
@@ -43,22 +41,27 @@
 import { useTeacherStore } from '../../../stores/modules/teacher';
 import { ref, onMounted } from 'vue';
 
-import Answer from '../../../components/answer/Answer.vue';
+
+import StudentAnswer from '../../../components/answer/StudentAnswer.vue';
 export default {
 
-    components: { Answer },
+    components: { StudentAnswer },
 
     setup() {
         const test = ref(null);
 
         const teacherStore = useTeacherStore();
+        const imgUrl = import.meta.env.VITE_APP_API;
 
         onMounted(async () => {
             test.value = await teacherStore.tmpTest;
             console.log(test.value.student_work)
         })
 
-        return { test };
+        return {
+            test,
+            imgUrl
+        };
 
     }
 

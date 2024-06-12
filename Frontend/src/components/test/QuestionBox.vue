@@ -5,10 +5,9 @@
 
         <div v-if="question.attachment">
             <div v-for="(file, index) in question.attachment" :key="index">
-                <img v-if="file.endsWith('.jpg') || file.endsWith('.png')"
-                    :src="'http://192.168.1.11:4444/static/'+ file" class="p-10 w-1/2" />
-                <audio class="ml-4" v-else-if="file.endsWith('.mp3')" controls
-                    :src="'http://192.168.1.11:4444/static/'+ file">
+                <img v-if="file.endsWith('.jpg') || file.endsWith('.png')" :src="imgUrl + 'static/'+ file"
+                    class="p-10 w-1/2" />
+                <audio class="ml-4" v-else-if="file.endsWith('.mp3')" controls :src="imgUrl + 'static/'+ file">
                     Your browser does not support the audio element.
                 </audio>
             </div>
@@ -38,6 +37,9 @@ export default {
         const userAnswers = ref({});
         userAnswers.value[props.question.id] = [];
         const studentAnswers = ref([]);
+
+
+        const imgUrl = import.meta.env.VITE_APP_API;
         const selectAnswer = (index, event) => {
             const inputElement = event.target.querySelector('input');
             if (inputElement) {
@@ -65,6 +67,7 @@ export default {
         return {
             question: ref(props.question),
             userAnswers,
+            imgUrl,
             studentAnswers,
             selectAnswer
         }

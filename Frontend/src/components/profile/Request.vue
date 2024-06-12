@@ -1,7 +1,7 @@
 <template>
     <div class="bg-gray-100 p-4 rounded-lg shadow-md m-4 flex items-center justify-between">
         <div class="flex items-center">
-            <img :src="'http://localhost:4444/static/'+ user.avatar_path" class="rounded-full w-64 h-64 text-center">
+            <img :src="imgUrl+'static/'+ user.avatar_path" class="rounded-full w-64 h-64 text-center">
             <div class="ml-4">
                 <h2 class="text-xl font-bold">{{ student.name }}</h2>
                 <p class="text-gray-600">{{ student.email }}</p>
@@ -33,6 +33,7 @@ export default {
         const studentId = ref({
             student_id: []
         });
+        const imgUrl = import.meta.env.VITE_APP_API;
         const acceptStudent = (id) => {
             studentId.value.student_id.push(id);
             teacherStore.addStudent(studentId.value, teacherStore.groupId);
@@ -43,6 +44,7 @@ export default {
         }
         return {
             studentId,
+            imgUrl,
             acceptStudent, deleteStudent
         }
     }

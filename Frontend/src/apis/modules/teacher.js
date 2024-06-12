@@ -154,7 +154,7 @@ export default {
     });
   },
   updateGroup(group) {
-    return Api().put(`teacher/group/update`, group, {
+    return Api().patch(`teacher/group/update`, group, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -218,6 +218,21 @@ export default {
   //profile
   getInfor() {
     return Api().get(`teacher/`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+  },
+  updateAvatar(formData) {
+    return Api().put(`teacher/avatar`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+  },
+  updateProfile(data) {
+    return Api().put(`teacher/information`, data, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },

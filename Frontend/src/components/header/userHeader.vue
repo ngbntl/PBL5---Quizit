@@ -26,7 +26,7 @@
 
         <div class="flex     justify-end items-center hover:cursor-pointer">
             <router-link :to="currentProfileRoute">
-                <img :src="'http://192.168.1.11:4444/static/'+ profile"
+                <img :src="img+'static/'+ profile"
                     class="rounded-full w-12 h-12 text-center absolute transform -translate-x-2/3  top-2">
 
             </router-link>
@@ -51,6 +51,8 @@ export default {
         const profile = ref(null);
         const studentStore = useStudentStore();
         const teacherStore = useTeacherStore();
+
+        const img = import.meta.env.VITE_APP_API;
         const currentProfileRoute = computed(() => {
             console.log(route.path)
             return route.path.startsWith('/student') ? { name: 'student - profile' } : { name: 'teacher-profile' };
@@ -70,6 +72,7 @@ export default {
         return {
             currentProfileRoute,
             profile,
+            img
 
         };
     }

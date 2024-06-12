@@ -40,11 +40,8 @@
               'text-yellow-500': item.start != null && item.end == null ,
             }">
                             {{
-                            item.start === null
-                            ? "Chưa tham gia"
-                            : (item.start != null && item.end == null)
-                            ? "Đang làm bài"
-                            : "Đã hoàn thành"
+                            item.state !== undefined ? item.state :
+                            (item.start === null ? "Chưa tham gia" : (item.end === null) ? "Đang làm" : "Đã hoàn thành")
                             }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ item.score*10 }}</td>
@@ -57,11 +54,10 @@
     </div>
 </template>
 <script>
-import { onMounted, ref } from "vue";
+import { ref, onMounted, computed, watchEffect } from "vue";
 import { useRoute } from "vue-router";
-
 import { useTeacherStore } from "../../../stores/modules/teacher";
-import router from '../../../router';
+import router from "../../../router";
 
 export default {
     setup() {
@@ -69,43 +65,58 @@ export default {
         const route = useRoute();
         const teacherStore = useTeacherStore();
 
-
         const webSocket = () => {
-
-            const WS = ref(new WebSocket(`ws://192.168.1.11:4444/teacher`));
-
-            WS.value.onopen = (event) => {
-                console.log("Connection opened", event);
-
+            const WS = new WebSocket(`${import.meta.env.VITE_APP_WS}teacher`);
+            WS.onopen = (event) => {
                 let token = localStorage.getItem("token");
-
                 let auth = {
                     command: "AUTHENTICATE",
                     detail: {
                         token: token,
                     },
                 };
-                WS.value.send(JSON.stringify(auth));
-
-                WS.value.onmessage = (event) => {
+                WS.send(JSON.stringify(auth));
+                WS.onmessage = (event) => {
                     let receivedData = JSON.parse(event.data);
-                    if (receivedData.message == "Authenticated") {
-                        console.log(route.params);
-                        let join = {
+                    let joingr;
+                    if (receivedData.status === 200) {
+                        joingr = {
                             command: "JOIN GROUP TEST",
                             detail: {
                                 group_test_id: route.params.testId,
-                            },
-                        };
-                        WS.value.send(JSON.stringify(join));
-                        WS.value.onmessage = (event) => {
-                            let receivedData = JSON.parse(event.data);
-                            console.log(receivedData);
-                            data.value = data.value.map(obj => obj.student_id === receivedData.student_id ? receivedData : obj);
-                        };
+                            }
+                        }
                     }
+                    WS.send(JSON.stringify(joingr));
+                    WS.onmessage = (event) => {
+                        let receivedData = JSON.parse(event.data);
+                        if (receivedData.status === 200) {
+                            WS.onmessage = (event) => {
+                                let receivedData = JSON.parse(event.data);
+                                //6console.log(receivedData);
+
+                                data.value.forEach((stu) => {
+                                    console.log(stu)
+                                    if (stu.student.id == receivedData.student.id) {
+                                        stu.violate = receivedData.violate;
+                                        if (receivedData.score) {
+                                            stu.score = receivedData.score;
+                                        }
+                                        if (receivedData.state === "WORKING") {
+                                            stu.state = 'Đang làm'
+                                        } else if (receivedData.state === "SUBMIT") {
+                                            stu.state = "Đã nộp bài"
+                                        }
+
+                                    }
+                                })
+
+                            };
+                        };
+                    };
                 };
             };
+
         };
 
         onMounted(async () => {
@@ -113,18 +124,16 @@ export default {
             webSocket();
         });
 
-
         const getTestHistory = async (item) => {
-            teacherStore.tmpTest = await item;
-            console.log(item)
-            router.push({
-                name: 'testHistory',
-            });
+            teacherStore.tmpTest = item;
+            if (item) {
+                router.push({ name: "testHistory" });
+            }
         };
+
         return {
             data,
-            webSocket,
-            getTestHistory
+            getTestHistory,
         };
     },
 };

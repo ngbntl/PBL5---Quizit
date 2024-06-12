@@ -41,7 +41,8 @@ export default {
             showPassword.value = !showPassword.value;
         }
 
-        const WS = ref(new WebSocket(`ws://192.168.1.11:4444/student`));
+        let url = import.meta.env.VITE_APP_WS;
+        const WS = ref(new WebSocket(url + 'student'));
 
 
 
